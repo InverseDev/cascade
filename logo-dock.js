@@ -24,14 +24,14 @@
     cover.setAttribute('data-logo-cover', '');
     host.prepend(cover);
   }
-  const DIST = 380;                                   // px of scrolling the flight takes
+  const DIST = 520;                                   // px of scrolling the flight takes
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const wide = matchMedia('(min-width: 861px)');
   const lerp = (a, b, t) => a + (b - a) * t;
   const ease = t => 1 - (1 - t) ** 3;
   const css = document.createElement('style');
   css.textContent =
-    '.cm-fly{position:fixed;left:0;top:0;z-index:1301;max-width:none;height:auto;box-sizing:border-box;' +
+    '.cm-fly{position:fixed;left:0;top:0;z-index:2147483647;max-width:none;height:auto;box-sizing:border-box;' +
     'transform-origin:0 0;pointer-events:none;will-change:transform;filter:drop-shadow(0 8px 18px rgba(35,70,90,.14));' +
     'animation:cm-fly-in .9s .15s cubic-bezier(.22,1,.36,1) both}' +
     '@keyframes cm-fly-in{from{opacity:0}}' +
