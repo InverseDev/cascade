@@ -98,3 +98,22 @@
   html body.history-page .alarm-brand-logo{height:30px}
   html body.history-page .summary-card strong{font-size:26px}
 }
+
+
+/* Compact phone layout: retain all History & Reports controls without oversized gaps. */
+@media (max-width: 767px) {
+  html body.history-page .history-container { margin: 14px auto 24px !important; width: calc(100% - 24px) !important; }
+  html body.history-page .history-title { gap: 10px !important; margin-bottom: 14px !important; }
+  html body.history-page .history-title h1 { margin: 6px 0 !important; }
+  html body.history-page .history-summary { gap: 8px !important; margin-bottom: 12px !important; }
+  html body.history-page .summary-card { padding: 11px 10px 12px !important; }
+  html body.history-page .history-main-card { padding: 12px !important; }
+  html body.history-page .history-toolbar { margin-bottom: 10px !important; }
+  html body.history-page .history-search { margin-bottom: 10px !important; }
+  html body.history-page .history-filters { gap: 10px !important; margin-bottom: 10px !important; }
+  html body.history-page .history-date-filters { gap: 8px !important; }
+  html body.history-page .history-day-heading { padding-top: 12px !important; }
+  html body.history-page .history-entry { padding: 10px 3px !important; }
+  html body.history-page .cascade-footer { padding-top: 22px !important; }
+  html body.history-page .cascade-footer-inner { gap: 16px 12px !important; padding-bottom: 18px !important; }
+}
