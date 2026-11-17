@@ -1,0 +1,624 @@
+// Cascade live dashboard — real Supabase sensor readings, no demo simulation.
+const CASCADE_CONFIG = window.CASCADE_CONFIG || {};
+let waterLevel = null;
+let distanceCm = null;
+let motorStatus = "unknown";
+let sensorOnline = false;
+let latestReadingAt = null;
+let cutoffLevel = 90;
+let lowWaterLevel = 20;
+let previousLowState = false;
+let previousConnectionState = "waiting";
+let readingRequestInProgress = false;
+let cascadeSupabase = null;
+let motorAuthSession = null;
+let motorCommandInFlight = false;
+let scene, camera, renderer, waterMesh, waterGeometry, waterPositions, animationFrame;
+let threeReady = false;
+
+function setConnectionState(state, label) {
+  const badge = document.getElementById("connectionStatus");
+  const labelNode = document.getElementById("connectionLabel");
+  const heroText = document.getElementById("heroConnectionText");
+  if (badge) badge.dataset.state = state;
+  if (labelNode) labelNode.textContent = label;
+  if (heroText) {
+    heroText.textContent = state === "live" ? "Device connected" :
+      state === "offline" ? "Device offline" :
+      state === "error" ? "Connection error" :
+      state === "setup" ? "Setup required" : "Waiting for sensor";
+  }
+}
+
+function updateDashboard() {
+  updateMotorControls();
+  const waitingForReading = waterLevel === null || !Number.isFinite(waterLevel);
+  const pct = waitingForReading ? null : Math.max(0, Math.min(100, waterLevel));
+  const percentText = waitingForReading ? "--%" : `${pct.toFixed(1)}%`;
+  const distanceText = Number.isFinite(distanceCm) ? `Distance: ${distanceCm.toFixed(2)} cm` : "Distance: -- cm";
+
+  ["waterLevel", "tankReading", "heroPercent"].forEach(id => {
+    const node = document.getElementById(id);
+    if (node) node.textContent = percentText;
+  });
+  const bar = document.getElementById("waterBar");
+  if (bar) bar.style.width = waitingForReading ? "0%" : `${pct}%`;
+  ["heroWater", "dashWater"].forEach(id => {
+    const node = document.getElementById(id);
+    if (node) node.style.height = waitingForReading ? "0%" : `${pct}%`;
+  });
+  const litres = document.getElementById("litres");
+  const heroLitres = document.getElementById("heroLitres");
+  if (litres) litres.textContent = distanceText;
+  if (heroLitres) heroLitres.textContent = distanceText;
+
+  const motorIsOn = sensorOnline && motorStatus === "on";
+  const motorStatusNode = document.getElementById("motorStatus");
+  if (motorStatusNode) motorStatusNode.textContent = motorStatus.toUpperCase();
+  const motorMessage = document.getElementById("motorMessage");
+  if (motorMessage) {
+    motorMessage.textContent = !sensorOnline
+      ? "Device feedback is unavailable. Pump state is unknown."
+      : motorStatus === "on"
+        ? "The device reports that the motor is ON."
+        : motorStatus === "off"
+          ? "The device reports that the motor is OFF."
+          : "The device has not reported a motor state.";
+  }
+  const motorPill = document.getElementById("motorPill");
+  if (motorPill) {
+    motorPill.textContent = !sensorOnline ? "● Unknown" : motorIsOn ? "● Running" : motorStatus === "off" ? "● Stopped" : "● Unknown";
+    motorPill.classList.toggle("running", motorIsOn);
+    motorPill.classList.toggle("unknown", !sensorOnline || motorStatus === "unknown");
+  }
+  document.body.classList.toggle("motor-running", motorIsOn);
+
+  const levelState = document.getElementById("levelState");
+  if (levelState) {
+    levelState.textContent = waitingForReading ? "Waiting for sensor" :
+      !sensorOnline ? "Last reading · offline" :
+      pct <= lowWaterLevel ? "Low water" :
+      pct >= cutoffLevel ? "High water" : "Healthy level";
+  }
+
+  const alertMessage = document.getElementById("alertMessage");
+  if (alertMessage) {
+    if (!sensorOnline) {
+      alertMessage.textContent = waitingForReading
+        ? "Waiting for the first sensor reading."
+        : "⚠ Device offline. Showing the last received reading.";
+      alertMessage.classList.toggle("warning", !waitingForReading);
+      previousLowState = false;
+    } else if (pct <= lowWaterLevel) {
+      alertMessage.textContent = "⚠ Low water! Tank needs filling.";
+      alertMessage.classList.add("warning");
+      if (!previousLowState) {
+        addActivity("Low-water alert: " + pct.toFixed(1) + "%");
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification("Cascade: Low Water", { body: `Tank level is ${pct.toFixed(1)}%.` });
+        }
+      }
+      previousLowState = true;
+    } else {
+      alertMessage.textContent = "✓ Water level is normal.";
+      alertMessage.classList.remove("warning");
+      previousLowState = false;
+    }
+  }
+
+  const sensorMeta = document.getElementById("sensorMeta");
+  if (sensorMeta) {
+    if (!latestReadingAt) sensorMeta.textContent = "No sensor reading received yet.";
+    else {
+      const time = new Date(latestReadingAt).toLocaleString();
+      sensorMeta.textContent = `${distanceText} · Last update: ${time}${sensorOnline ? "" : " · stale/offline"}`;
+    }
+  }
+}
+
+function updateMotorControls() {
+  const onButton = document.getElementById("motorOnButton");
+  const offButton = document.getElementById("motorOffButton");
+  const loginControls = document.getElementById("motorLoginControls");
+  const sessionControls = document.getElementById("motorSessionControls");
+  const userLabel = document.getElementById("motorUserLabel");
+  const authMessage = document.getElementById("motorAuthMessage");
+  const signedIn = Boolean(motorAuthSession?.access_token);
+  const freshLevel = sensorOnline && Number.isFinite(waterLevel);
+
+  if (loginControls) loginControls.hidden = signedIn;
+  if (sessionControls) sessionControls.hidden = !signedIn;
+  if (userLabel) userLabel.textContent = signedIn ? `Signed in: ${motorAuthSession.user?.email || "owner account"}` : "";
+  if (onButton) onButton.disabled = !signedIn || !freshLevel || waterLevel >= cutoffLevel || motorCommandInFlight;
+  if (offButton) offButton.disabled = !signedIn || motorCommandInFlight;
+  if (authMessage) {
+    if (!signedIn) authMessage.textContent = "Sign in with the owner account to enable motor commands.";
+    else if (motorCommandInFlight) authMessage.textContent = "Sending command… waiting for the device channel.";
+    else if (!sensorOnline) authMessage.textContent = "Device is offline. ON is blocked; OFF can be sent when the device reconnects.";
+    else if (waterLevel >= cutoffLevel) authMessage.textContent = `Tank is at or above ${cutoffLevel}%. Motor ON is blocked.`;
+    else authMessage.textContent = "Owner account signed in. Commands are sent to the ESP32; status changes only after device feedback.";
+  }
+}
+
+async function initializeMotorAuth() {
+  const baseUrl = String(CASCADE_CONFIG.SUPABASE_URL || "").replace(/\/$/, "");
+  const publicKey = String(CASCADE_CONFIG.SUPABASE_ANON_KEY || "").trim();
+  if (!window.supabase?.createClient || !baseUrl || !publicKey || publicKey.includes("PASTE_YOUR")) {
+    const authMessage = document.getElementById("motorAuthMessage");
+    if (authMessage) authMessage.textContent = "Supabase client/key setup is incomplete. Check supabase-config.js.";
+    updateMotorControls();
+    return;
+  }
+
+  cascadeSupabase = window.supabase.createClient(baseUrl, publicKey, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
+  const { data, error } = await cascadeSupabase.auth.getSession();
+  if (!error) motorAuthSession = data.session;
+  cascadeSupabase.auth.onAuthStateChange((_event, session) => {
+    motorAuthSession = session;
+    updateMotorControls();
+  });
+  updateMotorControls();
+}
+
+async function motorSignIn() {
+  const email = document.getElementById("motorEmail")?.value.trim();
+  const password = document.getElementById("motorPassword")?.value;
+  const message = document.getElementById("motorAuthMessage");
+  const loginButton = document.getElementById("motorLoginButton");
+  if (!cascadeSupabase) {
+    if (message) message.textContent = "Supabase login is not configured yet.";
+    return;
+  }
+  if (!email || !password) {
+    if (message) message.textContent = "Enter the owner email and password.";
+    return;
+  }
+  if (loginButton) loginButton.disabled = true;
+  if (message) message.textContent = "Signing in…";
+  try {
+    const { data, error } = await cascadeSupabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    motorAuthSession = data.session;
+    if (message) message.textContent = "Signed in. Motor commands are available subject to safety checks.";
+    addActivity("Owner signed in to the motor control panel.");
+  } catch (error) {
+    console.error("Cascade sign-in error:", error);
+    if (message) message.textContent = error.message || "Sign-in failed. Check your account details.";
+  } finally {
+    if (loginButton) loginButton.disabled = false;
+    updateMotorControls();
+  }
+}
+
+async function motorSignOut() {
+  if (!cascadeSupabase) return;
+  const { error } = await cascadeSupabase.auth.signOut();
+  if (error) {
+    console.error("Cascade sign-out error:", error);
+    alert("Could not sign out. Please try again.");
+    return;
+  }
+  motorAuthSession = null;
+  addActivity("Owner signed out of the motor control panel.");
+  updateMotorControls();
+}
+
+async function sendMotorCommand(command) {
+  if (!motorAuthSession?.access_token || !cascadeSupabase) {
+    alert("Please sign in with the owner account first.");
+    return;
+  }
+  if (command === "ON" && (!sensorOnline || !Number.isFinite(waterLevel) || waterLevel >= cutoffLevel)) {
+    alert("Motor ON is blocked: a fresh sensor reading below the cutoff is required.");
+    return;
+  }
+  if (motorCommandInFlight) return;
+
+  motorCommandInFlight = true;
+  updateMotorControls();
+  try {
+    const { data, error } = await cascadeSupabase.functions.invoke("motor-control", {
+      body: { action: "command", command }
+    });
+    if (error) {
+      let detail = error.message || "Motor command request failed.";
+      try {
+        const body = error.context && await error.context.json();
+        if (body?.error) detail = body.error;
+      } catch (_) { /* Keep the SDK error message. */ }
+      throw new Error(detail);
+    }
+    if (!data?.success) throw new Error(data?.error || "Motor command was not accepted.");
+    const id = data.command?.id;
+    const message = `Motor ${command} command queued${id ? ` (#${id})` : ""}. Waiting for ESP32 acknowledgement.`;
+    addActivity(message);
+    const motorMessage = document.getElementById("motorMessage");
+    if (motorMessage) motorMessage.textContent = message;
+  } catch (error) {
+    console.error("Cascade motor command error:", error);
+    alert(error.message || "Could not send the motor command.");
+    addActivity(`Motor ${command} command failed: ${error.message || "request error"}`);
+  } finally {
+    motorCommandInFlight = false;
+    updateMotorControls();
+  }
+}
+
+function motorOn() { return sendMotorCommand("ON"); }
+function motorOff() { return sendMotorCommand("OFF"); }
+
+function updateCutoff() {
+  cutoffLevel = Number(document.getElementById("cutoff").value);
+  document.getElementById("cutoffValue").textContent = cutoffLevel + "%";
+}
+function updateLowLevel() {
+  lowWaterLevel = Number(document.getElementById("lowLevel").value);
+  document.getElementById("lowValue").textContent = lowWaterLevel + "%";
+}
+function saveSettings() {
+  if (lowWaterLevel >= cutoffLevel) {
+    alert("Low-water alert must be below the cutoff level.");
+    return;
+  }
+  try {
+    localStorage.setItem("cascade-dashboard-settings", JSON.stringify({ cutoffLevel, lowWaterLevel }));
+    addActivity(`Dashboard preferences saved locally: cutoff ${cutoffLevel}%, low alert ${lowWaterLevel}%.`);
+    alert("Dashboard preferences saved on this browser. Device-side automation is not active yet.");
+  } catch (error) {
+    console.error("Settings save failed:", error);
+    alert("Could not save dashboard preferences in this browser.");
+  }
+}
+async function enableNotifications() {
+  if (!("Notification" in window)) {
+    alert("Your browser does not support notifications.");
+    return;
+  }
+  const permission = await Notification.requestPermission();
+  if (permission === "granted") {
+    new Notification("Cascade", { body: "Browser notifications are enabled." });
+    addActivity("Browser notifications enabled.");
+  } else {
+    alert("Notification permission was not granted.");
+  }
+}
+
+function setSensorOffline(message, state = "offline", label = "DEVICE OFFLINE") {
+  sensorOnline = false;
+  motorStatus = "unknown";
+  setConnectionState(state, label);
+  if (previousConnectionState !== state) {
+    if (previousConnectionState === "live") addActivity("ESP32 sensor connection lost.");
+    previousConnectionState = state;
+  }
+  updateDashboard();
+  const sensorMeta = document.getElementById("sensorMeta");
+  if (sensorMeta && message) sensorMeta.textContent = message;
+}
+
+async function fetchLatestReading() {
+  if (readingRequestInProgress) return;
+  const baseUrl = String(CASCADE_CONFIG.SUPABASE_URL || "").replace(/\/$/, "");
+  const anonKey = String(CASCADE_CONFIG.SUPABASE_ANON_KEY || "").trim();
+  const deviceId = String(CASCADE_CONFIG.DEVICE_ID || "cascade-esp32-01");
+  if (!baseUrl || !anonKey || anonKey.includes("PASTE_YOUR")) {
+    setSensorOffline("Add the Supabase publishable/anon key in supabase-config.js.", "setup", "SETUP REQUIRED");
+    previousConnectionState = "setup";
+    return;
+  }
+
+  readingRequestInProgress = true;
+  try {
+    const query = new URLSearchParams({
+      select: "device_id,distance_cm,water_level_percent,motor_status,sensor_status,created_at",
+      device_id: `eq.${deviceId}`,
+      order: "created_at.desc",
+      limit: "1"
+    });
+    const response = await fetch(`${baseUrl}/rest/v1/${encodeURIComponent(CASCADE_CONFIG.SENSOR_TABLE || "sensor_readings")}?${query}`, {
+      method: "GET",
+      headers: {
+        apikey: anonKey,
+        // New sb_publishable keys belong in apikey only; legacy anon JWT keys
+        // may also be sent as a bearer token for backward compatibility.
+        ...(anonKey.startsWith("sb_publishable_") ? {} : { Authorization: `Bearer ${anonKey}` }),
+        Accept: "application/json"
+      },
+      cache: "no-store"
+    });
+    if (!response.ok) {
+      const detail = await response.text();
+      console.error("Supabase sensor query failed:", response.status, detail);
+      setSensorOffline(
+        response.status === 401 || response.status === 403
+          ? "Supabase denied the read. Check the publishable key and sensor_readings SELECT policy."
+          : `Supabase request failed (HTTP ${response.status}). Check the table and API settings.`,
+        "error", "SUPABASE ERROR"
+      );
+      previousConnectionState = "error";
+      return;
+    }
+    const rows = await response.json();
+    if (!Array.isArray(rows) || rows.length === 0) {
+      waterLevel = null;
+      distanceCm = null;
+      latestReadingAt = null;
+      setSensorOffline("No rows found for device " + deviceId + ". Waiting for the ESP32 to upload.", "waiting", "WAITING FOR DATA");
+      previousConnectionState = "waiting";
+      return;
+    }
+
+    const row = rows[0];
+    const level = row.water_level_percent === null || row.water_level_percent === undefined
+      ? NaN : Number(row.water_level_percent);
+    const distance = row.distance_cm === null || row.distance_cm === undefined
+      ? NaN : Number(row.distance_cm);
+    const timestamp = Date.parse(row.created_at);
+    const staleAfter = Number(CASCADE_CONFIG.STALE_AFTER_MS || 30000);
+    const age = Number.isFinite(timestamp) ? Date.now() - timestamp : Infinity;
+    const fresh = age >= -60000 && age <= staleAfter;
+    const reportedSensorStatus = String(row.sensor_status || "unknown").toLowerCase();
+    const declaredOnline = reportedSensorStatus === "online";
+
+    waterLevel = Number.isFinite(level) && level >= 0 && level <= 100
+      ? level : null;
+    distanceCm = Number.isFinite(distance) && distance >= 0 && distance <= 500
+      ? distance : null;
+    latestReadingAt = Number.isFinite(timestamp) ? timestamp : null;
+    sensorOnline = fresh && declaredOnline && waterLevel !== null;
+
+    const reportedMotorStatus = String(row.motor_status || "unknown").toLowerCase();
+    motorStatus = sensorOnline && ["on", "off"].includes(reportedMotorStatus)
+      ? reportedMotorStatus : "unknown";
+
+    if (sensorOnline) {
+      setConnectionState("live", "DEVICE ONLINE");
+      if (previousConnectionState !== "live") addActivity("ESP32 sensor connected. Live readings received.");
+      previousConnectionState = "live";
+    } else {
+      setConnectionState("offline", "DEVICE OFFLINE");
+      if (previousConnectionState === "live") addActivity("ESP32 reading is stale or sensor reports offline.");
+      previousConnectionState = "offline";
+    }
+    updateDashboard();
+  } catch (error) {
+    console.error("Cascade live data error:", error);
+    setSensorOffline("Could not reach Supabase. Check internet connection and project URL.", "error", "CONNECTION ERROR");
+    previousConnectionState = "error";
+  } finally {
+    readingRequestInProgress = false;
+  }
+}
+
+function startLiveData() {
+  fetchLatestReading();
+  const interval = Math.max(3000, Number(CASCADE_CONFIG.POLL_INTERVAL_MS || 5000));
+  window.setInterval(fetchLatestReading, interval);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) fetchLatestReading();
+  });
+}
+
+/* SAVE HISTORY RECORDS */
+const FLUIDOPS_HISTORY_KEY = "fluidops_full_history";
+function saveHistoryRecord(type, message, value = null) {
+    let records = [];
+    try {
+        const saved = JSON.parse(
+            localStorage.getItem(FLUIDOPS_HISTORY_KEY) || "[]"
+        );
+        if (Array.isArray(saved)) {
+            records = saved;
+        }
+    } catch (error) {
+        console.error("History read error:", error);
+    }
+    const record = {
+        id: Date.now() + "-" + Math.random().toString(36).slice(2),
+        type: type,
+        message: message,
+        value: value,
+        timestamp: new Date().toISOString()
+    };
+    records.unshift(record);
+    records = records.slice(0, 2000);
+    try {
+        localStorage.setItem(
+            FLUIDOPS_HISTORY_KEY,
+            JSON.stringify(records)
+        );
+    } catch (error) {
+        console.error("History save error:", error);
+    }
+}
+function getHistoryCategory(message) {
+    const text = String(message).toLowerCase();
+    if (/low-water|alert|warning|cutoff|blocked/.test(text)) {
+        return "alert";
+    }
+    if (text.includes("motor")) {
+        return "motor";
+    }
+    return "system";
+}
+function addActivity(message) {
+  saveHistoryRecord(getHistoryCategory(message), message);
+  const list = document.getElementById("activityList");
+  const item = document.createElement("li");
+  const dot = document.createElement("span");
+  dot.className = "activity-dot";
+  const text = document.createElement("span");
+  text.textContent = message;
+  const time = document.createElement("time");
+  time.textContent = new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+  item.append(dot, text, time);
+  list.prepend(item);
+  while (list.children.length > 8) list.lastElementChild.remove();
+    // Add notification to Notification Center
+    const notificationList = document.getElementById("notificationList");
+    const notificationCount = document.getElementById("notificationCount");
+    if (notificationList && notificationCount) {
+        const emptyMessage = notificationList.querySelector(".empty-notifications");
+        if (emptyMessage) emptyMessage.remove();
+        const notification = document.createElement("li");
+        notification.className = "empty-notifications";
+        notification.style.cssText = "text-align:left;padding:14px 8px;border-bottom:1px solid var(--line);";
+        notification.textContent = message;
+        notificationList.prepend(notification);
+        const currentCount = Number(notificationCount.textContent) || 0;
+        notificationCount.textContent = currentCount + 1;
+    }
+}
+
+function setupThreeScene() {
+  if (!window.THREE) return;
+  const host = document.getElementById("tankScene");
+  if (!host) return;
+  try {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+    camera.position.set(0, 1.2, 6.8);
+    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(1, 1);
+    renderer.domElement.style.cssText = "position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.72;z-index:6";
+    // The handcrafted CSS tank remains the visual fallback and primary illustration.
+    // Three.js adds a subtle 3D water-globe accent floating in the scene.
+    host.appendChild(renderer.domElement);
+    const ambient = new THREE.AmbientLight(0xffffff, 1.8); scene.add(ambient);
+    const key = new THREE.PointLight(0x8e7aff, 2.2, 20); key.position.set(2,3,4); scene.add(key);
+    const geometry = new THREE.SphereGeometry(.17, 32, 24);
+    const material = new THREE.MeshPhysicalMaterial({color:0x8de7ee, metalness:.08, roughness:.12, transmission:.35, transparent:true, opacity:.8});
+    const orb = new THREE.Mesh(geometry, material); orb.position.set(-2.15,.2,0); scene.add(orb);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(.28,.008,8,64), new THREE.MeshBasicMaterial({color:0x9b8bff,transparent:true,opacity:.65}));
+    ring.position.copy(orb.position); ring.rotation.x = 1.1; scene.add(ring);
+    const resize = () => {
+      const w = host.clientWidth, h = host.clientHeight;
+      if (!w || !h) return;
+      camera.aspect = w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h);
+    };
+    resize(); window.addEventListener("resize", resize);
+    let t=0;
+    const animate = () => {
+      animationFrame = requestAnimationFrame(animate); t += .012;
+      orb.position.y = .2 + Math.sin(t)*.14;
+      ring.rotation.z += .004;
+      renderer.render(scene,camera);
+    };
+    animate(); threeReady = true;
+  } catch (e) { console.warn("3D accent unavailable; CSS animation fallback active.", e); }
+}
+function setupMotion() {
+  const revealItems = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {threshold: .12});
+    revealItems.forEach(el => observer.observe(el));
+  } else revealItems.forEach(el => el.classList.add("visible"));
+
+  if (window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.to(".glow-one", {
+    y: 350,
+    ease: "none",
+    scrollTrigger: {
+        trigger: "body",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 1
+    }
+});
+gsap.to(".glow-two", {
+    y: -250,
+    ease: "none",
+    scrollTrigger: {
+        trigger: "body",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 1
+    }
+});
+    gsap.from(".hero-copy > *", {y:22,opacity:0,duration:.75,stagger:.1,ease:"power2.out",delay:.1});
+    gsap.from(".hero-visual", {y:25,opacity:0,duration:1,ease:"power3.out",delay:.25});
+  }
+  const nav = document.getElementById("mainNav");
+  document.getElementById("menuToggle").addEventListener("click", () => nav.classList.toggle("open"));
+  nav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => nav.classList.remove("open")));
+}
+updateDashboard();
+setupMotion();
+setupThreeScene();
+startLiveData();
+initializeMotorAuth();
+// Dark and Light Mode
+const themeToggle = document.getElementById("themeToggle");
+// Load saved theme
+const savedTheme = localStorage.getItem("fluidops-theme");
+
+if (savedTheme === "dark") {
+    document.body.classList.add("dark-mode");
+    themeToggle.textContent = "☀️";
+    themeToggle.setAttribute("aria-label", "Switch to light mode");
+}
+// Toggle theme on click
+themeToggle.addEventListener("click", () => {
+    const isDark = document.body.classList.toggle("dark-mode");
+    themeToggle.textContent = isDark ? "☀️" : "🌙";
+    themeToggle.setAttribute(
+        "aria-label",
+        isDark ? "Switch to light mode" : "Switch to dark mode"
+    );
+    localStorage.setItem(
+        "fluidops-theme",
+        isDark ? "dark" : "light"
+    );
+});
+// Notification Panel Controls
+(() => {
+    const bell = document.getElementById("notificationToggle");
+    const panel = document.getElementById("notificationPanel");
+    const clearBtn = document.getElementById("clearNotifications");
+    const notificationList = document.getElementById("notificationList");
+    const count = document.getElementById("notificationCount");
+    if (!bell || !panel) return;
+    // Open and close notification panel
+    bell.addEventListener("click", () => {
+        panel.classList.toggle("show");
+        const isOpen = panel.classList.contains("show");
+        panel.setAttribute("aria-hidden", String(!isOpen));
+    });
+    // Close panel when clicking outside
+    document.addEventListener("click", (event) => {
+        if (!panel.contains(event.target) && !bell.contains(event.target)) {
+            panel.classList.remove("show");
+            panel.setAttribute("aria-hidden", "true");
+        }
+    });
+    // Clear all notifications
+    clearBtn.addEventListener("click", () => {
+        notificationList.innerHTML = `
+            <li class="empty-notifications">
+                You're all caught up!
+            </li>
+        `;
+        count.textContent = "0";
+    });
+})();
+// Active Navigation Indicator
+const navLinks = document.querySelectorAll(".main-nav a");
+navLinks.forEach(link => {
+    link.addEventListener("click", () => {
+        navLinks.forEach(item => item.classList.remove("active"));
+        link.classList.add("active");
+    });
+});
+

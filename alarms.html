@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cascade | Alarm Center</title>
+    <link
+    rel="icon"
+    type="image/png"
+    href="assets/brand/cascade-icon.png">
+   <!-- <title>Cascade | Alarm Center</title> -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Titan+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="alarms.css">
+<link rel="stylesheet" href="alarms-mobile.css">
+<link rel="stylesheet" href="cascade-android-chat.css">
+</head>
+<body class="alarm-page">
+    <!-- NAVBAR -->
+    <header class="alarm-navbar">
+        <a href="index.html#home" class="alarm-brand">
+           <img
+        src="assets/brand/cascade-horizontal.png"
+        alt="Cascade Smart Water"
+        class="alarm-brand-logo">
+        </a>
+        <div class="alarm-nav-actions">
+            <a href="index.html#home" class="home-link">
+                Home
+            </a>
+            <a href="index.html#dashboard" class="back-dashboard">
+                Back to Dashboard
+            </a>
+            <a href="history.html" class="hstry">
+                History & Reports
+            </a>
+            <button id="alarmThemeToggle" aria-label="Toggle theme">
+                🌙
+            </button>
+        </div>
+    </header>
+    <main class="alarm-container">
+        <!-- PAGE HEADING -->
+        <section class="alarm-page-heading">
+            <div>
+                <span class="alarm-eyebrow">SMART REMINDERS</span>
+                <h1>Alarm <span>& Alerts.</span></h1>
+                <p>Schedule reminders and stay updated with your water system.</p>
+            </div>
+        </section>
+        <!-- ALARM CREATION -->
+        <section class="alarm-layout">
+            <article class="alarm-panel">
+                <div class="alarm-panel-heading">
+                    <div class="alarm-panel-icon">⏰</div>
+                    <div>
+                        <h2>Create New Alarm</h2>
+                        <p>Set your own reminder and ringtone.</p>
+                    </div>
+                </div>
+                <form id="alarmForm">
+                    <label for="alarmName">Alarm name</label>
+                    <input
+                        type="text"
+                        id="alarmName"
+                        placeholder="e.g. Check water tank"
+                        maxlength="60"
+                        required
+                    >
+                    <div class="alarm-time-row">
+                        <div>
+                            <label for="alarmDate">Alarm date</label>
+                            <input type="date" id="alarmDate">
+                        </div>
+                        <div>
+                            <label for="alarmTime">Alarm time</label>
+                            <input type="time" id="alarmTime" required>
+                        </div>
+                    </div>
+                    <label class="alarm-check-row">
+                        <input type="checkbox" id="alarmRepeat">
+                        <span>Repeat every day</span>
+                    </label>
+                    <div class="alarm-sound-area">
+                        <label for="alarmSoundPreset">Choose alarm sound</label>
+                        <select id="alarmSoundPreset">
+                            <option value="classic">Classic Beep</option>
+                            <option value="gentle">Gentle Chime</option>
+                            <option value="digital">Digital Alert</option>
+                            <option value="custom">My Custom Ringtone</option>
+                        </select>
+                        <label for="alarmSoundFile">
+                            Choose ringtone from your folder
+                        </label>
+                        <input
+                            type="file"
+                            id="alarmSoundFile"
+                            accept="audio/*"
+                        >
+                        <div class="alarm-audio-controls">
+                            <button class="alarm1" type="button" id="testAlarmSound">
+                                ▶ Test Sound
+                            </button>
+                            <button type="button" id="stopAlarmSound">
+                                ■ Stop
+                            </button>
+                        </div>
+                        <audio id="alarmSoundPreview" hidden></audio>
+
+                        <p id="soundFileName">No custom ringtone selected.</p>
+                    </div>
+                    <button type="submit" class="create-alarm-btn">
+                        + Create Alarm
+                    </button>
+                    <p id="alarmFormMessage" aria-live="polite"></p>
+                </form>
+            </article>
+            <!-- SYSTEM ALERT SETTINGS -->
+            <article class="alarm-panel">
+
+                <div class="alarm-panel-heading">
+                    <div class="alarm-panel-icon">🔔</div>
+                    <div>
+                        <h2>System Alerts</h2>
+                        <p>Choose which events should notify you.</p>
+                    </div>
+                </div>
+                <div class="alarm-alert-option">
+                    <div>
+                        <strong>Low Water Alert</strong>
+                        <small>When tank level falls below your limit</small>
+                    </div>
+                    <input type="checkbox" id="lowWaterAlertEnabled" checked>
+                </div>
+                <div class="alarm-alert-option">
+                    <div>
+                        <strong>Motor ON/OFF</strong>
+                        <small>When motor status changes</small>
+                    </div>
+                    <input type="checkbox" id="motorAlertEnabled" checked>
+                </div>
+                <div class="alarm-alert-option">
+                    <div>
+                        <strong>Automatic Cutoff</strong>
+                        <small>When the motor stops automatically</small>
+                    </div>
+                    <input type="checkbox" id="cutoffAlertEnabled" checked>
+                </div>
+                <button
+                    type="button"
+                    id="enableAlarmNotifications"
+                    class="enable-notifications-btn"
+                >
+                    Enable Browser Notifications
+                </button>
+                <p id="notificationPermissionStatus">
+                    Browser notification permission not checked yet.
+                </p>
+            </article>
+        </section>
+        <!-- SCHEDULED ALARMS -->
+        <section class="scheduled-alarms-panel">
+            <div class="scheduled-heading">
+                <div>
+                    <h2>Scheduled Alarms</h2>
+                    <p>Manage your upcoming reminders.</p>
+                </div>
+                <span id="alarmCount">0 alarms</span>
+            </div>
+            <div id="scheduledAlarmList">
+                <div class="alarm-empty">
+                    <h3>No alarms scheduled yet.</h3>
+                    <p>Your saved alarms will appear here.</p>
+                </div>
+            </div>
+        </section>
+        <!-- RECENT ALARM HISTORY -->
+        <section class="alarm-history-panel">
+            <div class="scheduled-heading">
+                <div>
+                    <h2>Recent Alarm Activity</h2>
+                    <p>See when your alarms were triggered.</p>
+                </div>
+            </div>
+            <div id="alarmActivityList">
+                <div class="alarm-empty">
+                    No alarm activity yet.
+                </div>
+            </div>
+        </section>
+        <!-- CASCADE PREMIUM FOOTER -->
+<footer class="cascade-footer" id="footer">
+  <div class="cascade-footer-inner">
+    <!-- Brand -->
+    <div class="footer-brand">
+      <a href="#home" class="footer-logo" aria-label="Cascade home">
+        <img
+          src="assets/brand/cascade-horizontal.png"
+          alt="Cascade Smart Water"
+          class="footer-brand-logo"
+        >
+      </a>
+      <div class="footer-brand-tagline">
+        SMART SOLUTIONS FOR SAFER WATERS.
+      </div>
+      <p>
+        Smart water monitoring and pump automation
+        for homes, societies and farms.
+      </p>
+
+    </div>
+    <!-- Product -->
+    <div class="footer-column">
+      <h4>PRODUCT</h4>
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#dashboard">Live demo</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <!-- Company -->
+    <div class="footer-column">
+      <h4>COMPANY</h4>
+      <a href="mailto:FluidOps.Cascade@gmail.com">Contact</a>
+      <a href="#how">FAQ</a>
+      <a href="mailto:FluidOps.Cascade@gmail.com?subject=Support">
+        Support
+      </a>
+    </div>
+    <!-- Contact -->
+    <div class="footer-column footer-contact">
+      <h4>REACH US</h4>
+      <a href="mailto:FluidOps.Cascade@gmail.com">
+        FluidOps.Cascade@gmail.com
+      </a>
+      <a href="tel:+917698861734">
+        +91 76988 61734
+      </a>
+      <a href="#footer">Privacy</a>
+    </div>
+  </div>
+  <!-- Bottom Bar -->
+  <div class="cascade-footer-bottom">
+    © 2026 CASCADE
+    <br>
+      SMART WATER MANAGEMENT SYSTEM
+    <span><a class="footera" href="index.html#dashboard">Return to Dashboard ↑</a></span>
+  </div>
+</footer>
+        <!-- <footer class="alarm-page-footer">
+            <span>Cascade · Smart Water Management</span>
+            <a href="index.html#dashboard">Return to Dashboard ↑</a>
+        </footer> -->
+    </main>
+    <script src="alarms.js"></script>
+    <script src="alarms-mobile.js"></script>
+</body>
+</html>

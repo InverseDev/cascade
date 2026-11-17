@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta property="og:image" content="https://TUMHARA-DOMAIN/og-image.png">
+  <meta name="theme-color" content="#f7f7ff" />
+  <title>Cascade — Smart Water, Smarter Living</title>
+  <link
+    rel="icon"
+    type="image/png"
+    href="assets/brand/cascade-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Titan+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Titan+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="motion.css">
+  <link rel="stylesheet" href="cascade-android-chat.css">
+  <!-- <link rel="stylesheet" href="mobile1.css"> -->
+  <!-- <link rel="stylesheet" href="responsive-overrides-fixed (1).css"> -->
+  <!-- <link rel="stylesheet" href="mobile-fix.css"> -->
+  <!-- <link rel="stylesheet" href="mobile-view.css"> -->
+  <!-- <link rel="stylesheet" href="mobile.css">  -->
+  <!-- <link rel="stylesheet" href="style-responsive-fixed.css"> -->
+</head>
+<body>
+  <div class="page-glow glow-one"></div><div class="page-glow glow-two"></div>
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="Cascade home">
+    <img data-logo-dock
+        src="assets/brand/cascade-horizontal.png"
+        alt="Cascade Smart Water"
+        class="brand-logo"
+    > 
+  </a>
+    <nav class="main-nav" id="mainNav">
+      <a class="active" href="#home">Home</a>
+      <a href="#features">Features</a>
+      <a href="#how">How It Works</a><a href="#dashboard">Dashboard</a>
+    </nav>
+    <a class="header-cta" href="history.html">
+    History & Reports
+    <!-- <span>↗</span> -->
+</a>
+<a class="header-cta1" href="alarms.html">
+    Alarm Centre 
+    <!-- <span>↗</span> -->
+</a>
+    <button class="notification-toggle" id="notificationToggle" aria-label="Open notifications">
+    🔔
+    <span class="notification-count" id="notificationCount">0</span>
+</button>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+<!-- <button class="notification-toggle" id="notificationToggle" aria-label="Open notifications"></button> -->
+<button
+    class="theme-toggle"
+    id="themeToggle"
+    aria-label="Switch to dark mode"
+    title="Toggle dark/light mode"
+>
+    🌙
+</button>
+  </header>
+<!-- Notification Panel -->
+<div class="notification-panel" id="notificationPanel" aria-hidden="true">
+    <div class="notification-panel-header">
+        <div>
+            <h3>Notifications</h3>
+            <p>Stay updated with Cascade</p>
+        </div>
+        <button id="clearNotifications">Clear all</button>
+    </div>
+    <ul id="notificationList">
+        <li class="empty-notifications">
+            You're all caught up!
+        </li>
+    </ul>
+</div>
+  <main>
+    <section class="hero section-wrap" id="home">
+        <div class="hero-copy reveal">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> SMART WATER MANAGEMENT SYSTEM</div>
+        <h1>Every drop.<br><span class="gradient-text">Under control.</span></h1>
+        <p class="hero-description">
+          A smarter way to monitor your water,
+          automate your pump, and protect every precious drop — all from one intelligent dashboard.</p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="#dashboard">Explore live demo <span>→</span></a>
+          <a class="text-btn" href="#how">See how it works <span>↗</span></a></div>
+        <div class="hero-proof">
+          <div class="proof-avatars"><i>💧</i><i>⚡</i><i>◈</i></div>
+          <div><strong>Smarter water decisions</strong><small>Monitor. Automate. Conserve.</small></div>
+        </div>
+      </div>
+      <div class="hero-visual reveal">
+        <div class="visual-orbit orbit-a"></div><div class="visual-orbit orbit-b"></div>
+        <div class="float-chip chip-top">
+          <span class="chip-icon">⌁</span><span><b>Live monitoring</b>
+            <small id="heroConnectionText">Waiting for sensor</small></span><i class="live-dot"></i></div>
+        <div class="tank-scene" id="tankScene">
+          <div class="scene-label">CASCADE / TANK 01</div>
+          <div class="tank-shadow"></div>
+          <div class="tank">
+            <div class="tank-top"></div><div class="tank-inner">
+              <div class="water-fill" id="heroWater">
+                <div class="water-wave wave-one"></div>
+                <div class="water-wave wave-two"></div><div class="water-shine"></div></div>
+              <div class="water-bubbles"><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="tank-measure">
+                <span>100%</span>
+                <span>75%</span>
+                <span>50%</span>
+                <span>25%</span>
+                <span>0%</span></div>
+            </div>
+            <div class="tank-rim"></div><div class="tank-glass"></div>
+            <div class="tank-foot foot-left"></div><div class="tank-foot foot-right"></div>
+          </div>
+          <div class="tank-pipe pipe-top"></div>
+          <div class="tank-pipe pipe-side"></div>
+          <div class="pipe-joint"></div>
+          <div class="pump-unit"><div class="pump-cap"></div>
+          <div class="pump-body"><div class="pump-rotor">
+            <span></span><span></span><span></span></div></div><div class="pump-base"></div></div>
+          <div class="scene-water-drop drop-a">◆</div><div class="scene-water-drop drop-b">◆</div>
+        </div>
+        <div class="float-chip chip-bottom">
+          <div class="mini-ring">
+            <span id="heroPercent">58%</span></div>
+            <span><b>Tank capacity</b><small id="heroLitres">Distance: -- cm</small></span></div>
+        <div class="visual-caption">AQUAGUARD INTELLIGENCE <span>•</span> 3D LIVE PREVIEW</div>
+      </div>
+    </section>
+    <section class="stats-strip section-wrap reveal">
+      <div><span class="stat-icon">◉</span><strong>24/7</strong><small>Water visibility</small></div>
+      <div><span class="stat-icon">⌁</span><strong>Auto</strong><small>Smart pump control</small></div>
+      <div><span class="stat-icon">✧</span><strong>Real-time</strong>
+        <small>Alerts & monitoring</small></div>
+      <div><span class="stat-icon">↗</span><strong>Efficient</strong>
+        <small>Water conservation</small></div>
+    </section>
+    <section class="features-section section-wrap" id="features">
+      <div class="section-heading reveal"><div class="eyebrow">BUILT FOR EVERY DROP</div>
+      <h2>Control more.<br><span class="gradient-text">Waste less.</span></h2>
+      <p>Everything you need to keep your water system<br> running smoothly, safely, and intelligently.</p>
+    </div>
+      <div class="feature-grid">
+        <article class="feature-card reveal"><div class="feature-icon icon-blue">◉</div>
+          <h3>Live water insights</h3>
+          <p>Keep an eye on your tank level with a clear, real-time visual overview.</p>
+          <span class="feature-number">01</span></article>
+        <article class="feature-card featured-card reveal"><div class="feature-icon icon-purple">ϟ</div>
+          <h3>Intelligent motor control</h3>
+          <p>Operate your pump with a tap and let automatic cutoff handle the rest.</p>
+          <span class="feature-number">02</span></article>
+        <article class="feature-card reveal"><div class="feature-icon icon-cyan">♧</div>
+          <h3>Helpful alerts</h3>
+          <p>Get notified when water runs low or when your tank reaches its set limit.</p>
+          <span class="feature-number">03</span></article>
+      </div>
+    </section>
+    <section class="how-section section-wrap" id="how">
+      <div class="how-visual reveal"><div class="how-circle circle-one"></div>
+      <div class="how-circle circle-two">
+      <!-- <img data-logo-dock
+        src="assets/brand/cascade-icon.png"
+        alt="Cascade Smart Water"
+        class="logo">  -->
+      </div> 
+      <div class="how-drop">
+      <img data-logo-dock
+        src="assets/brand/cascade-icon.png"
+        alt="Cascade Smart Water"
+        class="logo"> 
+      </div>
+      <!-- <div class="how-dropa"></div> -->
+      <div class="how-line line-one"></div><div class="how-line line-two"></div>
+      <div class="how-tag tag-one">SENSE</div><div class="how-tag tag-two">AUTOMATE</div>
+      <div class="how-tag tag-three">CONSERVE</div></div>
+      <div class="how-copy reveal"><div class="eyebrow">SIMPLE BY DESIGN</div>
+      <h2>From water flow<br>to <span class="gradient-text">smart control.</span></h2>
+      <div class="step-list"><div class="step"><b>01</b><div><h3>Monitor your tank</h3>
+        <p>View the current water level and capacity at a glance.</p></div></div>
+        <div class="step"><b>02</b><div><h3>Set your preferences</h3>
+          <p>Choose your low-water alert and automatic cutoff levels.</p></div></div>
+          <div class="step"><b>03</b><div><h3>Let Cascade help</h3>
+            <p>Control the motor and track system activity in one place.</p></div></div></div></div>
+    </section>
+
+    <section class="dashboard-section" id="dashboard">
+      <div class="section-wrap">
+        <div class="dashboard-heading reveal"><div><div class="eyebrow">OUR CONTROL CENTER</div>
+        <h2>Smart <span class="gradient-text">dashboard</span><span class="gradient-text">.</span></h2>
+        <p>Live sensor readings from your Cascade device.</p></div>
+        <div class="demo-status" id="connectionStatus" data-state="waiting"><i class="live-dot"></i><span id="connectionLabel">WAITING FOR DEVICE</span></div></div>
+        <div class="dashboard-grid">
+          <article class="dash-card water-card reveal">
+            <div class="card-top"><div><span class="card-kicker">TANK OVERVIEW</span>
+              <h3>Water level</h3></div><div class="card-symbol blue-symbol">⌁</div></div>
+            <div class="level-row"><strong id="waterLevel">58%</strong>
+              <span class="level-state" id="levelState">Healthy level</span></div>
+            <div class="level-track"><div id="waterBar"></div></div>
+            <div class="litres-row"><span id="litres">Distance: -- cm</span><span>SENSOR DATA</span></div>
+            <p class="sensor-meta" id="sensorMeta">Waiting for the first ESP32 reading…</p>
+            <div class="dash-tank-wrap"><div class="dash-tank">
+              <div class="dash-tank-water" id="dashWater"><div class="dash-wave"></div></div>
+              <div class="dash-tank-glare"></div></div>
+              <div class="tank-reading"><b id="tankReading">58%</b><small>Current fill</small></div></div>
+          </article>
+          <article class="dash-card motor-card reveal">
+            <div class="card-top"><div><span class="card-kicker">PUMP MANAGEMENT</span>
+              <h3>Motor control</h3></div><div class="card-symbol purple-symbol">ϟ</div></div>
+            <div class="motor-visual"><div class="motor-halo"></div>
+            <div class="motor-illustration" id="motorIllustration">
+              <div class="motor-fan"><i></i><i></i><i></i></div></div><div class="motor-pipe"></div></div>
+            <div class="motor-status-row"><div><span class="status-label">DEVICE-REPORTED STATUS</span>
+              <strong id="motorStatus">OFF</strong></div>
+              <span class="status-pill" id="motorPill">● Stopped</span></div>
+            <p id="motorMessage" class="muted-copy">Motor state will be reported by the ESP32.</p>
+            <div class="motor-auth" id="motorAuthPanel">
+              <div id="motorLoginControls">
+                <label for="motorEmail">Owner sign-in</label>
+                <input id="motorEmail" type="email" autocomplete="username" placeholder="Your account email">
+                <input id="motorPassword" type="password" autocomplete="current-password" placeholder="Password">
+                <button class="auth-btn" id="motorLoginButton" type="button" onclick="motorSignIn()">Sign in to control pump</button>
+              </div>
+              <div id="motorSessionControls" hidden>
+                <span class="motor-user-label" id="motorUserLabel"></span>
+                <button class="auth-btn secondary-auth-btn" type="button" onclick="motorSignOut()">Sign out</button>
+              </div>
+              <p id="motorAuthMessage" class="motor-auth-message">Sign in with the owner account to enable motor commands.</p>
+            </div>
+            <div class="button-row">
+              <button id="motorOnButton" class="control-btn turn-on" onclick="motorOn()" disabled title="Sign in and wait for a fresh sensor reading">Turn motor ON <span>↗</span></button>
+              <button id="motorOffButton" class="control-btn turn-off" onclick="motorOff()" disabled title="Sign in to send a stop command">Turn OFF</button>
+            </div>
+          </article>
+          <article class="dash-card setting-card reveal">
+            <div class="card-top"><div><span class="card-kicker">AUTOMATION RULE</span>
+              <h3>Automatic cutoff</h3></div><div class="card-symbol cyan-symbol">◎</div></div>
+            <p class="muted-copy">Stop the motor automatically when the tank reaches your chosen level.</p>
+            <div class="range-value"><strong id="cutoffValue">90%</strong><span class="cutoff">Cutoff threshold</span></div>
+            <input id="cutoff" class="range-input" type="range" min="50"
+             max="100" value="90" oninput="updateCutoff()">
+            <div class="range-ends"><span>50%</span><span>100%</span></div>
+            <div class="setting-note"><span>✦</span> Threshold saved as a dashboard preference. Device-side automation is not active yet.</div>
+            <button class="subtle-btn" onclick="saveSettings()">Save automation settings ↗</button>
+          </article>
+          <article class="dash-card alert-card reveal">
+            <div class="card-top"><div><span class="card-kicker">EARLY WARNING</span>
+              <h3>Low water alert</h3></div><div class="card-symbol amber-symbol">⌁</div></div>
+            <p class="muted-copy">Get an alert whenever your tank falls below this level.</p>
+            <div class="range-value"><strong id="lowValue">20%</strong><span>Alert threshold</span></div>
+            <input id="lowLevel" class="range-input amber-range" type="range"
+             min="5" max="40" value="20" oninput="updateLowLevel()">
+            <div class="range-ends"><span>5%</span><span>40%</span></div>
+            <div class="alert-message" id="alertMessage">✓ Water level is normal.</div>
+            <button class="subtle-btn" onclick="enableNotifications()">Enable browser notifications ↗</button>
+          </article>
+        </div>
+        <div class="activity-card reveal"><div class="activity-head"><div>
+          <span class="card-kicker">SYSTEM HISTORY</span><h3>Recent activity</h3></div><span
+           class="history-label">LATEST EVENTS</span></div><ul id="activityList"><li>
+            <span class="activity-dot"></span><span>Cascade dashboard started.</span>
+            <time>Just now</time></li></ul></div>
+        <div class="dashboard-footnote">Live readings are fetched from Supabase. Pump commands require the owner account and a connected ESP32; actual relay feedback is shown only after the device reports it.</div>
+      </div>
+    </section>
+  <!-- CASCADE PRICING SECTION -->
+<section class="cascade-pricing" id="pricing">
+  <div class="pricing-container">
+    <div class="pricing-heading">
+      <span class="pricing-eyebrow">● WHAT YOU GET</span>
+      <h2>One box. One price.</h2>
+    </div>
+    <div class="pricing-grid">
+      <!-- LEFT: MAIN PRICE CARD -->
+      <div class="pricing-main-card">
+        <div class="pricing-product-name">
+          CASCADE STARTER
+        </div>
+        <div class="pricing-value">
+          <h3>₹2,999</h3>
+          <span>proposed one-time price</span>
+        </div>
+        <p class="pricing-description">
+          Indicative prototype package. Final pricing,
+          installation and service coverage are yet to be confirmed.
+        </p>
+        <ul class="pricing-benefits">
+          <li>Tank sensor + ESP32 motor controller</li>
+          <li>Live water monitoring dashboard</li>
+          <li>Motor ON/OFF control through website</li>
+          <li>Automatic cutoff and low-water alerts</li>
+        </ul>
+      </div>
+      <!-- RIGHT: SPECIFICATIONS CARD -->
+      <div class="pricing-spec-card">
+        <div class="pricing-spec-row">
+          <span>WORKS WITH</span>
+          <p>Overhead and underground tanks, subject to installation compatibility.</p>
+        </div>
+        <div class="pricing-spec-row">
+          <span>MOTOR SUPPORT</span>
+          <p>Pump compatibility depends on verified voltage, current and controller ratings.</p>
+        </div>
+        <div class="pricing-spec-row">
+          <span>CONNECTIVITY</span>
+          <p>Wi-Fi connectivity for remote monitoring and website control.</p>
+        </div>
+        <div class="pricing-spec-row">
+          <span>POWER</span>
+          <p>Separate regulated power supplies according to controller and pump requirements.</p>
+        </div>
+        <div class="pricing-spec-row">
+          <span>IN THE BOX</span>
+          <p>ESP32 controller, HC-SR04 sensor and relay module. Other accessories subject to final package.</p>
+        </div>
+      </div>
+    </div>
+    <p class="pricing-disclaimer">
+      Prototype package · Pricing and specifications are illustrative
+      and subject to testing and final confirmation.
+    </p>
+  </div>
+</section>
+<!-- END CASCADE PRICING -->
+    <section class="closing-cta section-wrap reveal"><div>
+      <div class="eyebrow">A BETTER WAY TO MANAGE WATER</div><h2>Make every drop<br>
+        <span class="gradient-text">count.</span></h2></div>
+        <a class="primary-btn" href="#dashboard">Try the live demo <span>→</span></a>
+        <div class="cta-orb"></div></section>
+  </main>
+<!-- CASCADE PREMIUM FOOTER -->
+<footer class="cascade-footer" id="footer">
+  <div class="cascade-footer-inner">
+    <!-- Brand -->
+    <div class="footer-brand">
+
+      <a href="#home" class="footer-logo" aria-label="Cascade home">
+        <img
+          src="assets/brand/cascade-horizontal.png"
+          alt="Cascade Smart Water"
+          class="footer-brand-logo"
+        >
+      </a>
+      <div class="footer-brand-tagline">
+        SMART SOLUTIONS FOR SAFER WATERS.
+      </div>
+      <p>
+        Smart water monitoring and pump automation
+        for homes, societies and farms.
+      </p>
+
+    </div>
+    <!-- Product -->
+    <div class="footer-column">
+      <h4>PRODUCT</h4>
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#dashboard">Live demo</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <!-- Company -->
+    <div class="footer-column">
+      <h4>COMPANY</h4>
+      <a href="mailto:FluidOps.Cascade@gmail.com">Contact</a>
+      <a href="#how">FAQ</a>
+      <a href="mailto:FluidOps.Cascade@gmail.com?subject=Support">
+        Support
+      </a>
+    </div>
+    <!-- Contact -->
+    <div class="footer-column footer-contact">
+      <h4>REACH US</h4>
+      <a href="mailto:FluidOps.Cascade@gmail.com">
+        FluidOps.Cascade@gmail.com
+      </a>
+      <a href="tel:+917698861734">
+        +91 76988 61734
+      </a>
+      <a href="#footer">Privacy</a>
+    </div>
+  </div>
+  <!-- Bottom Bar -->
+  <div class="cascade-footer-bottom">
+    <span>© 2026 CASCADE</span>
+    <span>
+      SMART WATER MANAGEMENT SYSTEM
+    </span>
+  </div>
+</footer>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="app.js"></script>
+  <script src="motion.js" defer></script>
+  <script src="logo-dock.js"></script>
+  <script src="cascade-header-fix.js"></script>
+  <script src="mobile-view.js"></script>
+  <!-- <script src="quick-tools(1).js"></script> -->
+  <!-- <script src="quick-tools.js"></script> -->
+  <!-- <script src="stack-cards.js"></script> -->
+</body>
+</html>

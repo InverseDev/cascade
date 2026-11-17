@@ -1,0 +1,22 @@
+/* ============================================================
+   CASCADE — white outline for the logo in DARK MODE only.
+   Light mode is not touched. Works on every logo image
+   (header, big hero logo, flying logo, footer, icon, history/alarm pages).
+
+   Easiest: copy everything below and paste it at the END of style.css
+   (index, history and alarms pages all load style.css).
+   ============================================================ */
+body.dark-mode img[src*="cascade-horizontal"],
+body.dark-mode img[src*="cascade-icon"]{
+  --o:.5px;                                   /* outline thickness: bigger number = thicker outline */
+  --ring:drop-shadow(var(--o) 0 0 #fff) drop-shadow(calc(var(--o) * -1) 0 0 #fff)
+         drop-shadow(0 var(--o) 0 #fff) drop-shadow(0 calc(var(--o) * -1) 0 #fff);
+  filter:var(--ring) var(--ring);
+}
+/* big hero logo + the logo while it flies into the header (it is 800px wide, so a thicker outline) */
+body.dark-mode img[data-logo-cover],
+body.dark-mode img.cm-fly{--o:1.4px}
+/* footer logo */
+body.dark-mode img.footer-brand-logo{--o:.6px}
+/* small drop icon in "How it works" */
+body.dark-mode .how-drop img{--o:.6px}

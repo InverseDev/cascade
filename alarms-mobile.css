@@ -1,0 +1,99 @@
+/* =====================================================================
+   alarms-mobile.css  —  Alarm page ka MOBILE VIEW  (alag file)
+
+   Rules:
+   - Design, elements, colors, fonts, hover/animation: koi change nahi.
+   - HTML, alarms.css aur alarms.js ko chhua nahi gaya.
+   - Sirf phone ke liye size/spacing/wrapping adjust hoti hai, taaki sab
+     kuch screen mein fit ho (pehle navbar bahar nikalta tha, isliye phone
+     poora page zoom-out kar deta tha).
+   - Har rule @media ke andar hai => desktop (850px se bada) pe ZERO change.
+   - alarms.css ke BAAD load karo (saath mein alarms-mobile.js bhi):
+        <link rel="stylesheet" href="alarms.css">
+        <link rel="stylesheet" href="alarms-mobile.css">
+   ===================================================================== */
+
+/* iOS landscape mein text apne aap bada na ho */
+@media (max-width: 850px) {
+    html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+    }
+}
+
+/* 640px tak: phone portrait + chhote phones ka landscape (601-640px pe original navbar bhi bahar nikalta tha) */
+@media (max-width: 640px) {
+
+    /* ---------- NAVBAR: logo + Home + Back to Dashboard + theme ek hi row mein ---------- */
+    .alarm-navbar {
+        gap: 8px;
+        padding: 12px 3.5%;
+    }
+    .alarm-brand {
+        flex: 0 1 auto;          /* zarurat pade to logo thoda sikud sakta hai */
+        min-width: 0;
+    }
+    .alarm-brand-logo {
+        height: 32px;
+        min-width: 0;
+        max-width: 100%;
+    }
+    .alarm-nav-actions {
+        flex: 0 0 auto;
+        gap: 6px;
+    }
+    /* :not(:hover) => hover wale purane effects bilkul waise hi rehte hain */
+    .alarm-nav-actions > .home-link:not(:hover),
+    .alarm-nav-actions > .back-dashboard:not(:hover),
+    .alarm-nav-actions > #alarmThemeToggle:not(:hover) {
+        padding: 8px 10px;
+        font-size: 13px;
+        line-height: 1.15;
+        border-radius: 10px;
+    }
+    .alarm-nav-actions > .back-dashboard:not(:hover) {
+        width: min-content;      /* "Back to / Dashboard" do line mein, taaki logo ko jagah mile */
+        text-align: center;
+    }
+
+    /* Jagah kam pade to (alarms-mobile.js ye class lagata hai): logo upar, buttons neeche */
+    .alarm-navbar.am-nav-wrap {
+        flex-wrap: wrap;
+        justify-content: center;
+        row-gap: 8px;
+    }
+
+    /* ---------- Lambe text/naam screen se bahar na jaayein ---------- */
+    .scheduled-alarm-item > div:first-child,
+    .alarm-activity-item > div:first-child {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+    .scheduled-alarm-item button,
+    .alarm-activity-item button {
+        flex-shrink: 0;
+    }
+    .alarm-panel-heading > div:last-child,
+    .alarm-alert-option > div:first-child {
+        min-width: 0;
+    }
+    .alarm-panel-icon {
+        flex-shrink: 0;
+    }
+
+    /* ---------- Form: date/time/select ki height sab phones (iOS) pe ek jaisi ---------- */
+    #alarmForm input[type="date"],
+    #alarmForm input[type="time"],
+    #alarmForm select {
+        min-height: 47px;
+    }
+}
+
+/* Bahut chhoti screen (jaise 320px): JS na chale tab bhi navbar do row mein */
+@media (max-width: 350px) {
+    .alarm-navbar {
+        flex-wrap: wrap;
+        justify-content: center;
+        row-gap: 8px;
+    }
+}

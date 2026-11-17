@@ -1,0 +1,334 @@
+/* =====================================================================
+   cascade-android-chat.css
+   1. Android & Mobile Viewport Scaling + Overflow Protection
+   2. Floating Cascade Assistant Chatbot (Light & Dark Mode)
+   ===================================================================== */
+
+/* 1. ANDROID & MOBILE SCALING */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+.alarm-page, .history-page {
+    min-height: 100dvh;
+}
+
+/* Fix Android & narrow screen navbar wrapping (360px - 768px) */
+@media (max-width: 768px) {
+    .alarm-navbar,
+    .history-navbar {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px 4%;
+    }
+
+    .alarm-nav-actions,
+    .history-nav-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .alarm-nav-actions > a,
+    .alarm-nav-actions > button,
+    .history-nav-actions > a,
+    .history-nav-actions > button {
+        padding: 9px 12px !important;
+        font-size: 13px !important;
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Prevent text/input zoom on Android Chrome (requires >= 16px) */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+
+    /* Ensure touch-friendly buttons */
+    .create-alarm-btn,
+    .enable-notifications-btn,
+    .alarm-audio-controls button,
+    .scheduled-alarm-item button,
+    #historyExport,
+    #historyClear {
+        min-height: 44px;
+    }
+
+    /* History summary & filter grids on Android phones */
+    .history-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    .summary-card strong {
+        font-size: clamp(24px, 6vw, 34px) !important;
+    }
+
+    .history-eyebrow {
+        font-size: 16px !important;
+    }
+
+    .history-toolbar h2 {
+        font-size: 22px !important;
+    }
+
+    .history-toolbar p {
+        font-size: 15px !important;
+    }
+
+    /* Footer stacking on Android */
+    .cascade-footer-inner {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+    }
+
+    .cascade-footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+
+/* 2. FLOATING CHATBOT WIDGET */
+.cascade-chat-launcher {
+    position: fixed;
+    right: max(18px, env(safe-area-inset-right));
+    bottom: max(18px, env(safe-area-inset-bottom));
+    z-index: 9998;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: 2px solid #120258;
+    background: linear-gradient(135deg, #7657f6, #168b9c);
+    color: #ffffff;
+    font-size: 26px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 10px 28px rgba(22, 139, 156, 0.35);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cascade-chat-launcher:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 14px 32px rgba(118, 87, 246, 0.45);
+}
+
+.cascade-chat-window {
+    position: fixed;
+    right: max(18px, env(safe-area-inset-right));
+    bottom: calc(max(18px, env(safe-area-inset-bottom)) + 70px);
+    z-index: 9999;
+    width: min(370px, calc(100vw - 24px));
+    max-height: min(520px, 72dvh);
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    background: #ffffff;
+    border: 2px solid #120258;
+    box-shadow: 0 18px 45px rgba(18, 2, 88, 0.22);
+    overflow: hidden;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(14px) scale(0.97);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.cascade-chat-window.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+.cascade-chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: linear-gradient(120deg, #7657f6, #168b9c);
+    color: #ffffff;
+}
+
+.cascade-chat-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cascade-chat-title strong {
+    display: block;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.cascade-chat-title small {
+    display: block;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.cascade-chat-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: #ffffff;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+}
+
+.cascade-chat-messages {
+    flex: 1;
+    padding: 14px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f6f7ff;
+}
+
+.cascade-msg {
+    max-width: 84%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.45;
+    word-wrap: break-word;
+}
+
+.cascade-msg.bot {
+    align-self: flex-start;
+    background: #ffffff;
+    color: #19172b;
+    border: 1px solid #dcd6f7;
+    border-bottom-left-radius: 4px;
+}
+
+.cascade-msg.user {
+    align-self: flex-end;
+    background: #7657f6;
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
+}
+
+.cascade-chat-chips {
+    display: flex;
+    gap: 6px;
+    padding: 8px 12px;
+    overflow-x: auto;
+    background: #ffffff;
+    border-top: 1px solid #e6e3f5;
+    scrollbar-width: none;
+}
+
+.cascade-chat-chips::-webkit-scrollbar {
+    display: none;
+}
+
+.cascade-chip {
+    flex-shrink: 0;
+    padding: 6px 11px;
+    border-radius: 20px;
+    border: 1px solid #7657f6;
+    background: rgba(118, 87, 246, 0.08);
+    color: #4c32c7;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.cascade-chat-form {
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border-top: 1px solid #e6e3f5;
+}
+
+.cascade-chat-input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    border-radius: 11px;
+    border: 1.5px solid #cfc8f2;
+    background: #f9f8ff;
+    color: #12121b;
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+}
+
+.cascade-chat-input:focus {
+    border-color: #7657f6;
+}
+
+.cascade-chat-send {
+    padding: 0 15px;
+    border: none;
+    border-radius: 11px;
+    background: #19172b;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    min-height: 42px;
+}
+
+/* DARK MODE SUPPORT FOR CHATBOT */
+body.dark-mode .cascade-chat-launcher {
+    border-color: #48cbd1;
+}
+
+body.dark-mode .cascade-chat-window {
+    background: #151F32;
+    border-color: #35445F;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+}
+
+body.dark-mode .cascade-chat-messages {
+    background: #101827;
+}
+
+body.dark-mode .cascade-msg.bot {
+    background: #202A40;
+    color: #F1F5FF;
+    border-color: #35445F;
+}
+
+body.dark-mode .cascade-chat-chips,
+body.dark-mode .cascade-chat-form {
+    background: #151F32;
+    border-color: #35445F;
+}
+
+body.dark-mode .cascade-chip {
+    background: rgba(72, 203, 209, 0.14);
+    border-color: #48cbd1;
+    color: #8de7ee;
+}
+
+body.dark-mode .cascade-chat-input {
+    background: #101827;
+    border-color: #35445F;
+    color: #F1F5FF;
+}
+
+body.dark-mode .cascade-chat-send {
+    background: #7657f6;
+}

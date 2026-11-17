@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cascade | History & Reports</title>
+    <link
+    rel="icon"
+    type="image/png"
+    href="assets/brand/cascade-icon.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="history.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Titan+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="motion.css">
+  <link rel="stylesheet" href="history-mobile.css">
+  <link rel="stylesheet" href="cascade-android-chat.css">
+</head>
+<body class="history-page">
+    <header class="history-navbar">
+        <a href="index.html#home" class="history-brand">
+            <img
+        src="assets/brand/cascade-horizontal.png"
+        alt="Cascade Smart Water"
+        class="alarm-brand-logo">
+            <!-- <span>◆</span> Cascade -->
+        </a>
+        <div class="history-nav-actions">
+            <a href="index.html#home" class="home-link">
+                Home
+            </a>
+            <a href="index.html#dashboard" class="back-dashboard">
+                Back to Dashboard
+            </a>
+            <a href="alarms.html" class="alrm">
+                Alarm Centre
+            </a>
+            <button id="historyThemeToggle" aria-label="Toggle theme">
+                🌙
+            </button>
+        </div>
+    </header>
+    <main class="history-container">
+        <section class="history-title">
+            <div>
+                <span class="history-eyebrow">CASCADE SYSTEM RECORDS</span>
+                <h1>History & <span>Reports.</span></h1>
+                <p>Your complete water management activity in one place.</p>
+            </div>
+            <button id="historyExport">↓ Export CSV</button>
+        </section>
+        <section class="history-summary">
+            <article class="summary-card">
+                <span>Total Events</span>
+                <strong id="historyTotal">0</strong>
+            </article>
+            <article class="summary-card">
+                <span>Water Readings</span>
+                <strong id="historyWaterCount">0</strong>
+            </article>
+            <article class="summary-card">
+                <span>Motor Events</span>
+                <strong id="historyMotorCount">0</strong>
+            </article>
+            <article class="summary-card">
+                <span>Alerts</span>
+                <strong id="historyAlertCount">0</strong>
+            </article>
+        </section>
+        <section class="history-main-card">
+            <div class="history-toolbar">
+                <div>
+                    <h2>All Activity</h2>
+                    <p id="historyRecordCount">0 records</p>
+                </div>
+                <button id="historyClear">Clear History</button>
+            </div>
+            <div class="history-search">
+                <span>⌕</span>
+                <input
+                    type="search"
+                    id="historySearch"
+                    placeholder="Search your history..."
+                >
+            </div>
+            <div class="history-filters">
+                <div class="history-categories">
+                    <button class="history-filter active" data-filter="all">
+                        All
+                    </button>
+                    <button class="history-filter" data-filter="water">
+                        Water
+                    </button>
+                    <button class="history-filter" data-filter="motor">
+                        Motor
+                    </button>
+                    <button class="history-filter" data-filter="alert">
+                        Alerts
+                    </button>
+                    <button class="history-filter" data-filter="system">
+                        System
+                    </button>
+                </div>
+                <div class="history-date-filters">
+                    <label>
+                        From
+                        <input type="date" id="historyFrom">
+                    </label>
+                    <label>
+                        To
+                        <input type="date" id="historyTo">
+                    </label>
+                </div>
+            </div>
+            <div id="historyTimeline">
+                <div class="history-empty">
+                    <h3>No history available yet</h3>
+                    <p>Your system activities will appear here.</p>
+                </div>
+            </div>
+        </section>
+        <!-- <footer class="history-page-footer">
+            <span>Cascade · Smart Water Management</span>
+            <a href="index.html#dashboard">Return to Dashboard ↑</a>
+        </footer> -->
+        <!-- CASCADE PREMIUM FOOTER -->
+<footer class="cascade-footer" id="footer">
+  <div class="cascade-footer-inner">
+    <!-- Brand -->
+    <div class="footer-brand">
+
+      <a href="#home" class="footer-logo" aria-label="Cascade home">
+        <img
+          src="assets/brand/cascade-horizontal.png"
+          alt="Cascade Smart Water"
+          class="footer-brand-logo"
+        >
+      </a>
+      <div class="footer-brand-tagline">
+        SMART SOLUTIONS FOR SAFER WATERS.
+      </div>
+      <p>
+        Smart water monitoring and pump automation
+        for homes, societies and farms.
+      </p>
+
+    </div>
+    <!-- Product -->
+    <div class="footer-column">
+      <h4>PRODUCT</h4>
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#dashboard">Live demo</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <!-- Company -->
+    <div class="footer-column">
+      <h4>COMPANY</h4>
+      <a href="mailto:FluidOps.Cascade@gmail.com">Contact</a>
+      <a href="#how">FAQ</a>
+      <a href="mailto:FluidOps.Cascade@gmail.com?subject=Support">
+        Support
+      </a>
+    </div>
+    <!-- Contact -->
+    <div class="footer-column footer-contact">
+      <h4>REACH US</h4>
+      <a href="mailto:FluidOps.Cascade@gmail.com">
+        FluidOps.Cascade@gmail.com
+      </a>
+      <a href="tel:+917698861734">
+        +91 76988 61734
+      </a>
+      <a href="#footer">Privacy</a>
+    </div>
+  </div>
+    <!-- Bottom Bar -->
+  <div class="cascade-footer-bottom">
+    © 2026 CASCADE
+    <br>
+      SMART WATER MANAGEMENT SYSTEM
+    <span><a class="footera" href="index.html#dashboard">Return to Dashboard ↑</a></span>
+  </div>
+</footer>
+    </main>
+    <script src="history.js"></script>
+</body>
+</html>

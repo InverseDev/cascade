@@ -1,0 +1,25 @@
+/* ============================================================
+   Cascade logo placements — link AFTER motion.css
+   Rule: one big, cropped, faint mark per section. Never tiled wallpaper.
+   (keep cascade-icon.png in the same folder as this file)
+   ============================================================ */
+
+/* 1 · closing CTA: the plain ring (.cta-orb) becomes the drop mark */
+.closing-cta{overflow:hidden}
+.closing-cta > div:first-child,.closing-cta > .primary-btn{position:relative;z-index:1}
+.cta-orb{
+  width:250px;height:250px;right:20%;top:50%;
+  translate:0 -50%;rotate:12deg;
+  border:0;border-radius:0;box-shadow:none;
+  background:url("cascade-icon.png") center/contain no-repeat;
+  opacity:.16;pointer-events:none}
+
+/* 2 · pricing dark card: white silhouette cropped into the corner */
+.pricing-main-card{position:relative;overflow:hidden}
+.pricing-main-card::after{
+  content:"";position:absolute;right:-50px;bottom:-60px;width:280px;height:280px;
+  background:url("cascade-icon.png") center/contain no-repeat;
+  filter:brightness(0) invert(1);opacity:.07;pointer-events:none}
+
+/* 3 · dark mode: the wordmark is navy, so give it a light pill instead of letting it vanish */
+body.dark-mode img[src*="cascade-horizontal"]{background:#fff;border-radius:12px;padding:6px 12px}
