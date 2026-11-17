@@ -142,3 +142,69 @@ main, header, footer, section, .section-wrap,
     min-height: 34px;
   }
 }
+
+
+/* Final mobile polish: keep navigation reachable, trim excess whitespace,
+   and make the Sense / Automate / Conserve illustration render reliably. */
+.site-header .brand-logo,
+.history-navbar .alarm-brand-logo,
+.alarm-navbar .alarm-brand-logo {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+.how-visual > .how-drop {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 2;
+}
+.how-visual > .how-drop > .logo {
+  position: relative;
+  inset: auto;
+  display: block;
+  width: min(72%, 280px);
+  height: auto;
+  max-height: 220px;
+  object-fit: contain;
+  padding: 0;
+  margin: 0;
+  transform: none;
+  animation: cascadeMarkPulse 4s ease-in-out infinite;
+}
+@keyframes cascadeMarkPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+@media (max-width: 768px) {
+  .site-header { padding-block: 6px; min-height: 54px; }
+  .site-header .brand-logo { height: 30px; max-height: 30px; }
+  .site-header .main-nav { max-height: calc(100dvh - 70px); overflow-y: auto; }
+  .site-header .main-nav a { padding: 9px 12px; }
+  .hero { padding-top: 22px !important; }
+  .stats-strip { margin: 12px auto 34px !important; gap: 8px 10px !important; }
+  .features-section { padding-bottom: 42px !important; }
+  .section-heading { margin-bottom: 18px !important; }
+  .feature-card { min-height: 0 !important; padding: 15px !important; }
+  .how-section { gap: 18px !important; padding-bottom: 42px !important; }
+  .how-visual { height: 270px !important; }
+  .dashboard-section { padding: 38px 0 !important; }
+  .dash-card { padding: 15px !important; }
+  .cascade-pricing { padding: 34px 0 !important; }
+  .closing-cta { margin: 28px auto !important; padding: 18px 16px !important; gap: 14px !important; }
+  .cascade-footer { padding: 22px 12px 0 !important; }
+  .cascade-footer-inner { gap: 18px 12px !important; padding-bottom: 20px !important; }
+  .history-container, .alarm-container { margin-top: 14px !important; margin-bottom: 24px !important; }
+  .history-navbar, .alarm-navbar { padding: 8px 12px !important; gap: 8px !important; }
+}
+@media (max-width: 420px) {
+  .how-visual { height: 245px !important; }
+  .how-visual > .how-drop > .logo { width: min(78%, 230px); max-height: 180px; }
+  .hero { padding-top: 16px !important; }
+  .section-wrap, .history-container, .alarm-container, .pricing-container { width: calc(100% - 24px) !important; }
+}
