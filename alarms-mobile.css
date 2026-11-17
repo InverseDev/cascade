@@ -97,3 +97,17 @@
         row-gap: 8px;
     }
 }
+
+
+/* Compact phone spacing while keeping the complete alarm form and lists visible. */
+@media (max-width: 640px) {
+  .alarm-navbar { padding: 8px 12px !important; }
+  .alarm-container { width: calc(100% - 24px) !important; margin: 14px auto 24px !important; }
+  .alarm-page-heading { margin-bottom: 14px !important; gap: 10px !important; }
+  .alarm-panel, .scheduled-alarms-panel, .alarm-history-panel { padding: 14px !important; }
+  .alarm-layout { gap: 12px !important; }
+  .alarm-panel-heading { margin-bottom: 10px !important; }
+  #alarmForm { gap: 10px !important; }
+  #alarmForm label { margin-bottom: 4px !important; }
+  .scheduled-alarm-item, .alarm-activity-item { padding: 10px !important; }
+}
