@@ -20,11 +20,11 @@
     cover.src = dock.currentSrc || dock.src;          // same logo file as the header
     cover.alt = '';
     cover.width = 800;
-    cover.style.cssText = 'display:block;height:auto;margin-bottom:22px';
+    cover.style.cssText = 'display:block;width:min(72vw,620px);max-width:100%;height:auto;margin:0 auto 24px;filter:drop-shadow(0 14px 28px rgba(48,93,117,.12))';
     cover.setAttribute('data-logo-cover', '');
     host.prepend(cover);
   }
-  const DIST = 260;                                   // px of scrolling the flight takes
+  const DIST = 380;                                   // px of scrolling the flight takes
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const wide = matchMedia('(min-width: 861px)');
   const lerp = (a, b, t) => a + (b - a) * t;
@@ -32,7 +32,7 @@
   const css = document.createElement('style');
   css.textContent =
     '.cm-fly{position:fixed;left:0;top:0;z-index:1000;max-width:none;height:auto;box-sizing:border-box;' +
-    'transform-origin:0 0;pointer-events:none;will-change:transform;' +
+    'transform-origin:0 0;pointer-events:none;will-change:transform;filter:drop-shadow(0 8px 18px rgba(35,70,90,.14));' +
     'animation:cm-fly-in .9s .15s cubic-bezier(.22,1,.36,1) both}' +
     '@keyframes cm-fly-in{from{opacity:0}}' +
     '@media (max-width:860px){[data-logo-cover]{display:none!important}}';
