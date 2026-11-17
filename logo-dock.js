@@ -43,7 +43,7 @@
   fly.setAttribute('aria-hidden', 'true');
   fly.draggable = false;
   fly.className = 'cm-fly';
-  document.body.appendChild(fly);
+  document.documentElement.appendChild(fly); // root-level overlay: escapes body/section stacking contexts
   if (RM) cover.style.display = 'none';
   else cover.style.visibility = 'hidden';             // keeps its space in the hero, the clone represents it
   let busy = false;
