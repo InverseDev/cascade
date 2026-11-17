@@ -2446,3 +2446,68 @@ body.dark-mode .how-drop img{--o:.6px}
 
 
 
+
+
+/* Economic accessibility statement replaces the feature checklist */
+.pricing-main-card {
+  background: #f7f5f0;
+  color: #2d4054;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(28px, 4vw, 54px);
+}
+.pricing-product-name {
+  color: #7d8989;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+}
+.pricing-value {
+  margin-top: 24px;
+  gap: 12px;
+  align-items: baseline;
+}
+.pricing-value h3 {
+  color: #2d4054;
+  font-size: clamp(54px, 7vw, 78px);
+  letter-spacing: -3px;
+}
+.pricing-value span {
+  color: #7d8989;
+  font-size: 14px;
+  font-weight: 600;
+}
+.pricing-quote {
+  border: 0;
+  margin: clamp(26px, 4vw, 42px) 0 0;
+  padding: 0;
+  color: #2d4054;
+}
+.pricing-quote h3 {
+  margin: 0 0 16px;
+  color: #344b63;
+  font-size: clamp(25px, 3vw, 34px);
+  line-height: 1.2;
+  font-weight: 800;
+}
+.pricing-quote p {
+  margin: 0;
+  color: #7d8989;
+  font-size: clamp(15px, 1.5vw, 19px);
+  line-height: 1.65;
+  font-weight: 500;
+  max-width: 650px;
+}
+@media (max-width: 600px) {
+  .pricing-main-card {
+    min-height: 0;
+    padding: 28px 24px;
+  }
+  .pricing-value h3 {
+    font-size: clamp(48px, 14vw, 66px);
+  }
+  .pricing-quote {
+    margin-top: 28px;
+  }
+}
