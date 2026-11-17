@@ -835,3 +835,50 @@ body.dark-mode .pricing-value span { color:#a6b1c8 !important; }
 body.dark-mode .pricing-quote h3 { color:#f1f5ff !important; }
 body.dark-mode .pricing-quote p { color:#b4c3d6 !important; }
 body.dark-mode .pricing-spec-row span { color:#a18cff !important; }
+
+
+/* Definitive logo-flight stacking */
+.site-header { z-index:1000 !important; }
+img.cm-fly { position:fixed !important; z-index:2147483647 !important; pointer-events:none !important; max-width:none !important; transform-origin:0 0 !important; }
+
+/* Pricing palette: Cascade blue / periwinkle / violet identity */
+.cascade-pricing {
+ padding:clamp(54px,6vw,82px) clamp(18px,6vw,7%) !important;
+ background:radial-gradient(ellipse at 12% 10%,rgba(139,120,255,.22),transparent 43%),radial-gradient(ellipse at 90% 85%,rgba(79,194,232,.2),transparent 45%),linear-gradient(135deg,#dce9ff 0%,#e8e5ff 48%,#d9f0fb 100%) !important;
+ color:#20294b !important;
+}
+.cascade-pricing .pricing-heading { margin-bottom:clamp(22px,3vw,34px) !important; }
+.cascade-pricing .pricing-eyebrow { color:#6256bd !important;font-size:13px !important;letter-spacing:.16em !important; }
+.cascade-pricing .pricing-heading h2 { color:#22294b !important;font-family:"Space Grotesk",sans-serif !important; }
+.cascade-pricing .pricing-grid { gap:clamp(16px,2vw,24px) !important; }
+.cascade-pricing .pricing-main-card {
+ min-height:0 !important;padding:clamp(26px,3.3vw,42px) !important;border-radius:26px !important;
+ background:linear-gradient(145deg,rgba(255,255,255,.91),rgba(231,232,255,.92)) !important;
+ border:1px solid rgba(105,91,201,.2) !important;box-shadow:0 18px 42px rgba(64,67,137,.13) !important;color:#26294c !important;
+}
+.cascade-pricing .pricing-main-card::before { background:linear-gradient(90deg,#6558c8,#9382ed,#52b9dc) !important; }
+.cascade-pricing .pricing-product-name { color:#716e9b !important;font:700 12px/1.4 "DM Sans",sans-serif !important;letter-spacing:.17em !important; }
+.cascade-pricing .pricing-value { margin-top:16px !important; }
+.cascade-pricing .pricing-value h3 { font:400 clamp(52px,6vw,76px)/1 "Titan One",sans-serif !important;letter-spacing:-.035em !important;background:linear-gradient(110deg,#4f48b7,#7765db 55%,#309fbe) !important;-webkit-background-clip:text !important;background-clip:text !important;color:transparent !important; }
+.cascade-pricing .pricing-value span { color:#777b9b !important;font-size:13px !important; }
+.cascade-pricing .pricing-quote { margin-top:clamp(22px,2.5vw,30px) !important; }
+.cascade-pricing .pricing-quote h3 { color:#25294c !important;font:700 clamp(25px,2.7vw,36px)/1.15 "Space Grotesk",sans-serif !important; }
+.cascade-pricing .pricing-quote p { color:#686f91 !important;font:600 clamp(15px,1.35vw,18px)/1.6 "DM Sans",sans-serif !important; }
+.cascade-pricing .pricing-spec-card {
+ padding:clamp(24px,3vw,38px) !important;border-radius:26px !important;background:linear-gradient(145deg,rgba(255,255,255,.9),rgba(229,241,255,.94)) !important;
+ border:1px solid rgba(105,125,204,.18) !important;box-shadow:0 18px 42px rgba(64,67,137,.09) !important;
+}
+.cascade-pricing .pricing-spec-row { border-color:rgba(104,111,170,.15) !important; }
+.cascade-pricing .pricing-spec-row span { color:#6258bd !important; }
+.cascade-pricing .pricing-spec-row p { color:#4f5c7d !important; }
+.cascade-pricing .pricing-disclaimer { color:#687391 !important; }
+body.dark-mode .cascade-pricing { background:radial-gradient(ellipse at 12% 10%,rgba(123,103,225,.18),transparent 43%),radial-gradient(ellipse at 90% 85%,rgba(53,160,191,.15),transparent 45%),linear-gradient(135deg,#15182b 0%,#1d2038 50%,#172b39 100%) !important;color:#edf0ff !important; }
+body.dark-mode .cascade-pricing .pricing-heading h2,body.dark-mode .cascade-pricing .pricing-quote h3 { color:#f0efff !important; }
+body.dark-mode .cascade-pricing .pricing-eyebrow,body.dark-mode .cascade-pricing .pricing-spec-row span { color:#aaa0ff !important; }
+body.dark-mode .cascade-pricing .pricing-main-card { background:linear-gradient(145deg,#252642,#202e43) !important;border-color:rgba(160,145,255,.22) !important;color:#f0efff !important; }
+body.dark-mode .cascade-pricing .pricing-product-name,body.dark-mode .cascade-pricing .pricing-value span { color:#b1b4d0 !important; }
+body.dark-mode .cascade-pricing .pricing-quote p,body.dark-mode .cascade-pricing .pricing-disclaimer { color:#b8c5dd !important; }
+body.dark-mode .cascade-pricing .pricing-spec-card { background:linear-gradient(145deg,#22283d,#1c3040) !important;border-color:rgba(103,180,210,.18) !important; }
+body.dark-mode .cascade-pricing .pricing-spec-row { border-color:rgba(164,174,220,.14) !important; }
+body.dark-mode .cascade-pricing .pricing-spec-row p { color:#c0cbe0 !important; }
+@media(max-width:760px) { .cascade-pricing { padding:48px 6% !important; }.cascade-pricing .pricing-main-card,.cascade-pricing .pricing-spec-card { padding:25px 22px !important; } }
