@@ -460,3 +460,183 @@ html, body {
   .pricing-quote h3 { font-size: clamp(25px, 7vw, 32px); }
   .pricing-quote p { font-size: 16px; }
 }
+
+
+/* Feature cards: small, purposeful animated product moments */
+.feature-card {
+  isolation: isolate;
+  padding-bottom: 108px;
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease;
+}
+.feature-card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 20px 42px rgba(27, 56, 79, .14);
+  border-color: rgba(92, 169, 190, .72);
+}
+.feature-motion {
+  position: absolute;
+  right: 24px;
+  bottom: 20px;
+  height: 68px;
+  width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+.water-tank {
+  position: relative;
+  width: 43px;
+  height: 58px;
+  border: 2px solid rgba(55, 143, 190, .7);
+  border-radius: 9px 9px 12px 12px;
+  overflow: hidden;
+  background: rgba(255,255,255,.48);
+  box-shadow: inset 0 0 14px rgba(70,177,220,.12);
+}
+.water-tank i {
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  bottom: 0;
+  height: 65%;
+  background: linear-gradient(180deg,#65d9ed,#398bd0);
+  border-radius: 45% 45% 0 0;
+  animation: cascadeWaterLevel 3.8s ease-in-out infinite alternate;
+}
+.water-tank i::before {
+  content:"";
+  position:absolute;
+  left:0;right:0;top:-5px;height:10px;
+  border-radius:50%;
+  background:#9af0f4;
+  animation:cascadeWaterRipple 2.2s ease-in-out infinite;
+}
+.water-tank b {
+  position:absolute;inset:9px 7px auto;height:2px;
+  background:rgba(255,255,255,.75);
+  box-shadow:0 13px rgba(255,255,255,.45),0 26px rgba(255,255,255,.3);
+}
+.water-readout {
+  margin-left:10px;
+  color:#3989ad;
+  font:700 17px/1 "Space Grotesk",sans-serif;
+  animation:cascadeReadout 3.8s ease-in-out infinite alternate;
+}
+@keyframes cascadeWaterLevel { from{height:38%} to{height:82%} }
+@keyframes cascadeWaterRipple { 50%{transform:translateX(7px)} }
+@keyframes cascadeReadout { from{opacity:.65} to{opacity:1} }
+
+.motor-motion { justify-content:center; }
+.motor-ring {
+  width:54px;height:54px;border:2px solid rgba(129,104,210,.42);
+  border-radius:50%;display:grid;place-items:center;position:relative;
+  background:rgba(255,255,255,.4);
+}
+.motor-ring::before,.motor-ring::after {
+  content:"";position:absolute;inset:7px;border:1px dashed rgba(129,104,210,.6);border-radius:50%;
+}
+.motor-ring i {
+  width:27px;height:27px;border-radius:50%;
+  background:conic-gradient(from 0deg,#9c86ed 0 18%,#d9d0ff 18% 34%,#9c86ed 34% 52%,#d9d0ff 52% 68%,#9c86ed 68% 86%,#d9d0ff 86%);
+  animation:cascadeMotorSpin 2.8s linear infinite;
+}
+.motor-pulse {
+  position:absolute;width:74px;height:74px;border:1px solid rgba(145,118,225,.45);
+  border-radius:50%;animation:cascadeMotorPulse 2.4s ease-out infinite;
+}
+@keyframes cascadeMotorSpin { to{transform:rotate(360deg)} }
+@keyframes cascadeMotorPulse { 0%{transform:scale(.65);opacity:.75} 100%{transform:scale(1.25);opacity:0} }
+
+.alert-motion { justify-content:center; }
+.alert-toast {
+  width:108px;height:48px;border-radius:12px;
+  background:rgba(255,255,255,.82);
+  border:1px solid rgba(54,174,184,.3);
+  box-shadow:0 7px 18px rgba(34,105,125,.1);
+  display:flex;align-items:center;gap:8px;padding:9px;
+  animation:cascadeAlertFloat 3.2s ease-in-out infinite;
+}
+.alert-toast i {
+  width:22px;height:22px;border-radius:8px;background:#d7f6ef;position:relative;
+}
+.alert-toast i::after {
+  content:"!";position:absolute;inset:0;display:grid;place-items:center;
+  color:#299d8c;font:800 14px/1 "DM Sans",sans-serif;
+}
+.alert-toast b,.alert-toast em {
+  display:block;height:5px;border-radius:5px;background:#a6c9c9;
+}
+.alert-toast b{width:42px;box-shadow:0 9px #d4e3e3}
+.alert-toast em{position:absolute;width:5px;height:5px;border-radius:50%;background:#36b6a4;margin-left:88px;margin-top:-25px}
+.alert-dot {
+  position:absolute;width:9px;height:9px;border-radius:50%;background:#54c5b1;
+  right:7px;top:3px;box-shadow:0 0 0 0 rgba(84,197,177,.55);
+  animation:cascadeAlertPing 1.8s ease-out infinite;
+}
+@keyframes cascadeAlertFloat { 0%,100%{transform:translateY(2px)} 50%{transform:translateY(-5px)} }
+@keyframes cascadeAlertPing { 70%,100%{box-shadow:0 0 0 9px rgba(84,197,177,0)} }
+
+@media(max-width:760px) {
+  .feature-card { padding-bottom:98px; }
+  .feature-motion { right:18px;bottom:16px;transform:scale(.9);transform-origin:bottom right; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .feature-motion *, .feature-motion *::before, .feature-motion *::after {
+    animation:none !important;
+  }
+}
+
+/* Bring the price statement into Cascade's water-tech visual language */
+.cascade-pricing {
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg,#eef9f8 0%,#f4f3ff 52%,#eaf7fb 100%);
+}
+.cascade-pricing::before,.cascade-pricing::after {
+  content:"";position:absolute;border-radius:50%;pointer-events:none;filter:blur(2px);
+}
+.cascade-pricing::before {
+  width:360px;height:360px;right:-150px;top:-190px;
+  background:radial-gradient(circle,rgba(96,190,205,.2),transparent 70%);
+}
+.cascade-pricing::after {
+  width:300px;height:300px;left:-150px;bottom:-190px;
+  background:radial-gradient(circle,rgba(139,125,220,.15),transparent 70%);
+}
+.pricing-container { position:relative;z-index:1; }
+.pricing-heading .pricing-eyebrow {
+  color:#4b9eaa;
+  font-family:"DM Sans",sans-serif;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.16em;
+}
+.pricing-heading h2 {
+  color:#233d50;
+  font-family:"Space Grotesk",sans-serif;
+  letter-spacing:-.04em;
+}
+.pricing-main-card {
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(108,174,184,.25);
+  border-radius:24px;
+  background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(231,247,247,.92));
+  box-shadow:0 18px 48px rgba(42,91,110,.09);
+}
+.pricing-main-card::before {
+  content:"";position:absolute;inset:0 0 auto;height:4px;
+  background:linear-gradient(90deg,#54b8c6,#8b83df,#75d4c4);
+}
+.pricing-value h3 {
+  background:linear-gradient(115deg,#25485b,#3d7890 58%,#7d79c8);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.pricing-quote h3 { color:#29475b; }
+.pricing-quote p { color:#748b91; }
+.pricing-spec-card {
+  border:1px solid rgba(108,174,184,.2);
+  border-radius:24px;
+  box-shadow:0 18px 48px rgba(42,91,110,.07);
+}
