@@ -1,0 +1,18 @@
+# Node
+node_modules/
+
+# Capacitor generated web bundle
+www/
+
+# Android generated/build files
+android/.gradle/
+android/local.properties
+android/build/
+android/app/build/
+android/.idea/
+android/*.iml
+.idea/
+
+# OS/editor
+.DS_Store
+Thumbs.db
