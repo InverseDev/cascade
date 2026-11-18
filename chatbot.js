@@ -116,7 +116,6 @@
   };
   function applyLanguage() {
     const t = uiText[assistantLanguage];
-    root.querySelector(".cascade-chat-language-label").textContent = t.label;
     root.querySelector(".cascade-chat-welcome h3").textContent = t.welcome;
     root.querySelector(".cascade-chat-welcome p").textContent = t.intro;
     root.querySelector(".cascade-chat-form input").placeholder = t.placeholder;
