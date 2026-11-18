@@ -411,3 +411,17 @@ html.cascade-native-app body.dark-mode #alarmForm input:not([type="checkbox"]),
 html.cascade-native-app body.dark-mode #alarmForm select { background:#17263a !important; color:#eaf2ff !important; border-color:#344963 !important; }
 html.cascade-native-app body.dark-mode .alarm-sound-area { background:#17263a !important; border-color:#344963 !important; }
 html.cascade-native-app .cascade-chat-launcher { display:none !important; }
+
+/* Neutral offline/stale-data messaging: informative, not an error-colored warning. */
+html.cascade-native-app .alert-message.warning,
+html.cascade-native-app .level-state {
+  color:#7c899a !important;
+  background:#f1f4f7 !important;
+  border-color:#e2e8ef !important;
+}
+html.cascade-native-app body.dark-mode .alert-message.warning,
+html.cascade-native-app body.dark-mode .level-state {
+  color:#a6b3c3 !important;
+  background:#1b2a3d !important;
+  border-color:#34465c !important;
+}
