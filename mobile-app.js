@@ -39,6 +39,7 @@
   });
   document.body.appendChild(nav);
   const main=document.querySelector("main"); if(main) main.classList.add("cascade-app-content");
+  const dashboardTitle=document.querySelector(".dashboard-heading h2");if(dashboardTitle)dashboardTitle.textContent="Dashboard";
   function setActive(key){active=key;Object.entries(navButtons).forEach(([name,button])=>{button.classList.toggle("active",name===key);if(name===key)button.setAttribute("aria-current","page");else button.removeAttribute("aria-current");});}
   function closeDrawer(){overlay.classList.remove("open");document.body.classList.remove("cascade-drawer-open");}
   function openDrawer(){overlay.classList.add("open");document.body.classList.add("cascade-drawer-open");}
@@ -61,8 +62,9 @@
   if(authLogin&&authSession){new MutationObserver(syncAuthView).observe(authLogin,{attributes:true,attributeFilter:["hidden"]});new MutationObserver(syncAuthView).observe(authSession,{attributes:true,attributeFilter:["hidden"]});}
   syncAuthView();
   const themeMenu=overlay.querySelector(".cascade-drawer-theme");
+  themeMenu.classList.toggle("enabled",document.body.classList.contains("dark-mode"));
   themeMenu.addEventListener("click",()=>{const themeButton=document.getElementById("themeToggle");if(themeButton)themeButton.click();themeMenu.classList.toggle("enabled",document.body.classList.contains("dark-mode"));});
-  async function requestAppNotifications(){const plugin=Capacitor?.Plugins?.LocalNotifications;if(!plugin||typeof plugin.checkPermissions!=="function")return;try{const permission=await plugin.checkPermissions();if(permission.display==="prompt"||permission.display==="prompt-with-rationale")await plugin.requestPermissions();}catch(error){console.warn("Cascade notification permission:",error);}}
+  async function requestAppNotifications(){const plugin=Capacitor?.Plugins?.LocalNotifications;if(!plugin||typeof plugin.checkPermissions!=="function")return;try{if(plugin.createChannel)await plugin.createChannel({id:"cascade-alerts",name:"Cascade alerts",description:"Water level and pump alerts",importance:4});const permission=await plugin.checkPermissions();if(permission.display==="prompt"||permission.display==="prompt-with-rationale")await plugin.requestPermissions();}catch(error){console.warn("Cascade notification permission:",error);}}
   requestAppNotifications();
   if(active==="dashboard"&&!window.location.hash)history.replaceState(null,"",window.location.pathname+"#dashboard");
   setActive(active);
