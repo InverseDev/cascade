@@ -93,3 +93,45 @@ body.dark-mode #cascade-chat .cascade-chat-form input{color:#f0efff!important;bo
  #cascade-chat .cascade-chat-language{max-width:94px!important}
  #cascade-chat .cascade-chat-head-actions{gap:6px!important}
 }
+
+
+/* Premium language menu: compact trigger with a clear, native-script picker. */
+#cascade-chat .cascade-chat-head-actions{position:relative!important;gap:10px!important}
+#cascade-chat .cascade-language-picker{position:relative!important;z-index:8!important}
+#cascade-chat .cascade-language-trigger{all:unset!important;box-sizing:border-box!important;min-width:112px!important;height:43px!important;padding:5px 9px!important;display:flex!important;align-items:center!important;gap:8px!important;border:1px solid #ffffff45!important;border-radius:12px!important;color:#fff!important;background:linear-gradient(145deg,#ffffff20,#ffffff0d)!important;box-shadow:inset 0 1px 0 #ffffff20!important;cursor:pointer!important;transition:background .18s,border-color .18s,transform .18s!important}
+#cascade-chat .cascade-language-trigger:hover,#cascade-chat .cascade-language-trigger[aria-expanded="true"]{border-color:#ffffff90!important;background:#ffffff28!important}
+#cascade-chat .cascade-language-trigger:active{transform:scale(.98)!important}
+#cascade-chat .cascade-language-globe{width:27px!important;height:27px!important;display:grid!important;place-items:center!important;border:1px solid #ffffff38!important;border-radius:9px!important;color:#fff!important;background:#ffffff20!important;font:600 15px/1 "Poppins",sans-serif!important}
+#cascade-chat .cascade-language-current{min-width:0!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:2px!important}
+#cascade-chat .cascade-language-current small{color:#c9d8f5!important;font:700 7px/1 "Montserrat",sans-serif!important;letter-spacing:1px!important}
+#cascade-chat .cascade-language-current strong{color:#fff!important;font:600 11px/1.2 "Montserrat",sans-serif!important;white-space:nowrap!important}
+#cascade-chat .cascade-language-chevron{margin-left:auto!important;color:#dce8ff!important;font:500 18px/1 Arial,sans-serif!important;transition:transform .18s!important}
+#cascade-chat .cascade-language-trigger[aria-expanded="true"] .cascade-language-chevron{transform:rotate(180deg)!important}
+#cascade-chat .cascade-language-menu{position:absolute!important;top:calc(100% + 11px)!important;right:0!important;width:252px!important;padding:10px!important;border:1px solid #e4e8f2!important;border-radius:17px!important;background:#fff!important;box-shadow:0 18px 48px #101b3d38!important;color:#202944!important;animation:cascadeLanguageMenuIn .16s ease-out both!important}
+#cascade-chat .cascade-language-menu[hidden]{display:none!important}
+#cascade-chat .cascade-language-menu-title{padding:5px 8px 9px!important;color:#78839b!important;font:700 9px "Montserrat",sans-serif!important;letter-spacing:1.1px!important;text-transform:uppercase!important}
+#cascade-chat .cascade-language-option{all:unset!important;box-sizing:border-box!important;width:100%!important;min-height:54px!important;padding:7px 8px!important;display:flex!important;align-items:center!important;gap:10px!important;border:1px solid transparent!important;border-radius:11px!important;color:#25324c!important;cursor:pointer!important;transition:background .15s,border-color .15s!important}
+#cascade-chat .cascade-language-option:hover{background:#f3f6fc!important}
+#cascade-chat .cascade-language-option.active{border-color:#dfe3fa!important;background:#f1f2ff!important}
+#cascade-chat .cascade-language-script{width:34px!important;height:34px!important;flex:0 0 34px!important;display:grid!important;place-items:center!important;border-radius:10px!important;color:#fff!important;background:linear-gradient(145deg,#6673d8,#398da9)!important;font:700 12px "Poppins",sans-serif!important}
+#cascade-chat .cascade-language-option>span:nth-child(2){min-width:0!important;display:flex!important;flex-direction:column!important;gap:3px!important}
+#cascade-chat .cascade-language-option strong{color:#25324c!important;font:700 12px "Montserrat",sans-serif!important}
+#cascade-chat .cascade-language-option small{color:#8992a7!important;font:500 9px "Montserrat",sans-serif!important}
+#cascade-chat .cascade-language-check{margin-left:auto!important;color:#5d68cb!important;font:700 14px Arial,sans-serif!important;opacity:0!important}
+#cascade-chat .cascade-language-option.active .cascade-language-check{opacity:1!important}
+#cascade-chat .cascade-language-menu-note{margin:7px 3px 1px!important;padding:9px 7px 2px!important;border-top:1px solid #edf0f6!important;color:#8992a7!important;font:500 9px/1.5 "Montserrat",sans-serif!important}
+@keyframes cascadeLanguageMenuIn{from{opacity:0;transform:translateY(-5px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+body.dark-mode #cascade-chat .cascade-language-menu{border-color:#3b4160!important;background:#202640!important}
+body.dark-mode #cascade-chat .cascade-language-menu-title,body.dark-mode #cascade-chat .cascade-language-menu-note{color:#a6afc8!important}
+body.dark-mode #cascade-chat .cascade-language-menu-note{border-color:#3b4160!important}
+body.dark-mode #cascade-chat .cascade-language-option{color:#e9eaff!important}
+body.dark-mode #cascade-chat .cascade-language-option:hover{background:#2a3150!important}
+body.dark-mode #cascade-chat .cascade-language-option.active{border-color:#515b85!important;background:#30375a!important}
+body.dark-mode #cascade-chat .cascade-language-option strong{color:#f0efff!important}
+body.dark-mode #cascade-chat .cascade-language-option small{color:#aab2cb!important}
+@media(max-width:430px){
+ #cascade-chat .cascade-language-trigger{min-width:98px!important;height:40px!important;padding:4px 7px!important;gap:6px!important}
+ #cascade-chat .cascade-language-globe{width:25px!important;height:25px!important}
+ #cascade-chat .cascade-language-menu{right:-42px!important;width:min(252px,calc(100vw - 34px))!important}
+}
+@media(prefers-reduced-motion:reduce){#cascade-chat .cascade-language-menu,#cascade-chat .cascade-language-chevron{animation:none!important;transition:none!important}}
