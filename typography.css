@@ -1,0 +1,45 @@
+/* Cascade typography system: Open Sans + Ubuntu + Rubik */
+:root {
+  --font-body: "Open Sans", sans-serif;
+  --font-heading: "Ubuntu", sans-serif;
+  --font-ui: "Rubik", sans-serif;
+}
+html, body {
+  font-family: var(--font-body) !important;
+}
+*, *::before, *::after {
+  font-family: inherit !important;
+}
+h1, h2, h3, h4, h5, h6,
+.hero h1, .section-heading h2, .dashboard-heading h2,
+.history-title h1, .alarm-page-heading h1,
+.cascade-pricing h2, .cascade-pricing h3,
+#cascade-chat .cascade-chat-welcome h3 {
+  font-family: var(--font-heading) !important;
+}
+button, input, select, textarea,
+nav, .main-nav a, .history-nav-actions a, .alarm-nav-actions a,
+.eyebrow, .card-kicker, .section-eyebrow, .history-eyebrow,
+.alarm-eyebrow, .status-label, .range-ends, .range-value span,
+.feature-number, .history-label, .pricing-eyebrow,
+#cascade-chat button, #cascade-chat select,
+#cascade-chat .cascade-chat-language-label,
+#cascade-chat .cascade-chat-language,
+#cascade-chat .cascade-chat-suggestions button,
+#cascade-chat .cascade-chat-confirm button,
+#cascade-chat .cascade-chat-language-option,
+#cascade-chat .cascade-chat-brand strong {
+  font-family: var(--font-ui) !important;
+}
+#cascade-chat {
+  font-family: var(--font-body) !important;
+}
+#cascade-chat .cascade-chat-message,
+#cascade-chat .cascade-chat-welcome p,
+#cascade-chat .cascade-chat-form input,
+#cascade-chat .cascade-chat-foot {
+  font-family: var(--font-body) !important;
+}
+#cascade-chat .cascade-chat-welcome h3 {
+  font-family: var(--font-heading) !important;
+}
