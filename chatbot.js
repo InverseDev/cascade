@@ -321,11 +321,38 @@
       if ("Notification" in window) { Notification.requestPermission(); return "Requested browser notification permission."; }
       return "This browser does not support notifications.";
     }
+    if (/\\b(refresh|reload|update)\\b.*\\b(sensor|readings|device|dashboard)\\b/.test(q)) {
+      if (typeof window.fetchLatestReading === "function") { window.fetchLatestReading(); return "Refreshing the latest sensor reading from Supabase."; }
+      navigateTo("dashboard"); return "Opening the Dashboard, where live sensor readings are displayed.";
+    }
+    if (/\\b(test|preview|play)\\b.*\\b(alarm|ringtone|sound)\\b/.test(q)) {
+      const button = document.getElementById("testAlarmSound");
+      if (!button) { navigateTo("alerts"); return "Opening Alarm Centre. I can preview the selected ringtone there."; }
+      button.click(); return "Playing a preview of the currently selected alarm sound.";
+    }
+    const soundChoice = q.match(/\\b(classic|gentle|digital)\\b.*\\b(sound|ringtone|alarm)\\b|\\b(sound|ringtone|alarm)\\b.*\\b(classic|gentle|digital)\\b/);
+    if (soundChoice) {
+      const select = document.getElementById("alarmSoundPreset");
+      if (!select) { navigateTo("alerts"); return "Opening Alarm Centre. Ask me again to change the ringtone."; }
+      const preset = ["classic","gentle","digital"].find(value => q.includes(value));
+      if (preset) { select.value = preset; select.dispatchEvent(new Event("change",{bubbles:true})); return "Selected the " + preset + " alarm sound."; }
+    }
+    if (/\\b(clear|reset)\\b.*\\b(search|filters?)\\b/.test(q)) {
+      const search = document.getElementById("historySearch");
+      const from = document.getElementById("historyFrom"), to = document.getElementById("historyTo");
+      if (!search || !from || !to) { navigateTo("history"); return "Opening History & Reports. Ask me again to clear its filters."; }
+      search.value = ""; from.value = ""; to.value = "";
+      search.dispatchEvent(new Event("input",{bubbles:true}));
+      from.dispatchEvent(new Event("change",{bubbles:true}));
+      to.dispatchEvent(new Event("change",{bubbles:true}));
+      const all = document.querySelector('.history-filter[data-filter="all"]'); if (all) all.click();
+      return "Cleared the history search and date filters.";
+    }
 
     const alertPref = q.match(/\b(enable|turn on|disable|turn off)\b.*\b(low water|low-water|motor|cutoff|cut-off)\b.*\b(alert|alerts|notification|notifications)\b|\b(enable|turn on|disable|turn off)\b.*\b(alert|alerts|notifications)\b.*\b(low water|low-water|motor|cutoff|cut-off)\b/);
     if (alertPref) {
       const enabled = /enable|turn on/.test(q);
-      const targetText = (alertPref[2] || alertPref[6] || "").replace(/-/g,"");
+      const targetText = (alertPref[2] || alertPref[4] || "").replace(/-/g," ");
       const target = /low water/.test(targetText) ? "lowWaterAlertEnabled" : /motor/.test(targetText) ? "motorAlertEnabled" : /cutoff/.test(targetText) ? "cutoffAlertEnabled" : null;
       if (!target) return "Which alert do you mean: low-water, motor, or automatic-cutoff alerts?";
       const checkbox = document.getElementById(target);
