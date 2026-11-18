@@ -1,0 +1,20 @@
+{
+  "name": "cascade",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cascade smart water management website and Android app",
+  "scripts": {
+    "build:mobile": "node scripts/prepare-mobile.mjs",
+    "android:sync": "npm run build:mobile && cap sync android",
+    "android:open": "cap open android",
+    "android:run": "npm run android:sync && cap run android",
+    "android:apk": "npm run android:sync && cd android && gradlew.bat assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/core": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/cli": "^8.0.0"
+  }
+}
