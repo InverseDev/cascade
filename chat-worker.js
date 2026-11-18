@@ -34,12 +34,22 @@ export default {
       const language = ["en", "hi", "bn"].includes(body.language) ? body.language : "en";
       const languageName = language === "hi" ? "Hindi (हिन्दी)" : language === "bn" ? "Bengali (বাংলা)" : "English";
       if (!message) return Response.json({ error: "Message is required." }, { status: 400, headers: cors });
+      const live = body.liveStatus && typeof body.liveStatus === "object" ? body.liveStatus : null;
+      const liveContext = live ? JSON.stringify({
+        waterLevelPercent: Number.isFinite(Number(live.waterLevelPercent)) ? Number(live.waterLevelPercent) : null,
+        distanceCm: Number.isFinite(Number(live.distanceCm)) ? Number(live.distanceCm) : null,
+        sensorOnline: live.sensorOnline === true,
+        motorStatus: ["on", "off"].includes(live.motorStatus) ? live.motorStatus : "unknown",
+        lastUpdated: typeof live.lastUpdated === "string" ? live.lastUpdated : null,
+        lowWaterAlertPercent: Number.isFinite(Number(live.lowWaterAlertPercent)) ? Number(live.lowWaterAlertPercent) : null,
+        maximumCutoffPercent: Number.isFinite(Number(live.maximumCutoffPercent)) ? Number(live.maximumCutoffPercent) : null
+      }) : "No live dashboard sensor context is available.";
       const upstream = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
         body: JSON.stringify({
           model: "gemini-3.8-flash",
-          input: SYSTEM_PROMPT + "\n\nRESPONSE LANGUAGE (mandatory): " + languageName + ". Understand the visitor's message even if it is in another supported language, but answer in " + languageName + ".\n\nRecent conversation:\n" + history + "\n\nVisitor's latest message: " + message
+          input: SYSTEM_PROMPT + "\n\nRESPONSE LANGUAGE (mandatory): " + languageName + ". Understand the visitor's message even if it is in another supported language, but answer in " + languageName + ".\n\nLIVE DASHBOARD CONTEXT (use this for questions about current water level, sensor, or pump; do not invent missing values):\n" + liveContext + "\n\nRecent conversation:\n" + history + "\n\nVisitor's latest message: " + message
         })
       });
       const data = await upstream.json();
