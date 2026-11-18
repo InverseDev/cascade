@@ -30,7 +30,7 @@ export default {
     try {
       const body = await request.json();
       const message = String(body.message || "").trim().slice(0, 1000);
-      const history = String(body.history || "").slice(-6000);
+      const history = String(body.history || "").slice(-3500);
       const language = ["en", "hi", "bn"].includes(body.language) ? body.language : "en";
       const languageName = language === "hi" ? "Hindi (हिन्दी)" : language === "bn" ? "Bengali (বাংলা)" : "English";
       if (!message) return Response.json({ error: "Message is required." }, { status: 400, headers: cors });
@@ -45,7 +45,7 @@ export default {
         maximumCutoffPercent: Number.isFinite(Number(live.maximumCutoffPercent)) ? Number(live.maximumCutoffPercent) : null
       }) : "No live dashboard sensor context is available.";
       // Try the primary model first, then lighter stable models if Google reports temporary capacity pressure.
-      const models = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite"];
+      const models = ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.8-flash"];
       let upstream, data, usedModel = models[0];
       for (let i = 0; i < models.length; i++) {
         usedModel = models[i];
@@ -54,6 +54,7 @@ export default {
           headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
           body: JSON.stringify({
             model: usedModel,
+            generation_config: { thinking_level: "minimal", max_output_tokens: 512 },
             input: SYSTEM_PROMPT + "\n\nRESPONSE LANGUAGE (mandatory): " + languageName + ". Understand the visitor's message even if it is in another supported language, but answer in " + languageName + ".\n\nLIVE DASHBOARD CONTEXT (use this for questions about current water level, sensor, or pump; do not invent missing values):\n" + liveContext + "\n\nRecent conversation:\n" + history + "\n\nVisitor's latest message: " + message
           })
         });
