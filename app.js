@@ -30,6 +30,19 @@ function setConnectionState(state, label) {
   }
 }
 
+async function sendCascadeAppNotification(title, body, id = 1201) {
+  const nativePlugin = window.Capacitor?.isNativePlatform?.() ? window.Capacitor?.Plugins?.LocalNotifications : null;
+  if (nativePlugin) {
+    try {
+      const permission = await nativePlugin.checkPermissions();
+      if (permission.display !== "granted") return;
+      await nativePlugin.schedule({ notifications: [{ id, title, body, schedule: { at: new Date(Date.now() + 500) }, channelId: "cascade-alerts" }] });
+    } catch (error) { console.warn("Cascade app notification failed:", error); }
+    return;
+  }
+  if ("Notification" in window && Notification.permission === "granted") new Notification(title, { body });
+}
+
 function updateDashboard() {
   updateMotorControls();
   const waitingForReading = waterLevel === null || !Number.isFinite(waterLevel);
@@ -94,9 +107,7 @@ function updateDashboard() {
       alertMessage.classList.add("warning");
       if (!previousLowState) {
         addActivity("Minimum water threshold reached: " + pct.toFixed(1) + "%");
-        if ("Notification" in window && Notification.permission === "granted") {
-          new Notification("Cascade: Minimum Water Threshold", { body: `Tank level is ${pct.toFixed(1)}%. Automatic pump start requires ESP32 automation.` });
-        }
+        sendCascadeAppNotification("Cascade: Low water", `Tank level is ${pct.toFixed(1)}%. Check the pump and water supply.`, 1201);
       }
       previousLowState = true;
     } else {
@@ -271,18 +282,21 @@ function saveSettings() {
     alert("Could not save dashboard preferences in this browser.");
   }
 }
-async function enableNotifications() {
-  if (!("Notification" in window)) {
-    alert("Your browser does not support notifications.");
+async async function enableNotifications() {
+  const nativePlugin = window.Capacitor?.isNativePlatform?.() ? window.Capacitor?.Plugins?.LocalNotifications : null;
+  if (nativePlugin) {
+    try {
+      const permission = await nativePlugin.checkPermissions();
+      const result = permission.display === "granted" ? permission : await nativePlugin.requestPermissions();
+      if (result.display === "granted") addActivity("App notifications enabled.");
+      else alert("Notification permission was not granted.");
+    } catch (error) { console.error("App notification permission:", error); }
     return;
   }
+  if (!("Notification" in window)) { alert("Your browser does not support notifications."); return; }
   const permission = await Notification.requestPermission();
-  if (permission === "granted") {
-    new Notification("Cascade", { body: "Browser notifications are enabled." });
-    addActivity("Browser notifications enabled.");
-  } else {
-    alert("Notification permission was not granted.");
-  }
+  if (permission === "granted") { new Notification("Cascade", { body: "Browser notifications are enabled." }); addActivity("Browser notifications enabled."); }
+  else alert("Notification permission was not granted.");
 }
 
 function setSensorOffline(message, state = "offline", label = "DEVICE OFFLINE") {
