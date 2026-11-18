@@ -243,3 +243,74 @@ html.cascade-native-app.cascade-assistant-active body { padding-top:0 !important
 html.cascade-native-app .motor-auth-required[hidden] { display:none !important; }
 .cascade-drawer-account-link { display:block;padding:12px;border-radius:12px;color:#2563eb;font:650 14px system-ui,sans-serif;text-decoration:none;background:#edf4ff; }
 html.cascade-native-app body.dark-mode .cascade-drawer-account-link { color:#a9cbff;background:#1a3555; }
+
+
+/* Customer app refinement: keep only controls and live system information. */
+html.cascade-native-app .dashboard-heading .eyebrow,
+html.cascade-native-app .dashboard-heading h2,
+html.cascade-native-app .sensor-meta,
+html.cascade-native-app .motor-card .card-top,
+html.cascade-native-app .motor-card > .muted-copy,
+html.cascade-native-app .setting-card .muted-copy,
+html.cascade-native-app .alert-card .muted-copy,
+html.cascade-native-app .cascade-chat-avatar,
+html.cascade-native-app #cascade-chat .cascade-chat-avatar,
+html.cascade-native-app .notification-toggle,
+html.cascade-native-app .notification-panel {
+  display: none !important;
+}
+html.cascade-native-app .dashboard-heading {
+  justify-content: flex-end !important;
+  margin: 0 2px 10px !important;
+}
+html.cascade-native-app .dashboard-heading > div:first-child { display:none !important; }
+html.cascade-native-app .motor-auth-required {
+  display: block !important;
+  margin: 8px 0 2px !important;
+  font: 650 13px/1.3 system-ui,sans-serif !important;
+  color: var(--cascade-app-muted) !important;
+}
+html.cascade-native-app .motor-auth-required[hidden] { display:none !important; }
+html.cascade-native-app .motor-card .button-row { display:none !important; }
+html.cascade-native-app .motor-card .button-row[hidden] { display:none !important; }
+html.cascade-native-app .cascade-app-drawer .motor-auth {
+  display:block !important;
+  margin-top:12px !important;
+}
+html.cascade-native-app .cascade-app-drawer .motor-auth-message { margin-top:8px !important; }
+html.cascade-native-app .cascade-app-drawer .motor-auth-required { display:none !important; }
+html.cascade-native-app .cascade-drawer-account h3 {
+  margin: 0 0 8px !important;
+  font: 700 15px/1.2 system-ui,sans-serif !important;
+}
+html.cascade-native-app .cascade-drawer-auth-slot .motor-auth label { display:block !important; }
+html.cascade-native-app .cascade-drawer-auth-slot .motor-auth input {
+  display:block !important; width:100% !important; margin:8px 0 !important;
+}
+html.cascade-native-app .cascade-drawer-auth-slot .motor-auth .auth-btn {
+  width:100% !important; margin-top:4px !important;
+}
+html.cascade-native-app .cascade-drawer-auth-slot .motor-auth-message {
+  display:block !important; font-size:12px !important;
+}
+html.cascade-native-app .cascade-chat-brand img,
+html.cascade-native-app .cascade-chat-brand .cascade-chat-avatar,
+html.cascade-native-app #cascade-chat .cascade-chat-head img {
+  display:none !important;
+}
+html.cascade-native-app body.dark-mode .cascade-app-topbar {
+  background:rgba(11,23,40,.97) !important;
+  border-color:#26364c !important;
+}
+html.cascade-native-app body.dark-mode .cascade-app-wordmark,
+html.cascade-native-app body.dark-mode .cascade-app-menu-button {
+  color:#eaf2ff !important;
+}
+html.cascade-native-app body.dark-mode .cascade-app-drawer {
+  background:#12243b !important; color:#eef4ff !important;
+}
+html.cascade-native-app body.dark-mode .cascade-drawer-links a,
+html.cascade-native-app body.dark-mode .cascade-drawer-theme {
+  color:#d8e6f8 !important;
+}
+html.cascade-native-app body.dark-mode .cascade-drawer-divider { background:#263b56 !important; }
