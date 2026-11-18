@@ -45,7 +45,9 @@ async function syncNativeAlarm(alarm) {
             at = new Date(`${alarm.date || new Date().toLocaleDateString("en-CA")}T${alarm.time}:00`);
             if (at <= new Date()) return;
         }
-        const schedule = alarm.repeat ? { at, repeats: true, every: "day" } : { at };
+        const schedule = alarm.repeat
+            ? { on: { hour: Number(alarm.time.split(":")[0]), minute: Number(alarm.time.split(":")[1]) }, allowWhileIdle: true }
+            : { at, allowWhileIdle: true };
         await plugin.schedule({ notifications: [{
             id, title: alarm.name || "Cascade reminder",
             body: "Your scheduled Cascade reminder.",
