@@ -1466,3 +1466,18 @@ body.dark-mode .site-header .menu-toggle:hover {
   .site-header .theme-toggle,
   .site-header .menu-toggle { transition: none !important; }
 }
+
+
+/* Header refinements: desktop uses the full nav; hamburger is mobile-only. */
+.site-header .menu-toggle { display: none !important; }
+@media (max-width: 650px) {
+  .site-header .menu-toggle { display: inline-grid !important; }
+}
+
+/* Keep the notification popover above the sticky header and page content. */
+#notificationPanel {
+  z-index: 2001 !important;
+  max-height: min(70vh, 620px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
