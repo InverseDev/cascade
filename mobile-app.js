@@ -41,6 +41,8 @@
   document.body.appendChild(nav);
   const main=document.querySelector("main"); if(main) main.classList.add("cascade-app-content");
   const dashboardTitle=document.querySelector(".dashboard-heading h2");if(dashboardTitle)dashboardTitle.textContent="Dashboard";
+  const compactLabels=[[".water-card .card-kicker","WATER LEVEL"],[".motor-card .card-kicker","PUMP CONTROL"],[".setting-card .card-kicker","MAX LEVEL"],[".alert-card .card-kicker","LOW LEVEL"]];
+  compactLabels.forEach(([selector,label])=>{const node=document.querySelector(selector);if(node)node.textContent=label;});
   function setActive(key){active=key;Object.entries(navButtons).forEach(([name,button])=>{button.classList.toggle("active",name===key);if(name===key)button.setAttribute("aria-current","page");else button.removeAttribute("aria-current");});}
   function closeDrawer(){overlay.classList.remove("open");document.body.classList.remove("cascade-drawer-open");}
   function openDrawer(){overlay.classList.add("open");document.body.classList.add("cascade-drawer-open");}
