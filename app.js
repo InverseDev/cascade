@@ -90,12 +90,12 @@ function updateDashboard() {
       alertMessage.classList.toggle("warning", !waitingForReading);
       previousLowState = false;
     } else if (pct <= lowWaterLevel) {
-      alertMessage.textContent = "⚠ Low water! Tank needs filling.";
+      alertMessage.textContent = "⚠ Minimum threshold reached. The pump start rule is set, but automatic starting is not active until ESP32 automation is implemented.";
       alertMessage.classList.add("warning");
       if (!previousLowState) {
-        addActivity("Low-water alert: " + pct.toFixed(1) + "%");
+        addActivity("Minimum water threshold reached: " + pct.toFixed(1) + "%");
         if ("Notification" in window && Notification.permission === "granted") {
-          new Notification("Cascade: Low Water", { body: `Tank level is ${pct.toFixed(1)}%.` });
+          new Notification("Cascade: Minimum Water Threshold", { body: `Tank level is ${pct.toFixed(1)}%. Automatic pump start requires ESP32 automation.` });
         }
       }
       previousLowState = true;
@@ -264,7 +264,7 @@ function saveSettings() {
   }
   try {
     localStorage.setItem("cascade-dashboard-settings", JSON.stringify({ cutoffLevel, lowWaterLevel }));
-    addActivity(`Dashboard preferences saved locally: cutoff ${cutoffLevel}%, low alert ${lowWaterLevel}%.`);
+    addActivity(`Dashboard preferences saved locally: maximum ${cutoffLevel}%, minimum ${lowWaterLevel}%.`);
     alert("Dashboard preferences saved on this browser. Device-side automation is not active yet.");
   } catch (error) {
     console.error("Settings save failed:", error);
