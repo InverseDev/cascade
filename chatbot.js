@@ -13,11 +13,17 @@
         <button class="cascade-chat-close" type="button" aria-label="Close chat">×</button>
       </header>
       <div class="cascade-chat-messages" role="log" aria-live="polite">
-        <div class="cascade-chat-message bot">Hi! I'm the Cascade assistant. Ask me about the system, dashboard, water monitoring or pump automation.</div>
+        <div class="cascade-chat-welcome">
+          <div class="cascade-chat-welcome-label">CASCADE · SMART WATER SYSTEM</div>
+          <h3>How can I help you?</h3>
+          <p>Ask me about your tank, water levels, alerts or pump controls. I can also help you adjust dashboard settings.</p>
+        </div>
+        <div class="cascade-chat-message bot">Hello! I'm your Cascade assistant. What would you like to know?</div>
         <div class="cascade-chat-suggestions">
-          <button type="button" data-question="How does Cascade work?">How does it work?</button>
-          <button type="button" data-question="Explain the dashboard features.">Dashboard features</button>
-          <button type="button" data-question="How do I change the low-water alert?">Change alert level</button>
+          <button type="button" data-question="How does Cascade work?">How does the system work?</button>
+          <button type="button" data-question="Explain the dashboard features.">Explore dashboard features</button>
+          <button type="button" data-question="How do I change the low-water alert?">Change low-water alert</button>
+          <button type="button" data-question="How do I change the maximum cutoff level?">Adjust maximum level</button>
         </div>
       </div>
       <form class="cascade-chat-form">
