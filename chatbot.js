@@ -548,7 +548,7 @@
       if(button.disabled) return "I can't send a pump-OFF command: sign in with the owner account first.";
       return confirmAction("Send a command to turn the pump OFF?", () => { window.motorOff(); return "Pump OFF command submitted. Check the reported device status for confirmation."; });
     }
-    if (/\b(explain|how|what|why|tell me)\b/.test(q)) return localAnswer(text);
+    // Let unmatched natural-language questions reach Gemini instead of the limited local FAQ.
     return null;
   }
 
