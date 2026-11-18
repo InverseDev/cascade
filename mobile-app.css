@@ -316,3 +316,98 @@ html.cascade-native-app body.dark-mode .cascade-drawer-theme {
 html.cascade-native-app body.dark-mode .cascade-drawer-divider { background:#263b56 !important; }
 
 html.cascade-native-app #cascade-chat .cascade-chat-avatar { display:none !important; }
+
+
+/* Android compact pass: smaller density, safe wrapping and balanced alarm layout. */
+html.cascade-native-app { -webkit-text-size-adjust:100% !important; text-size-adjust:100% !important; }
+html.cascade-native-app body { font-size:14px !important; }
+html.cascade-native-app .dashboard-section { padding:6px 0 14px !important; }
+html.cascade-native-app .dashboard-section > .section-wrap { padding:0 12px !important; }
+html.cascade-native-app .dashboard-grid { gap:9px !important; }
+html.cascade-native-app .dash-card { padding:12px !important; border-radius:16px !important; }
+html.cascade-native-app .level-row strong { font-size:clamp(30px,8vw,38px) !important; }
+html.cascade-native-app .litres-row { gap:8px !important; flex-wrap:wrap !important; font-size:12px !important; }
+html.cascade-native-app .demo-status { font-size:10px !important; padding:6px 9px !important; }
+html.cascade-native-app .range-value { display:flex !important; align-items:center !important; gap:8px !important; flex-wrap:nowrap !important; }
+html.cascade-native-app .range-value strong { font-size:23px !important; }
+html.cascade-native-app .range-value .cutoff { font-size:11px !important; min-width:0 !important; }
+html.cascade-native-app .native-threshold-save {
+  display:inline-grid !important; place-items:center !important; flex:0 0 29px !important;
+  width:29px !important; min-width:29px !important; height:29px !important; min-height:29px !important;
+  padding:0 !important; border:1px solid #b9c6d6 !important; border-radius:50% !important;
+  background:#f2f6fb !important; color:#64748b !important; font:700 16px/1 system-ui,sans-serif !important;
+  transition:background .16s,border-color .16s,color .16s,transform .16s !important;
+}
+html.cascade-native-app .native-threshold-save.saved {
+  color:#fff !important; background:#16a34a !important; border-color:#16a34a !important;
+}
+html.cascade-native-app .native-threshold-save:active { transform:scale(.92); }
+html.cascade-native-app .sensor-meta { display:block !important; margin-top:8px !important; color:#8995a6 !important; font-size:11px !important; line-height:1.35 !important; }
+html.cascade-native-app #sensorMeta { color:#8995a6 !important; }
+html.cascade-native-app #connectionStatus[data-state="offline"],
+html.cascade-native-app #connectionStatus[data-state="error"],
+html.cascade-native-app #connectionStatus[data-state="setup"] {
+  color:#78869a !important; background:#eef2f6 !important; border-color:#dfe5ec !important;
+}
+html.cascade-native-app #connectionStatus[data-state="offline"] .live-dot,
+html.cascade-native-app #connectionStatus[data-state="error"] .live-dot { background:#94a3b8 !important; box-shadow:none !important; }
+html.cascade-native-app #sensorMeta { overflow-wrap:anywhere !important; }
+html.cascade-native-app .subtle-btn[onclick*="saveSettings"],
+html.cascade-native-app .subtle-btn[onclick*="enableNotifications"] { display:none !important; }
+html.cascade-native-app #enableAlarmNotifications,
+html.cascade-native-app #notificationPermissionStatus { display:none !important; }
+
+/* Alarm screen: compact type, two-column date/time, no clipped labels or controls. */
+html.cascade-native-app .alarm-container { padding:8px 11px 16px !important; }
+html.cascade-native-app .alarm-page-heading { margin:0 2px 10px !important; }
+html.cascade-native-app .alarm-page-heading h1 { font-size:22px !important; line-height:1.2 !important; overflow-wrap:anywhere !important; }
+html.cascade-native-app .alarm-layout { display:grid !important; grid-template-columns:minmax(0,1fr) !important; gap:10px !important; }
+html.cascade-native-app .alarm-panel,
+html.cascade-native-app .scheduled-alarms-panel,
+html.cascade-native-app .alarm-history-panel { min-width:0 !important; padding:12px !important; border-radius:16px !important; }
+html.cascade-native-app .alarm-panel-heading { display:flex !important; align-items:center !important; gap:9px !important; margin:0 0 10px !important; }
+html.cascade-native-app .alarm-panel-heading h2,
+html.cascade-native-app .scheduled-heading h2 { font-size:15px !important; line-height:1.25 !important; overflow-wrap:anywhere !important; }
+html.cascade-native-app .alarm-panel-heading p,
+html.cascade-native-app .scheduled-heading p,
+html.cascade-native-app .alarm-page-heading p { display:none !important; }
+html.cascade-native-app #alarmForm { display:grid !important; gap:8px !important; min-width:0 !important; }
+html.cascade-native-app #alarmForm label { display:block !important; margin:0 0 3px !important; font-size:12px !important; line-height:1.25 !important; overflow-wrap:anywhere !important; }
+html.cascade-native-app #alarmForm input:not([type="checkbox"]),
+html.cascade-native-app #alarmForm select {
+  box-sizing:border-box !important; width:100% !important; max-width:100% !important;
+  min-width:0 !important; min-height:42px !important; height:42px !important;
+  padding:8px 10px !important; border-radius:11px !important; font-size:14px !important; line-height:1.2 !important;
+}
+html.cascade-native-app .alarm-time-row { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:9px !important; min-width:0 !important; }
+html.cascade-native-app .alarm-time-row > div { min-width:0 !important; }
+html.cascade-native-app .alarm-check-row { display:flex !important; align-items:center !important; gap:8px !important; font-size:12px !important; }
+html.cascade-native-app .alarm-sound-area { min-width:0 !important; padding:10px !important; border-radius:12px !important; }
+html.cascade-native-app .alarm-sound-area label,
+html.cascade-native-app .alarm-sound-area p { font-size:11px !important; line-height:1.35 !important; overflow-wrap:anywhere !important; }
+html.cascade-native-app .alarm-sound-area button,
+html.cascade-native-app #alarmForm button { min-height:38px !important; padding:8px 11px !important; font-size:12px !important; }
+html.cascade-native-app .alarm-alert-option { display:flex !important; align-items:center !important; gap:8px !important; padding:9px 0 !important; min-width:0 !important; }
+html.cascade-native-app .alarm-alert-option > div { min-width:0 !important; }
+html.cascade-native-app .alarm-alert-option strong { font-size:12px !important; line-height:1.3 !important; }
+html.cascade-native-app .alarm-alert-option small { display:block !important; font-size:10px !important; line-height:1.3 !important; overflow-wrap:anywhere !important; }
+html.cascade-native-app .scheduled-heading { display:flex !important; align-items:center !important; justify-content:space-between !important; gap:8px !important; }
+html.cascade-native-app .scheduled-alarm-item,
+html.cascade-native-app .alarm-activity-item { display:flex !important; align-items:center !important; justify-content:space-between !important; gap:8px !important; min-width:0 !important; padding:9px 0 !important; }
+html.cascade-native-app .scheduled-alarm-item > div,
+html.cascade-native-app .alarm-activity-item > div { flex:1 1 auto !important; min-width:0 !important; overflow-wrap:anywhere !important; }
+html.cascade-native-app .scheduled-alarm-item strong { display:block !important; font-size:13px !important; line-height:1.3 !important; overflow-wrap:anywhere !important; }
+html.cascade-native-app .scheduled-alarm-item small { display:block !important; font-size:11px !important; line-height:1.35 !important; overflow-wrap:anywhere !important; }
+html.cascade-native-app .scheduled-alarm-item button { flex:0 0 auto !important; min-height:34px !important; padding:6px 9px !important; font-size:11px !important; }
+html.cascade-native-app body.dark-mode #connectionStatus[data-state="offline"],
+html.cascade-native-app body.dark-mode #connectionStatus[data-state="error"],
+html.cascade-native-app body.dark-mode #connectionStatus[data-state="setup"] {
+  color:#a4afbf !important; background:#1c293a !important; border-color:#344357 !important;
+}
+html.cascade-native-app body.dark-mode #sensorMeta { color:#8998ad !important; }
+html.cascade-native-app body.dark-mode .native-threshold-save { background:#1a2b40 !important; border-color:#40536b !important; color:#b6c4d6 !important; }
+html.cascade-native-app body.dark-mode .native-threshold-save.saved { background:#16a34a !important; border-color:#16a34a !important; color:#fff !important; }
+html.cascade-native-app body.dark-mode #alarmForm input:not([type="checkbox"]),
+html.cascade-native-app body.dark-mode #alarmForm select { background:#17263a !important; color:#eaf2ff !important; border-color:#344963 !important; }
+html.cascade-native-app body.dark-mode .alarm-sound-area { background:#17263a !important; border-color:#344963 !important; }
+html.cascade-native-app .cascade-chat-launcher { display:none !important; }
