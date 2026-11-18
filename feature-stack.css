@@ -1,0 +1,50 @@
+/* Scroll-driven feature card deck */
+@media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+  .features-section.feature-stack-active {
+    position: relative;
+    padding-bottom: clamp(900px, 175vh, 1500px) !important;
+  }
+  .features-section.feature-stack-active .feature-grid {
+    position: sticky;
+    top: 19vh;
+    display: block !important;
+    width: min(1160px, 88vw);
+    height: clamp(300px, 34vw, 390px);
+    margin: 0 auto;
+    perspective: 1200px;
+  }
+  .features-section.feature-stack-active .feature-card {
+    position: absolute !important;
+    inset: 0 auto auto 0;
+    width: min(360px, 31vw);
+    min-height: 280px;
+    height: 100%;
+    margin: 0;
+    opacity: 1 !important;
+    will-change: transform;
+    transform-origin: center center;
+    transition: box-shadow .35s ease;
+    backface-visibility: hidden;
+  }
+  .features-section.feature-stack-active .feature-card:nth-child(1) { z-index: 3; }
+  .features-section.feature-stack-active .feature-card:nth-child(2) { z-index: 2; }
+  .features-section.feature-stack-active .feature-card:nth-child(3) { z-index: 1; }
+}
+@media (max-width: 899px), (prefers-reduced-motion: reduce) {
+  .features-section.feature-stack-active { padding-bottom: 80px !important; }
+  .features-section.feature-stack-active .feature-grid {
+    position: static;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+    height: auto;
+  }
+  .features-section.feature-stack-active .feature-card {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    min-height: 190px;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
