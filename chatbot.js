@@ -10,7 +10,7 @@
     <div class="cascade-chat-greeting" role="status" aria-live="polite">Hi! How may I help you?</div>
     <section class="cascade-chat-panel" aria-label="Cascade AI assistant" aria-hidden="true">
       <header class="cascade-chat-head">
-        <div class="cascade-chat-brand"><span class="cascade-chat-avatar">C</span><span><strong>Cascade Assistant</strong><small><i></i> Here to help</small></span></div>
+        <div class="cascade-chat-brand"><img class="cascade-chat-avatar" src="assets/mascots/cascade-hero.svg" alt="" aria-hidden="true"><strong>Cascade Assistant</strong></div>
         <div class="cascade-chat-head-actions">
           <div class="cascade-language-picker">
             <button class="cascade-language-trigger" type="button" id="cascade-chat-language" aria-haspopup="listbox" aria-expanded="false" aria-label="Choose assistant language">
@@ -31,11 +31,8 @@
       </header>
       <div class="cascade-chat-messages" role="log" aria-live="polite">
         <div class="cascade-chat-welcome">
-          <div class="cascade-chat-welcome-label">CASCADE · SMART WATER SYSTEM</div>
-          <h3>How can I help you?</h3>
-          <p>Ask me about your tank, water levels, alerts or pump controls. I can also help you adjust dashboard settings.</p>
+          <h3>How can I help?</h3>
         </div>
-        <div class="cascade-chat-message bot">Hello! I'm your Cascade assistant. What would you like to know?</div>
         <div class="cascade-chat-suggestions">
           <button type="button" data-question="How does Cascade work?">How does the system work?</button>
           <button type="button" data-question="Explain the dashboard features.">Explore dashboard features</button>
@@ -47,7 +44,7 @@
         <input name="message" type="text" maxlength="1000" placeholder="Ask about Cascade..." autocomplete="off" aria-label="Message Cascade assistant" required>
         <button type="submit" aria-label="Send message"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 4 16 8-16 8 3-8-3-8Zm3 8h13"/></svg></button>
       </form>
-      <div class="cascade-chat-foot">AI responses may be inaccurate. Hardware actions require confirmation.</div>
+      <div class="cascade-chat-foot">Hardware actions require confirmation.</div>
     </section>`;
   // Mount outside the page body so transforms/overflow on the site cannot
   // trap the assistant inside the document layout.
