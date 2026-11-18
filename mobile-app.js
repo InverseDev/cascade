@@ -17,7 +17,8 @@
   const icons = {
     dashboard: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="10" width="8" height="11" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/></svg>',
     history: '<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>',
-    alarms: '<svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>'
+    alarms: '<svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>',
+    assistant: '<svg viewBox="0 0 24 24"><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Z"/><path d="m19 14 1.2 2.8L23 18l-2.8 1.2L19 22l-1.2-2.8L15 18l2.8-1.2L19 14Z"/></svg>'
   };
 
   const appBar = document.createElement("header");
@@ -33,7 +34,7 @@
   const nav = document.createElement("nav");
   nav.className = "cascade-app-bottom-nav";
   nav.setAttribute("aria-label", "Main navigation");
-  const items = [["dashboard","Home","index.html#dashboard"],["history","History","history.html"],["alarms","Alarms","alarms.html"]];
+  const items = [["dashboard","Home","index.html#dashboard"],["history","History","history.html"],["alarms","Alarms","alarms.html"],["assistant","AI","#assistant"]];
   const navButtons = {};
   items.forEach(([key,label,href]) => {
     const item = document.createElement("a");
@@ -43,6 +44,22 @@
     item.innerHTML = icons[key] + "<span>" + label + "</span>";
     nav.appendChild(item);
     navButtons[key] = item;
+    item.addEventListener("click", event => {
+      const appRoot = document.documentElement;
+      const chatPanel = document.querySelector("#cascade-chat .cascade-chat-panel");
+      const launcher = document.querySelector("#cascade-chat .cascade-chat-launcher");
+      if (key === "assistant") {
+        event.preventDefault();
+        const opening = !appRoot.classList.contains("cascade-assistant-active");
+        appRoot.classList.toggle("cascade-assistant-active", opening);
+        if (opening && chatPanel && !chatPanel.classList.contains("open")) launcher?.click();
+        if (!opening && chatPanel?.classList.contains("open")) launcher?.click();
+        setActive(opening ? "assistant" : "dashboard");
+      } else if (appRoot.classList.contains("cascade-assistant-active")) {
+        appRoot.classList.remove("cascade-assistant-active");
+        if (chatPanel?.classList.contains("open")) launcher?.click();
+      }
+    });
   });
   document.body.appendChild(nav);
 
@@ -186,13 +203,16 @@
   }
   requestAppNotifications().finally(() => window.dispatchEvent(new Event("cascade-notification-permission-ready")));
 
-  // chatbot.js builds its launcher after this script; remove that launcher
-  // from the native app while keeping the assistant panel available to its tab.
-  const removeMascotLauncher = () => {
-    document.querySelectorAll(".cascade-chat-launcher").forEach(node => node.remove());
+  // Keep the launcher as an internal toggle for the AI tab, but never show
+  // the floating mascot button in the native Android interface.
+  const hideMascotLauncher = () => {
+    document.querySelectorAll(".cascade-chat-launcher").forEach(node => {
+      node.style.display = "none";
+      node.setAttribute("aria-hidden", "true");
+    });
   };
-  removeMascotLauncher();
-  new MutationObserver(removeMascotLauncher).observe(document.body, {childList:true,subtree:true});
+  hideMascotLauncher();
+  new MutationObserver(hideMascotLauncher).observe(document.documentElement, {childList:true,subtree:true});
 
   if (active === "dashboard" && !window.location.hash) history.replaceState(null,"",window.location.pathname + "#dashboard");
   setActive(active);
