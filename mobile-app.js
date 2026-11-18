@@ -47,17 +47,15 @@
     item.addEventListener("click", event => {
       const appRoot = document.documentElement;
       const chatPanel = document.querySelector("#cascade-chat .cascade-chat-panel");
-      const launcher = document.querySelector("#cascade-chat .cascade-chat-launcher");
       if (key === "assistant") {
         event.preventDefault();
         const opening = !appRoot.classList.contains("cascade-assistant-active");
         appRoot.classList.toggle("cascade-assistant-active", opening);
-        if (opening && chatPanel && !chatPanel.classList.contains("open")) launcher?.click();
-        if (!opening && chatPanel?.classList.contains("open")) launcher?.click();
+        if (typeof window.setCascadeAssistantOpen === "function") window.setCascadeAssistantOpen(opening);
         setActive(opening ? "assistant" : "dashboard");
       } else if (appRoot.classList.contains("cascade-assistant-active")) {
         appRoot.classList.remove("cascade-assistant-active");
-        if (chatPanel?.classList.contains("open")) launcher?.click();
+        if (typeof window.setCascadeAssistantOpen === "function") window.setCascadeAssistantOpen(false);
       }
     });
   });
