@@ -36,6 +36,7 @@ async function sendCascadeAppNotification(title, body, id = 1201) {
     try {
       const permission = await nativePlugin.checkPermissions();
       if (permission.display !== "granted") return;
+      if (nativePlugin.createChannel) await nativePlugin.createChannel({ id: "cascade-alerts", name: "Cascade alerts", description: "Water level and pump alerts", importance: 4 });
       await nativePlugin.schedule({ notifications: [{ id, title, body, schedule: { at: new Date(Date.now() + 500) }, channelId: "cascade-alerts" }] });
     } catch (error) { console.warn("Cascade app notification failed:", error); }
     return;
@@ -282,7 +283,7 @@ function saveSettings() {
     alert("Could not save dashboard preferences in this browser.");
   }
 }
-async async function enableNotifications() {
+async function enableNotifications() {
   const nativePlugin = window.Capacitor?.isNativePlatform?.() ? window.Capacitor?.Plugins?.LocalNotifications : null;
   if (nativePlugin) {
     try {
