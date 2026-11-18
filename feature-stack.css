@@ -2,7 +2,7 @@
 @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
   .features-section.feature-stack-active {
     position: relative;
-    padding-bottom: clamp(900px, 175vh, 1500px) !important;
+    padding-bottom: 58vh !important;
   }
   .features-section.feature-stack-active .feature-grid {
     position: sticky;
