@@ -138,44 +138,47 @@
     themeMenu.classList.toggle("enabled", dark);
   });
 
-  // Compact per-threshold save affordances. The existing settings function
-  // remains the single source of truth and persists both validated values.
-  function addThresholdSave(selector, inputId, label) {
+  // Native save controls sit in the top-right corner of each threshold card.
+  function addThresholdSave(cardSelector, inputId, label) {
+    const card = document.querySelector(cardSelector);
+    const header = card?.querySelector(".card-top");
     const input = document.getElementById(inputId);
-    const valueRow = document.querySelector(selector);
-    if (!input || !valueRow || valueRow.querySelector(".native-threshold-save")) return;
+    if (!card || !header || !input || header.querySelector(".native-threshold-save")) return;
     const button = document.createElement("button");
     button.type = "button";
     button.className = "native-threshold-save";
-    button.setAttribute("aria-label", "Save " + label + " threshold");
-    button.title = "Save " + label + " threshold";
-    button.textContent = "✓";
-    valueRow.appendChild(button);
+    button.setAttribute("aria-label", "Save " + label + " level");
+    button.title = "Save " + label + " level";
+    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3h2Z"/><path d="M7 3v6h10V3M7 21v-8h10v8"/></svg>';
+    header.appendChild(button);
     button.addEventListener("click", () => {
       if (typeof window.saveSettings !== "function") return;
+      button.disabled = true;
       const savedSuccessfully = window.saveSettings();
+      button.disabled = false;
       if (!savedSuccessfully) {
         button.classList.remove("saved");
-        button.title = "Could not save: minimum level must stay below maximum level.";
+        button.title = "Check that the minimum level is below the maximum level.";
         return;
       }
       try {
         const saved = JSON.parse(localStorage.getItem("cascade-dashboard-settings") || "null");
-        const expected = Number(input.value);
         const key = inputId === "cutoff" ? "cutoffLevel" : "lowWaterLevel";
-        if (saved && Number(saved[key]) === expected) {
+        if (saved && Number(saved[key]) === Number(input.value)) {
           button.classList.add("saved");
-          button.setAttribute("aria-label", label + " threshold saved");
+          button.setAttribute("aria-label", label + " level saved");
+          button.title = label + " level saved";
         }
       } catch (_) {}
     });
     input.addEventListener("input", () => {
       button.classList.remove("saved");
-      button.setAttribute("aria-label", "Save " + label + " threshold");
+      button.setAttribute("aria-label", "Save " + label + " level");
+      button.title = "Save " + label + " level";
     });
   }
-  addThresholdSave(".setting-card .range-value", "cutoff", "maximum");
-  addThresholdSave(".alert-card .range-value", "lowLevel", "minimum");
+  addThresholdSave(".setting-card", "cutoff", "maximum");
+  addThresholdSave(".alert-card", "lowLevel", "minimum");
 
   // Android's permission prompt is requested once per installation. After
   // that, notification delivery uses LocalNotifications, never Web Notifications.
