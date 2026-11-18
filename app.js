@@ -31,7 +31,10 @@ function setConnectionState(state, label) {
 }
 
 async function sendCascadeAppNotification(title, body, id = 1201) {
-  const nativePlugin = window.Capacitor?.isNativePlatform?.() ? window.Capacitor?.Plugins?.LocalNotifications : null;
+  const capacitor = window.Capacitor;
+  const nativePlugin = capacitor?.isNativePlatform?.()
+    ? (capacitor.registerPlugin?.("LocalNotifications") || capacitor.Plugins?.LocalNotifications)
+    : null;
   if (nativePlugin) {
     try {
       const permission = await nativePlugin.checkPermissions();
@@ -287,13 +290,19 @@ function saveSettings() {
   }
 }
 async function enableNotifications() {
-  const nativePlugin = window.Capacitor?.isNativePlatform?.() ? window.Capacitor?.Plugins?.LocalNotifications : null;
+  const capacitor = window.Capacitor;
+  const nativePlugin = capacitor?.isNativePlatform?.()
+    ? (capacitor.registerPlugin?.("LocalNotifications") || capacitor.Plugins?.LocalNotifications)
+    : null;
   if (nativePlugin) {
     try {
       const permission = await nativePlugin.checkPermissions();
-      const result = permission.display === "granted" ? permission : await nativePlugin.requestPermissions();
-      if (result.display === "granted") addActivity("App notifications enabled.");
-      else alert("Notification permission was not granted.");
+      if (permission.display === "granted") return;
+      const alreadyAsked = localStorage.getItem("cascade-native-notification-prompted") === "1";
+      if (!alreadyAsked && (permission.display === "prompt" || permission.display === "prompt-with-rationale")) {
+        await nativePlugin.requestPermissions();
+        localStorage.setItem("cascade-native-notification-prompted", "1");
+      }
     } catch (error) { console.error("App notification permission:", error); }
     return;
   }
