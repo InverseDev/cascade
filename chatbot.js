@@ -12,12 +12,20 @@
       <header class="cascade-chat-head">
         <div class="cascade-chat-brand"><span class="cascade-chat-avatar">C</span><span><strong>Cascade Assistant</strong><small><i></i> Here to help</small></span></div>
         <div class="cascade-chat-head-actions">
-          <label class="cascade-chat-language-label" for="cascade-chat-language">Language</label>
-          <select class="cascade-chat-language" id="cascade-chat-language" aria-label="Assistant language">
-            <option value="en">English</option>
-            <option value="hi">हिन्दी</option>
-            <option value="bn">বাংলা</option>
-          </select>
+          <div class="cascade-language-picker">
+            <button class="cascade-language-trigger" type="button" id="cascade-chat-language" aria-haspopup="listbox" aria-expanded="false" aria-label="Choose assistant language">
+              <span class="cascade-language-globe" aria-hidden="true">文</span>
+              <span class="cascade-language-current"><small>REPLY IN</small><strong>English</strong></span>
+              <span class="cascade-language-chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="cascade-language-menu" role="listbox" aria-label="Choose assistant language" hidden>
+              <div class="cascade-language-menu-title">Choose your language</div>
+              <button type="button" class="cascade-language-option" role="option" data-language="en"><span class="cascade-language-script">EN</span><span><strong>English</strong><small>English</small></span><span class="cascade-language-check">✓</span></button>
+              <button type="button" class="cascade-language-option" role="option" data-language="hi"><span class="cascade-language-script">हि</span><span><strong>हिन्दी</strong><small>Hindi · Hinglish supported</small></span><span class="cascade-language-check">✓</span></button>
+              <button type="button" class="cascade-language-option" role="option" data-language="bn"><span class="cascade-language-script">বা</span><span><strong>বাংলা</strong><small>Bengali · Banglish supported</small></span><span class="cascade-language-check">✓</span></button>
+              <div class="cascade-language-menu-note">You can type in native script or Roman letters.</div>
+            </div>
+          </div>
           <button class="cascade-chat-close" type="button" aria-label="Close chat">×</button>
         </div>
       </header>
@@ -56,12 +64,49 @@
   const messages = root.querySelector(".cascade-chat-messages");
   const initialGreeting = messages.querySelector(".cascade-chat-message.bot");
   if (initialGreeting) initialGreeting.dataset.initialGreeting = "true";
-  const languageSelect = root.querySelector("#cascade-chat-language");
+  const languageTrigger = root.querySelector("#cascade-chat-language");
+  const languageMenu = root.querySelector(".cascade-language-menu");
   const LANGUAGE_KEY = "cascade-assistant-language";
-  const languageNames = { en: "English", hi: "Hindi", bn: "Bengali" };
+  const languageNames = { en: "English", hi: "हिन्दी", bn: "বাংলা" };
   let assistantLanguage = localStorage.getItem(LANGUAGE_KEY) || "en";
   if (!["en", "hi", "bn"].includes(assistantLanguage)) assistantLanguage = "en";
-  languageSelect.value = assistantLanguage;
+  function closeLanguageMenu() {
+    languageMenu.hidden = true;
+    languageTrigger.setAttribute("aria-expanded", "false");
+  }
+  function refreshLanguageMenu() {
+    languageTrigger.querySelector(".cascade-language-current strong").textContent = languageNames[assistantLanguage];
+    languageMenu.querySelectorAll(".cascade-language-option").forEach(option => {
+      const active = option.dataset.language === assistantLanguage;
+      option.classList.toggle("active", active);
+      option.setAttribute("aria-selected", String(active));
+    });
+  }
+  languageTrigger.addEventListener("click", () => {
+    const opening = languageMenu.hidden;
+    languageMenu.hidden = !opening;
+    languageTrigger.setAttribute("aria-expanded", String(opening));
+  });
+  languageMenu.querySelectorAll(".cascade-language-option").forEach(option => {
+    option.addEventListener("click", () => {
+      const nextLanguage = option.dataset.language;
+      if (nextLanguage === assistantLanguage) { closeLanguageMenu(); return; }
+      assistantLanguage = nextLanguage;
+      localStorage.setItem(LANGUAGE_KEY, assistantLanguage);
+      refreshLanguageMenu();
+      closeLanguageMenu();
+      applyLanguage();
+      addMessage(assistantLanguage === "hi" ? "अब मैं हिन्दी में जवाब दूँगा। आप हिन्दी या Romanized Hindi (Hinglish) में लिख सकते हैं।" : assistantLanguage === "bn" ? "এখন থেকে আমি বাংলায় উত্তর দেব। আপনি বাংলা বা Romanized Bangla (Banglish)-এ লিখতে পারেন।" : "I'll reply in English. You can write in English, हिन्दी or বাংলা.", "bot");
+      saveChatLog();
+    });
+  });
+  document.addEventListener("pointerdown", event => {
+    if (!event.target.closest(".cascade-language-picker")) closeLanguageMenu();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeLanguageMenu();
+  });
+  refreshLanguageMenu();
   let busy = false;
 
   const uiText = {
@@ -89,13 +134,6 @@
         : ["How does the system work?","Explore dashboard features","Change low-water alert","Adjust maximum level"];
     root.querySelectorAll(".cascade-chat-suggestions button").forEach((button,index) => { button.textContent = suggestionLabels[index] || button.textContent; });
   }
-  languageSelect.addEventListener("change", () => {
-    assistantLanguage = languageSelect.value;
-    localStorage.setItem(LANGUAGE_KEY, assistantLanguage);
-    applyLanguage();
-    addMessage(assistantLanguage === "hi" ? "अब मैं हिन्दी में जवाब दूँगा। आप हिन्दी, বাংলা या English में लिख सकते हैं।" : assistantLanguage === "bn" ? "এখন থেকে আমি বাংলায় উত্তর দেব। আপনি हिन्दी, বাংলা বা English-এ লিখতে পারেন।" : "I'll reply in English. You can write in English, हिन्दी or বাংলা.", "bot");
-    saveChatLog();
-  });
   applyLanguage();
 
   function setOpen(open) {
@@ -331,6 +369,16 @@
       .replace(/कितने प्रतिशत|कितना प्रतिशत|प्रतिशत|শতাংশ|কত পার্সেন্ট/gi, "percent")
       .replace(/रद्द करो|रद्द करें|না|বাতিল করো|বাতিল করুন/gi, "cancel")
       .replace(/खोलो|खोलें|दिखाओ|দেখাও|খুলুন/gi, "open")
+      .replace(/कम पानी का अलर्ट|low pani alert|paani kam hone ka alert|kam paani ka alert/gi, "low water alert")
+      .replace(/low water ka alert|low water alert ko|pani kam ka alert/gi, "low water alert")
+      .replace(/maximum level|maximum pani level|max level|upar wala cutoff|motor band level|paani bharne ka level/gi, "maximum cutoff")
+      .replace(/kam kar do|kam karo|badha do|bada do|ghata do|set kar do|set karo|rakh do|rakhna|karna hai|kar do/gi, "set")
+      .replace(/kitna percent|kitne percent|kitna pratishat|kitna percentage/gi, "percent")
+      .replace(/jal ka star|pani ka level|paani ka level|tank ka level/gi, "water level")
+      .replace(/kom jol|jol kom|pani kom|panir level kom|joler level kom|kom panir alert|kom jol er alert/gi, "low water alert")
+      .replace(/beshi jol|jol beshi|tank bhore gele|motor bondho korar level/gi, "maximum cutoff")
+      .replace(/koto percent|koto shotangsho|koto percentage/gi, "percent")
+      .replace(/set kore dao|set koro|kore dao|bodle dao|barie dao|komie dao|rakho|koro/gi, "set")
       .replace(/[০-৯]/g, ch => "০১২৩৪৫৬৭৮৯".indexOf(ch))
       .replace(/[०-९]/g, ch => "०१२३४५६७८९".indexOf(ch));
   }
