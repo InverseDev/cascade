@@ -36,8 +36,12 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          # Publish the static website only; keep native Android build files out of Pages.
+          path: |
+            .
+            !./android/**
+            !./www/**
+            !./node_modules/**
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
