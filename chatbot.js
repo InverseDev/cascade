@@ -574,7 +574,7 @@
     addMessage(text, "user");
 
     const actionReply = runAction(text);
-    if (typeof actionReply === "string") { addMessage(actionReply, "bot") return; }
+    if (typeof actionReply === "string") { addMessage(actionReply, "bot"); return; }
     if (actionReply === true || actionReply === false) return;
     busy = true;
     const typing = addTyping();
