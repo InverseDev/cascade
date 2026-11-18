@@ -232,22 +232,23 @@
             </div>
           </article>
           <article class="dash-card setting-card reveal">
-            <div class="card-top"><div><span class="card-kicker">AUTOMATION RULE</span>
-            <p class="muted-copy">Stop the motor automatically when the tank reaches your chosen level.</p>
-            <div class="range-value"><strong id="cutoffValue">90%</strong><span class="cutoff">Cutoff threshold</span></div>
+            <div class="card-top"><div><span class="card-kicker">MAXIMUM THRESHOLD</span>
+            <p class="muted-copy">Set the maximum fill level. When the tank reaches this percentage, the pump should turn OFF automatically to prevent overfilling.</p>
+            <div class="range-value"><strong id="cutoffValue">90%</strong><span class="cutoff">Pump stop point</span></div>
             <input id="cutoff" class="range-input" type="range" min="50"
-             max="100" value="90" oninput="updateCutoff()">
+             max="100" value="90" aria-label="Maximum water level threshold" oninput="updateCutoff()">
             <div class="range-ends"><span>50%</span><span>100%</span></div>
-            <div class="setting-note"><span>✦</span> Threshold saved as a dashboard preference. Device-side automation is not active yet.</div>
-            <button class="subtle-btn" onclick="saveSettings()">Save automation settings ↗</button>
+            <div class="setting-note"><span>✦</span> Saved as a dashboard preference only. Automatic pump cutoff needs matching ESP32 firmware and is not active yet.</div>
+            <button class="subtle-btn" onclick="saveSettings()">Save thresholds ↗</button>
           </article>
           <article class="dash-card alert-card reveal">
-            <div class="card-top"><div><span class="card-kicker">EARLY WARNING</span>
-            <p class="muted-copy">Get an alert whenever your tank falls below this level.</p>
-            <div class="range-value"><strong id="lowValue">20%</strong><span>Alert threshold</span></div>
+            <div class="card-top"><div><span class="card-kicker">MINIMUM THRESHOLD</span>
+            <p class="muted-copy">Set the minimum water level. When the tank falls to this percentage, the pump should turn ON automatically to refill it.</p>
+            <div class="range-value"><strong id="lowValue">20%</strong><span class="cutoff">Pump start point</span></div>
             <input id="lowLevel" class="range-input amber-range" type="range"
-             min="5" max="40" value="20" oninput="updateLowLevel()">
+             min="5" max="40" value="20" aria-label="Minimum water level threshold" oninput="updateLowLevel()">
             <div class="range-ends"><span>5%</span><span>40%</span></div>
+            <div class="setting-note"><span>✦</span> Saved as a dashboard preference only. Automatic pump start needs matching ESP32 firmware and is not active yet.</div>
             <div class="alert-message" id="alertMessage">✓ Water level is normal.</div>
             <button class="subtle-btn" onclick="enableNotifications()">Enable browser notifications ↗</button>
           </article>
@@ -383,7 +384,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="app.js?v=20261118-live-1"></script>
+  <script src="app.js?v=20261118-threshold-labels-1"></script>
   <script src="motion.js" defer></script>
   <script src="logo-dock.js?v=20261118-centered-header-2" defer></script>
   <script src="mobile-view.js"></script>
