@@ -640,3 +640,17 @@ navLinks.forEach(link => {
     });
 });
 
+
+ 
+// Read-only live context for the website's AI assistant.
+window.getCascadeAssistantContext = function () {
+  return {
+    waterLevelPercent: Number.isFinite(waterLevel) ? waterLevel : null,
+    distanceCm: Number.isFinite(distanceCm) ? distanceCm : null,
+    sensorOnline: !!sensorOnline,
+    motorStatus: sensorOnline ? motorStatus : "unknown",
+    lastUpdated: Number.isFinite(latestReadingAt) ? new Date(latestReadingAt).toISOString() : null,
+    lowWaterAlertPercent: lowWaterLevel,
+    maximumCutoffPercent: cutoffLevel
+  };
+};
