@@ -608,11 +608,27 @@ themeToggle.addEventListener("click", () => {
     const notificationList = document.getElementById("notificationList");
     const count = document.getElementById("notificationCount");
     if (!bell || !panel) return;
-    // Open and close notification panel
+    // Keep the notification panel in the viewport, anchored below the sticky header.
+    const positionPanel = () => {
+        const header = document.querySelector(".site-header");
+        const headerBottom = header ? header.getBoundingClientRect().bottom : 0;
+        const top = Math.max(12, Math.min(headerBottom + 10, window.innerHeight - 120));
+        panel.style.position = "fixed";
+        panel.style.top = top + "px";
+        panel.style.left = "auto";
+        panel.style.right = "12px";
+        panel.style.zIndex = "2001";
+        panel.style.maxHeight = "calc(100dvh - " + (top + 16) + "px)";
+        panel.style.overflowY = "auto";
+    };
     bell.addEventListener("click", () => {
-        panel.classList.toggle("show");
-        const isOpen = panel.classList.contains("show");
-        panel.setAttribute("aria-hidden", String(!isOpen));
+        const willOpen = !panel.classList.contains("show");
+        if (willOpen) positionPanel();
+        panel.classList.toggle("show", willOpen);
+        panel.setAttribute("aria-hidden", String(!willOpen));
+    });
+    window.addEventListener("resize", () => {
+        if (panel.classList.contains("show")) positionPanel();
     });
     // Close panel when clicking outside
     document.addEventListener("click", (event) => {
@@ -631,14 +647,51 @@ themeToggle.addEventListener("click", () => {
         count.textContent = "0";
     });
 })();
-// Active Navigation Indicator
-const navLinks = document.querySelectorAll(".main-nav a");
-navLinks.forEach(link => {
-    link.addEventListener("click", () => {
-        navLinks.forEach(item => item.classList.remove("active"));
-        link.classList.add("active");
+// Keep the in-page navigation highlight synchronized with the section in view.
+(() => {
+  const nav = document.querySelector(".site-header .main-nav");
+  if (!nav) return;
+  const sectionLinks = [...nav.querySelectorAll('a[href^="#"]')];
+  const sections = sectionLinks
+    .map(link => document.querySelector(link.getAttribute("href")))
+    .filter(Boolean);
+  if (!sections.length) return;
+
+  const setActive = id => {
+    sectionLinks.forEach(link => {
+      const active = link.getAttribute("href") === "#" + id;
+      link.classList.toggle("active", active);
+      if (active) link.setAttribute("aria-current", "location");
+      else link.removeAttribute("aria-current");
     });
-});
+  };
+
+  let ticking = false;
+  const updateFromScroll = () => {
+    ticking = false;
+    const marker = (document.querySelector(".site-header")?.getBoundingClientRect().height || 0) + Math.min(150, window.innerHeight * 0.22);
+    let current = sections[0];
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= marker) current = section;
+      else break;
+    }
+    setActive(current.id);
+  };
+  const requestUpdate = () => {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(updateFromScroll);
+  };
+
+  sectionLinks.forEach(link => link.addEventListener("click", () => {
+    const id = link.getAttribute("href").slice(1);
+    setActive(id);
+    nav.classList.remove("open");
+  }));
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate);
+  updateFromScroll();
+})();
 
 
  
