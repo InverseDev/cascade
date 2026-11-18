@@ -14,8 +14,10 @@ function loadAlarms() {
         scheduledAlarms = [];
     }
     renderAlarms();
-    scheduledAlarms.forEach(alarm => syncNativeAlarm(alarm));
 }
+window.addEventListener("cascade-notification-permission-ready", () => {
+    scheduledAlarms.forEach(alarm => syncNativeAlarm(alarm));
+});
 function saveAlarms() {
     localStorage.setItem(ALARM_KEY, JSON.stringify(scheduledAlarms));
 }
@@ -33,6 +35,8 @@ async function syncNativeAlarm(alarm) {
     const plugin = getLocalNotifications();
     if (!plugin || !alarm?.enabled) return;
     try {
+        const permission = await plugin.checkPermissions();
+        if (permission.display !== "granted") return;
         const id = nativeAlarmNotificationId(alarm.id);
         await plugin.cancel({ notifications: [{ id }] });
         let at;
