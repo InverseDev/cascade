@@ -230,6 +230,7 @@
     no.addEventListener("click", () => {
       actions.remove(); setPending(null); addMessage("Cancelled. No changes made.", "bot"); saveChatLog();
     }, { once: true });
+    return true;
   }
   function readSettings() {
     try { return JSON.parse(localStorage.getItem("cascade-dashboard-settings") || '{"cutoffLevel":90,"lowWaterLevel":20}'); }
@@ -245,7 +246,6 @@
     const cutoff = document.getElementById("cutoff"), low = document.getElementById("lowLevel");
     if (cutoff) { cutoff.value = next.cutoffLevel; if (window.updateCutoff) window.updateCutoff(); }
     if (low) { low.value = next.lowWaterLevel; if (window.updateLowLevel) window.updateLowLevel(); }
-    if (cutoff && low && window.saveSettings) window.saveSettings();
     return "Saved your browser preferences: low-water alert " + next.lowWaterLevel + "% and maximum cutoff " + next.cutoffLevel + "%. These preferences do not configure the ESP32 or activate device-side automation.";
   }
   function toggleTheme(mode) {
@@ -385,7 +385,7 @@
     saveChatLog();
     const actionReply = runAction(text);
     if (typeof actionReply === "string") { addMessage(actionReply, "bot"); saveChatLog(); return; }
-    if (actionReply === false) return;
+    if (actionReply === true || actionReply === false) return;
     busy = true;
     const typing = addTyping();
     try {
