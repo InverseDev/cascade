@@ -24,6 +24,15 @@
     cover.setAttribute('data-logo-cover', '');
     host.prepend(cover);
   }
+  const header = dock.closest('.site-header');
+  let headerContent = null;
+  if (header && wide.matches) {
+    headerContent = document.createElement('div');
+    headerContent.className = 'cm-header-content';
+    const siblings = Array.from(header.children).filter(el => el !== dock.closest('.brand'));
+    siblings.forEach(el => headerContent.appendChild(el));
+    header.appendChild(headerContent);
+  }
   const DIST = 520;                                   // px of scrolling the flight takes
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const wide = matchMedia('(min-width: 861px)');
@@ -34,8 +43,10 @@
     '.cm-fly{position:fixed;left:0;top:0;z-index:2147483647;max-width:none;height:auto;box-sizing:border-box;' +
     'transform-origin:0 0;pointer-events:none;will-change:transform;filter:drop-shadow(0 8px 18px rgba(35,70,90,.14));' +
     'animation:cm-fly-in .9s .15s cubic-bezier(.22,1,.36,1) both}' +
+    '.site-header .cm-header-content{display:flex;align-items:center;justify-content:flex-end;gap:clamp(14px,2vw,30px);min-width:0;will-change:transform}' +
+    '.site-header .cm-header-content .main-nav{flex:0 1 auto;min-width:0}' +
     '@keyframes cm-fly-in{from{opacity:0}}' +
-    '@media (max-width:860px){[data-logo-cover]{display:none!important}}';
+    '@media (max-width:860px){[data-logo-cover]{display:none!important}.site-header .cm-header-content{display:contents}}';
   document.head.appendChild(css);
   const fly = document.createElement('img');          // the logo you actually see while flying
   fly.src = cover.currentSrc || cover.src;
@@ -57,6 +68,12 @@
     fly.style.display = '';
     const p = Math.min(1, scrollY / DIST), e = ease(p);
     const c = cover.getBoundingClientRect(), d = dock.getBoundingClientRect();
+    if (headerContent) {
+      const h = headerContent.getBoundingClientRect();
+      const centeredLeft = (innerWidth - h.width) / 2;
+      const shift = (centeredLeft - h.left) * (1 - e);
+      headerContent.style.transform = `translate3d(${shift.toFixed(1)}px,0,0)`;
+    }
     if (!c.width || !d.width) return;                 // images not loaded yet
     if (p >= 1) {                                     // docked: real header logo takes over
       fly.style.visibility = 'hidden';
