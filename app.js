@@ -8,6 +8,7 @@ let latestReadingAt = null;
 let cutoffLevel = 90;
 let lowWaterLevel = 20;
 let previousLowState = false;
+let previousMotorStatus = "unknown";
 let previousConnectionState = "waiting";
 let readingRequestInProgress = false;
 let cascadeSupabase = null;
@@ -28,6 +29,13 @@ function setConnectionState(state, label) {
       state === "error" ? "Connection error" :
       state === "setup" ? "Setup required" : "Waiting for sensor";
   }
+}
+
+function isCascadeAlertEnabled(preferenceId) {
+  try {
+    const preferences = JSON.parse(localStorage.getItem("cascade-alert-preferences") || "{}");
+    return preferences[preferenceId] !== false;
+  } catch (_) { return true; }
 }
 
 async function sendCascadeAppNotification(title, body, id = 1201) {
@@ -70,6 +78,23 @@ function updateDashboard() {
   if (heroLitres) heroLitres.textContent = distanceText;
 
   const motorIsOn = sensorOnline && motorStatus === "on";
+  if (sensorOnline && motorStatus !== "unknown") {
+    if (previousMotorStatus !== "unknown" && previousMotorStatus !== motorStatus) {
+      if (isCascadeAlertEnabled("motorAlertEnabled")) {
+        sendCascadeAppNotification(
+          motorStatus === "on" ? "Cascade: Pump started" : "Cascade: Pump stopped",
+          motorStatus === "on" ? "The device reports that the pump is now running." : "The device reports that the pump has stopped.",
+          1202
+        );
+      }
+      if (previousMotorStatus === "on" && motorStatus === "off" && pct !== null && pct >= cutoffLevel && isCascadeAlertEnabled("cutoffAlertEnabled")) {
+        sendCascadeAppNotification("Cascade: Automatic cutoff", `The pump stopped at a tank level of ${pct.toFixed(1)}%.`, 1203);
+      }
+    }
+    previousMotorStatus = motorStatus;
+  } else {
+    previousMotorStatus = "unknown";
+  }
   const motorStatusNode = document.getElementById("motorStatus");
   if (motorStatusNode) motorStatusNode.textContent = sensorOnline && motorStatus !== "unknown" ? motorStatus.toUpperCase() : "—";
   const motorMessage = document.getElementById("motorMessage");
@@ -111,7 +136,9 @@ function updateDashboard() {
       alertMessage.classList.add("warning");
       if (!previousLowState) {
         addActivity("Minimum water threshold reached: " + pct.toFixed(1) + "%");
-        sendCascadeAppNotification("Cascade: Low water", `Tank level is ${pct.toFixed(1)}%. Check the pump and water supply.`, 1201);
+        if (isCascadeAlertEnabled("lowWaterAlertEnabled")) {
+          sendCascadeAppNotification("Cascade: Low water", `Tank level is ${pct.toFixed(1)}%. Check the pump and water supply.`, 1201);
+        }
       }
       previousLowState = true;
     } else {
