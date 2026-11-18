@@ -423,19 +423,40 @@
     }
 
     if (/^(hi|hello|hey|namaste|नमस्ते|नमस्कार|নমস্কার|হ্যালো)[.!?,\s]*$/i.test(q)) return assistantLanguage === "hi" ? "नमस्ते! मैं डैशबोर्ड सेटिंग, अलर्ट, हिस्ट्री और पंप नियंत्रण में मदद कर सकता हूँ।" : assistantLanguage === "bn" ? "নমস্কার! ড্যাশবোর্ড সেটিংস, অ্যালার্ট, ইতিহাস এবং পাম্প নিয়ন্ত্রণে সাহায্য করতে পারি।" : "Hello! I can manage dashboard preferences, navigate pages, create alarms, filter or export history, change themes and help with pump controls.";
-    const lowIntent = /low.?water|low level|low.*percent|low.*threshold|alert threshold|water alert/.test(q) && /set|change|adjust|make|update|want|new|percentage|percent|threshold|limit/.test(q);
-    const cutoffIntent = /cut.?off|maximum level|max level|full.?tank/.test(q) && /set|change|adjust|make|update|want|new|percentage|threshold/.test(q);
-    if (lowIntent || cutoffIntent) {
-      const kind = lowIntent ? "low" : "cutoff";
-      const m = q.match(/\b(\d{1,3})\s*%?/);
-      if (m) {
-        const value = Number(m[1]); setPending(null);
-        if (kind === "low" && value >= 5 && value <= 40) return confirmAction("Set the low-water alert to " + value + "%? This is a browser-only preference and does not configure the ESP32.", () => applySettings({ lowWaterLevel:value }));
-        if (kind === "cutoff" && value >= 50 && value <= 100) return confirmAction("Set the maximum cutoff to " + value + "%? This is a browser-only preference and does not configure the ESP32.", () => applySettings({ cutoffLevel:value }));
-        return kind === "low" ? "The low-water alert must be between 5% and 40%. What value would you like?" : "The maximum cutoff must be between 50% and 100%. What value would you like?";
+    // Threshold requests are handled locally, so they are fast and don't depend on Gemini wording.
+    const lowTerm = /low.?water|low level|low alert|early warning|minimum level|water (?:falls|drops|goes) below|below (?:the )?\d|paani (?:kam|neeche)|pani (?:kam|neeche)|jol (?:kom|niche)|panir (?:kom|niche)|कम पानी|पानी कम|नीचे जाए|कम हो|জল কম|পানি কম|নিচে নাম/.test(q);
+    const highTerm = /cut.?off|maximum|max level|high.?water|upper level|full.?tank|tank (?:is )?full|motor.{0,24}(?:off|stop|band)|(?:off|stop|band).{0,24}motor|tank bhar|paani bhar|pani bhar|jol bhore|panir tank bhore|टंकी भर|पानी भर|मोटर बंद|ভরে গেলে|মোটর বন্ধ/.test(q);
+    const hasThresholdValue = /\b\d{1,3}\s*%?/.test(q);
+    const lowValueMatch = q.match(/(?:low.?water|low level|low alert|early warning|minimum level|paani kam|pani kam|jol kom|panir kom|कम पानी|पानी कम|জল কম|পানি কম)[^\d]{0,28}(\d{1,3})\s*%?/) || q.match(/(\d{1,3})\s*%?[^\d]{0,20}(?:low.?water|low level|low alert|early warning|कम पानी|পানি কম|জল কম)/);
+    const highValueMatch = q.match(/(?:cut.?off|maximum|max level|high.?water|upper level|full.?tank|tank bhar|paani bhar|pani bhar|jol bhore|ট্যাংক ভরে|टंकी भर|पानी भर|মোটর বন্ধ)[^\d]{0,32}(\d{1,3})\s*%?/) || q.match(/(\d{1,3})\s*%?[^\d]{0,24}(?:cut.?off|maximum|max level|high.?water|upper level|full.?tank|motor|टंकी|পানি|জল)/);
+    const broadThresholdIntent = /\b(set|change|adjust|make|update|keep|put|want|should|when|reaches|drops|falls|below|above|at)\b|रखो|रखना|कर दो|सेट|जब|हो जाए|पर|করো|রাখো|যখন|হলে/.test(q);
+    if ((lowTerm || highTerm) && (hasThresholdValue || broadThresholdIntent)) {
+      const lowValue = lowValueMatch ? Number(lowValueMatch[1]) : null;
+      const highValue = highValueMatch ? Number(highValueMatch[1]) : null;
+      const generalValue = (q.match(/\b(\d{1,3})\s*%?/) || [])[1];
+      const changes = {};
+      if (lowTerm && lowValue !== null) changes.lowWaterLevel = lowValue;
+      if (highTerm && highValue !== null) changes.cutoffLevel = highValue;
+      if (!Object.keys(changes).length && lowTerm && !highTerm && generalValue) changes.lowWaterLevel = Number(generalValue);
+      if (!Object.keys(changes).length && highTerm && !lowTerm && generalValue) changes.cutoffLevel = Number(generalValue);
+      if (changes.lowWaterLevel !== undefined || changes.cutoffLevel !== undefined) {
+        setPending(null);
+        const low = changes.lowWaterLevel, high = changes.cutoffLevel;
+        if (low !== undefined && (low < 5 || low > 40)) return "The low-water alert must be between 5% and 40%.";
+        if (high !== undefined && (high < 50 || high > 100)) return "The maximum cutoff must be between 50% and 100%.";
+        const current = readSettings();
+        const next = { lowWaterLevel: low ?? current.lowWaterLevel, cutoffLevel: high ?? current.cutoffLevel };
+        if (next.lowWaterLevel >= next.cutoffLevel) return "The low-water alert must remain below the maximum cutoff. Please choose compatible percentages.";
+        const summary = (low !== undefined ? "low-water alert to " + low + "%" : "") + (low !== undefined && high !== undefined ? " and " : "") + (high !== undefined ? "maximum cutoff to " + high + "%" : "");
+        return confirmAction("Set the " + summary + "? This saves browser preferences only; it does not program the ESP32.", () => applySettings(changes));
       }
+      if (lowTerm && highTerm) {
+        setPending({ type:"threshold-pair" });
+        return "What two percentages should I use? Give the low-water alert first and the maximum cutoff second (for example, 15% and 88%).";
+      }
+      const kind = lowTerm ? "low" : "cutoff";
       setPending({ type:"threshold", kind });
-      return "Sure. What percentage should I set the " + (kind === "low" ? "low-water alert" : "maximum cutoff") + " to?";
+      return "What percentage should I set the " + (kind === "low" ? "low-water alert" : "maximum cutoff") + " to?";
     }
     const nav = q.match(/\b(open|go to|show|take me to|visit)\s+(the\s+)?(dashboard|home|alerts?|alarm center|alarm centre|history|reports|features|how it works)\b/);
     if (nav) {
