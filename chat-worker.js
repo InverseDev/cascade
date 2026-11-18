@@ -54,7 +54,7 @@ export default {
           headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
           body: JSON.stringify({
             model: usedModel,
-            input: SYSTEM_PROMPT + "\\n\\nRESPONSE LANGUAGE (mandatory): " + languageName + ". Understand the visitor's message even if it is in another supported language, but answer in " + languageName + ".\\n\\nLIVE DASHBOARD CONTEXT (use this for questions about current water level, sensor, or pump; do not invent missing values):\\n" + liveContext + "\\n\\nRecent conversation:\\n" + history + "\\n\\nVisitor's latest message: " + message
+            input: SYSTEM_PROMPT + "\n\nRESPONSE LANGUAGE (mandatory): " + languageName + ". Understand the visitor's message even if it is in another supported language, but answer in " + languageName + ".\n\nLIVE DASHBOARD CONTEXT (use this for questions about current water level, sensor, or pump; do not invent missing values):\n" + liveContext + "\n\nRecent conversation:\n" + history + "\n\nVisitor's latest message: " + message
           })
         });
         data = await upstream.json();
