@@ -26,7 +26,7 @@
   <!-- <link rel="stylesheet" href="style-responsive-fixed.css"> -->
   <link rel="stylesheet" href="typography.css?v=20261118-font-system-1">
   <link rel="stylesheet" href="feature-stack.css?v=20261118-scroll-deck-2">
-  <link rel="stylesheet" href="mobile-app.css?v=20261119-android-control-ui-3">
+  <link rel="stylesheet" href="mobile-app.css?v=20261119-android-control-ui-4">
 </head>
 <body>
   <div class="page-glow glow-one"></div><div class="page-glow glow-two"></div>
@@ -198,6 +198,10 @@
             <div class="level-track"><div id="waterBar"></div></div>
             <div class="litres-row"><span id="litres">Distance: -- cm</span><div class="guide-scale" aria-label="Water level indicator"><span><i class="scale-low"></i> Low</span><span><i class="scale-mid"></i> Mid-level</span><span><i class="scale-high"></i> Full</span></div></div>
             <p class="sensor-meta" id="sensorMeta">Waiting for the first ESP32 reading…</p>
+            <div class="water-reading-guide">
+              <span class="guide-kicker">UNDERSTANDING YOUR READING</span>
+              <p>The level is calculated from the latest sensor measurement. A higher percentage means more water is available in your tank.</p>
+            </div>
             <div class="dash-tank-wrap"><div class="dash-tank">
               <div class="dash-tank-water" id="dashWater"><div class="dash-wave"></div></div>
               <div class="dash-tank-glare"></div></div>
@@ -214,18 +218,18 @@
             <p id="motorMessage" class="muted-copy">Motor state will be reported by the ESP32.</p>
             <div class="motor-auth" id="motorAuthPanel">
               <div id="motorLoginControls">
-                <label for="motorEmail">Account</label>
+                <label for="motorEmail">Owner sign-in</label>
                 <input id="motorEmail" type="email" autocomplete="username" placeholder="Your account email">
                 <input id="motorPassword" type="password" autocomplete="current-password" placeholder="Password">
-                <button class="auth-btn" id="motorLoginButton" type="button" onclick="motorSignIn()">Sign in</button>
+                <button class="auth-btn" id="motorLoginButton" type="button" onclick="motorSignIn()">Sign in to control pump</button>
               </div>
               <div id="motorSessionControls" hidden>
                 <span class="motor-user-label" id="motorUserLabel"></span>
                 <button class="auth-btn secondary-auth-btn" type="button" onclick="motorSignOut()">Sign out</button>
               </div>
-              <p id="motorAuthMessage" class="motor-auth-message">Sign in required.</p>
+              <p id="motorAuthMessage" class="motor-auth-message">Sign in with the owner account to enable motor commands.</p>
             </div>
-            <div class="motor-auth-required" id="motorAuthRequired">Sign in required</div>
+            <div class="motor-auth-required" id="motorAuthRequired" hidden>Sign in required</div>
             <div class="button-row">
               <button id="motorOnButton" class="control-btn turn-on" onclick="motorOn()" disabled title="Sign in and wait for a fresh sensor reading">Turn motor ON <span>↗</span></button>
               <button id="motorOffButton" class="control-btn turn-off" onclick="motorOff()" disabled title="Sign in to send a stop command">Turn OFF</button>
@@ -238,6 +242,7 @@
             <input id="cutoff" class="range-input" type="range" min="50"
              max="100" value="90" aria-label="Maximum water level threshold" oninput="updateCutoff()">
             <div class="range-ends"><span>50%</span><span>100%</span></div>
+            <div class="setting-note"><span>✦</span> Saved as a dashboard preference only. Automatic pump cutoff needs matching ESP32 firmware and is not active yet.</div>
             <button class="subtle-btn" onclick="saveSettings()">Save thresholds ↗</button>
           </article>
           <article class="dash-card alert-card reveal">
@@ -247,11 +252,32 @@
             <input id="lowLevel" class="range-input amber-range" type="range"
              min="5" max="40" value="20" aria-label="Minimum water level threshold" oninput="updateLowLevel()">
             <div class="range-ends"><span>5%</span><span>40%</span></div>
+            <div class="setting-note"><span>✦</span> Saved as a dashboard preference only. Automatic pump start needs matching ESP32 firmware and is not active yet.</div>
             <div class="alert-message" id="alertMessage">✓ Water level is normal.</div>
+            <button class="subtle-btn" onclick="enableNotifications()">Enable browser notifications ↗</button>
           </article>
         </div>
+                <div class="dashboard-footnote">Live readings are fetched from Supabase. Pump commands require the owner account and a connected ESP32; actual relay feedback is shown only after the device reports it.</div>
       </div>
     </section>
+  <!-- CASCADE PRICING SECTION -->
+<section class="cascade-pricing" id="pricing">
+  <div class="pricing-container">
+    <div class="pricing-heading"><span class="pricing-eyebrow">● WHAT YOU GET</span><h2>One box. One price.</h2></div>
+    <div class="pricing-grid">
+      <div class="pricing-main-card"><div class="pricing-product-name">ECONOMIC ACCESSIBILITY</div><div class="pricing-value"><h3>₹1,999</h3><span>proposed one-time price</span></div><blockquote class="pricing-quote"><h3>Conservation is Not a Luxury.</h3><p>True impact demands scale. We refuse to build luxury toys for the few. Industrial-grade stewardship, engineered for everyone.</p></blockquote></div>
+      <div class="pricing-spec-card">
+        <div class="pricing-spec-row"><span>WORKS WITH</span><p>Overhead and underground tanks, subject to installation compatibility.</p></div>
+        <div class="pricing-spec-row"><span>MOTOR SUPPORT</span><p>Pump compatibility depends on verified voltage, current and controller ratings.</p></div>
+        <div class="pricing-spec-row"><span>CONNECTIVITY</span><p>Wi-Fi connectivity for remote monitoring and website control.</p></div>
+        <div class="pricing-spec-row"><span>POWER</span><p>Separate regulated power supplies according to controller and pump requirements.</p></div>
+        <div class="pricing-spec-row"><span>IN THE BOX</span><p>ESP32 controller, HC-SR04 sensor and relay module. Other accessories subject to final package.</p></div>
+      </div>
+    </div>
+    <p class="pricing-disclaimer">Prototype package · Pricing and specifications are illustrative and subject to testing and final confirmation.</p>
+  </div>
+</section>
+    <section class="closing-cta section-wrap reveal"><div><div class="eyebrow">A BETTER WAY TO MANAGE WATER</div><h2>Make every drop<br><span class="gradient-text">count.</span></h2></div><a class="primary-btn" href="#dashboard">Try the live demo <span>→</span></a><div class="cta-orb"></div></section>
   </main>
 <!-- CASCADE PREMIUM FOOTER -->
 <footer class="cascade-footer" id="footer">
@@ -327,6 +353,6 @@
   <!-- <script src="quick-tools(1).js"></script> -->
   <!-- <script src="quick-tools.js"></script> -->
   <!-- <script src="stack-cards.js"></script> -->
-  <script src="mobile-app.js?v=20261119-android-control-ui-3"></script>
+  <script src="mobile-app.js?v=20261119-android-control-ui-4"></script>
 </body>
 </html>
