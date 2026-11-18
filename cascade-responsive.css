@@ -1337,3 +1337,132 @@ body.dark-mode .how-visual .how-tag {
   .features-section .feature-card { border-radius: 19px !important; }
   .how-visual { border-radius: 22px; }
 }
+
+
+/* Premium interactive header navigation: translucent water-glass tabs. */
+.site-header .main-nav {
+  align-items: center;
+  gap: clamp(3px, .55vw, 9px) !important;
+}
+.site-header .main-nav a {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px clamp(8px, .9vw, 13px) !important;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: #54718a !important;
+  font-size: clamp(11px, .88vw, 13px) !important;
+  font-weight: 650 !important;
+  letter-spacing: -.01em;
+  text-decoration: none;
+  transition: color .22s ease, background .22s ease, border-color .22s ease,
+              box-shadow .22s ease, transform .22s ease;
+}
+.site-header .main-nav a::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  opacity: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, rgba(91,190,238,.2), rgba(105,157,245,.13));
+  transition: opacity .22s ease;
+}
+.site-header .main-nav a::after {
+  left: 50%;
+  bottom: 4px;
+  width: 14px;
+  height: 2px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #39b8dc, #657de2);
+  transform: translateX(-50%) scaleX(.35);
+  transition: transform .22s ease, opacity .22s ease;
+}
+.site-header .main-nav a:hover,
+.site-header .main-nav a.active {
+  color: #17699f !important;
+  border-color: rgba(86,166,215,.25);
+  background: rgba(224,244,255,.58);
+  box-shadow: 0 5px 16px rgba(43,132,187,.1), inset 0 1px 0 rgba(255,255,255,.8);
+  transform: translateY(-1px);
+}
+.site-header .main-nav a:hover::before,
+.site-header .main-nav a.active::before { opacity: 1; }
+.site-header .main-nav a:hover::after,
+.site-header .main-nav a.active::after { transform: translateX(-50%) scaleX(1); }
+.site-header .notification-toggle,
+.site-header .theme-toggle,
+.site-header .menu-toggle {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  margin-left: 5px;
+  border: 1px solid rgba(91,166,215,.27) !important;
+  border-radius: 13px !important;
+  color: #287bb1 !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.82), rgba(220,242,255,.62)) !important;
+  box-shadow: 0 7px 20px rgba(35,112,174,.1), inset 0 1px 0 rgba(255,255,255,.95) !important;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, background .22s ease;
+}
+.site-header .notification-toggle:hover,
+.site-header .theme-toggle:hover,
+.site-header .menu-toggle:hover {
+  transform: translateY(-2px) rotate(-2deg);
+  border-color: rgba(52,157,216,.52) !important;
+  background: linear-gradient(145deg, #fff, rgba(202,235,255,.9)) !important;
+  box-shadow: 0 11px 25px rgba(35,112,174,.18), inset 0 1px 0 #fff !important;
+}
+.site-header .notification-count {
+  border: 2px solid rgba(255,255,255,.9);
+  box-shadow: 0 2px 8px rgba(32,112,170,.2);
+}
+body.dark-mode .site-header .main-nav a { color: #b4cddd !important; }
+body.dark-mode .site-header .main-nav a:hover,
+body.dark-mode .site-header .main-nav a.active {
+  color: #b8edff !important;
+  border-color: rgba(110,190,228,.27);
+  background: rgba(42,104,137,.28);
+  box-shadow: 0 6px 18px rgba(0,0,0,.16), inset 0 1px 0 rgba(211,242,255,.08);
+}
+body.dark-mode .site-header .main-nav a::before {
+  background: linear-gradient(120deg, rgba(55,155,202,.2), rgba(82,112,205,.16));
+}
+body.dark-mode .site-header .notification-toggle,
+body.dark-mode .site-header .theme-toggle,
+body.dark-mode .site-header .menu-toggle {
+  color: #a9e3fb !important;
+  border-color: rgba(110,190,228,.25) !important;
+  background: linear-gradient(145deg, rgba(35,83,111,.88), rgba(25,62,88,.82)) !important;
+  box-shadow: 0 7px 20px rgba(0,0,0,.2), inset 0 1px 0 rgba(211,242,255,.1) !important;
+}
+body.dark-mode .site-header .notification-toggle:hover,
+body.dark-mode .site-header .theme-toggle:hover,
+body.dark-mode .site-header .menu-toggle:hover {
+  background: linear-gradient(145deg, rgba(48,112,145,.95), rgba(32,78,111,.92)) !important;
+}
+@media (max-width: 1050px) and (min-width: 651px) {
+  .site-header .main-nav { gap: 2px !important; }
+  .site-header .main-nav a { padding-inline: 7px !important; font-size: 11px !important; }
+}
+@media (max-width: 650px) {
+  .site-header .main-nav a {
+    width: calc(100% - 24px);
+    justify-content: flex-start;
+    margin: 2px 12px;
+    padding: 12px 14px !important;
+    font-size: 14px !important;
+  }
+  .site-header .menu-toggle { display: inline-grid; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header .main-nav a,
+  .site-header .notification-toggle,
+  .site-header .theme-toggle,
+  .site-header .menu-toggle { transition: none !important; }
+}
