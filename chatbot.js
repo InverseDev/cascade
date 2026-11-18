@@ -7,6 +7,7 @@
     <button class="cascade-chat-launcher" type="button" aria-label="Open Cascade AI assistant" aria-expanded="false">
       <img class="cascade-mascot-launcher" src="assets/mascots/cascade-hero.svg" alt="" aria-hidden="true">
     </button>
+    <div class="cascade-chat-greeting" role="status" aria-live="polite">Hi! How may I help you?</div>
     <section class="cascade-chat-panel" aria-label="Cascade AI assistant" aria-hidden="true">
       <header class="cascade-chat-head">
         <div class="cascade-chat-brand"><span class="cascade-chat-avatar">C</span><span><strong>Cascade Assistant</strong><small><i></i> Here to help</small></span></div>
@@ -49,6 +50,7 @@
 
   function setOpen(open) {
     panel.classList.toggle("open", open);
+    root.classList.toggle("chat-open", open);
     panel.setAttribute("aria-hidden", String(!open));
     launcher.setAttribute("aria-expanded", String(open));
     launcher.setAttribute("aria-label", open ? "Close Cascade AI assistant" : "Open Cascade AI assistant");
