@@ -184,7 +184,7 @@
       console.warn("Cascade notification permission:", error);
     }
   }
-  requestAppNotifications();
+  requestAppNotifications().finally(() => window.dispatchEvent(new Event("cascade-notification-permission-ready")));
 
   // chatbot.js builds its launcher after this script; remove that launcher
   // from the native app while keeping the assistant panel available to its tab.
