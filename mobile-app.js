@@ -51,7 +51,8 @@
   chatObserver.observe(document.documentElement,{childList:true,subtree:true});
   const authPanel=document.getElementById("motorAuthPanel");
   const authSlot=overlay.querySelector(".cascade-drawer-auth-slot");
-  if(authPanel&&authSlot)authSlot.appendChild(authPanel);
+  if(authPanel&&authSlot){authSlot.appendChild(authPanel);const label=authPanel.querySelector("label[for=\"motorEmail\"]");const loginButton=authPanel.querySelector("#motorLoginButton");if(label)label.textContent="Account";if(loginButton)loginButton.textContent="Sign in";}
+  if(!authPanel){const link=document.createElement("a");link.href="index.html#dashboard";link.textContent="Sign in / Account";link.className="cascade-drawer-account-link";authSlot.appendChild(link);}
   const authLogin=document.getElementById("motorLoginControls");
   const authSession=document.getElementById("motorSessionControls");
   const authRequired=document.getElementById("motorAuthRequired");
