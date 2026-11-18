@@ -44,16 +44,29 @@ export default {
         lowWaterAlertPercent: Number.isFinite(Number(live.lowWaterAlertPercent)) ? Number(live.lowWaterAlertPercent) : null,
         maximumCutoffPercent: Number.isFinite(Number(live.maximumCutoffPercent)) ? Number(live.maximumCutoffPercent) : null
       }) : "No live dashboard sensor context is available.";
-      const upstream = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
-        body: JSON.stringify({
-          model: "gemini-3.8-flash",
-          input: SYSTEM_PROMPT + "\n\nRESPONSE LANGUAGE (mandatory): " + languageName + ". Understand the visitor's message even if it is in another supported language, but answer in " + languageName + ".\n\nLIVE DASHBOARD CONTEXT (use this for questions about current water level, sensor, or pump; do not invent missing values):\n" + liveContext + "\n\nRecent conversation:\n" + history + "\n\nVisitor's latest message: " + message
-        })
-      });
-      const data = await upstream.json();
-      if (!upstream.ok) return Response.json({ error: "Gemini request failed.", detail: data.error?.message || "Unknown API error." }, { status: 502, headers: cors });
+      // Try the primary model first, then lighter stable models if Google reports temporary capacity pressure.
+      const models = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite"];
+      let upstream, data, usedModel = models[0];
+      for (let i = 0; i < models.length; i++) {
+        usedModel = models[i];
+        upstream = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
+          body: JSON.stringify({
+            model: usedModel,
+            input: SYSTEM_PROMPT + "\\n\\nRESPONSE LANGUAGE (mandatory): " + languageName + ". Understand the visitor's message even if it is in another supported language, but answer in " + languageName + ".\\n\\nLIVE DASHBOARD CONTEXT (use this for questions about current water level, sensor, or pump; do not invent missing values):\\n" + liveContext + "\\n\\nRecent conversation:\\n" + history + "\\n\\nVisitor's latest message: " + message
+          })
+        });
+        data = await upstream.json();
+        const capacityIssue = upstream.status === 429 || upstream.status === 503 ||
+          /high demand|resource_exhausted|unavailable|overloaded|capacity/i.test(data.error?.message || "");
+        if (upstream.ok || !capacityIssue || i === models.length - 1) break;
+      }
+      if (!upstream.ok) return Response.json({
+        error: "Gemini request failed.",
+        detail: data.error?.message || "Unknown API error.",
+        model: usedModel
+      }, { status: 502, headers: cors });
       const reply = data.output_text || (data.steps || []).filter(step => step.type === "model_output").flatMap(step => step.content || []).map(part => part.text || "").join("\n").trim();
       return Response.json({ reply: reply || "I couldn't form a response. Please try again." }, { headers: { ...cors, "Cache-Control": "no-store" } });
     } catch (error) {
