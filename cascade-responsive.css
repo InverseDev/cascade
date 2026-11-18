@@ -883,22 +883,54 @@ body.dark-mode .cascade-pricing .pricing-spec-row { border-color:rgba(164,174,22
 body.dark-mode .cascade-pricing .pricing-spec-row p { color:#c0cbe0 !important; }
 @media(max-width:760px) { .cascade-pricing { padding:48px 6% !important; }.cascade-pricing .pricing-main-card,.cascade-pricing .pricing-spec-card { padding:25px 22px !important; } }
 
-/* Balanced dashboard columns: prevent short cards leaving blank row gaps.
-   The existing single-column mobile layout is deliberately untouched. */
+/* Dashboard: keep Tank Overview and Pump Management side by side,
+   with matching card heights and a balanced two-by-two layout. */
 @media (min-width: 761px) {
   .dashboard-grid {
-    display: block !important;
-    column-count: 2;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-flow: row !important;
+    align-items: stretch;
+    column-count: initial !important;
     column-gap: 17px;
+    row-gap: 17px;
   }
   .dashboard-grid > .dash-card {
-    display: inline-block !important;
+    display: flex !important;
+    flex-direction: column;
     width: 100% !important;
+    min-width: 0 !important;
     min-height: 0 !important;
+    height: 100% !important;
+    margin: 0 !important;
+    break-inside: auto;
+  }
+  .dashboard-grid > .water-card .dash-tank-wrap {
+    margin-top: auto !important;
+    padding-top: 24px;
+    gap: 24px;
+  }
+  .dashboard-grid > .water-card .dash-tank {
+    width: 112px;
+    height: 178px;
+  }
+  .dashboard-grid > .water-card .tank-reading b {
+    font-size: 56px;
+  }
+  .dashboard-grid > .water-card .tank-reading small {
+    font-size: 18px;
+  }
+}
+@media (max-width: 760px) {
+  .dashboard-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    column-count: initial !important;
+  }
+  .dashboard-grid > .dash-card {
+    display: block !important;
     height: auto !important;
-    margin: 0 0 17px !important;
-    break-inside: avoid;
-    vertical-align: top;
+    margin: 0 !important;
   }
 }
 
