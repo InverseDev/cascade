@@ -69,16 +69,16 @@
     return "I can answer common questions about Cascade, its sensor, dashboard, pump controls and alerts. For open-ended AI answers, the Gemini backend still needs to be configured by the site owner.";
   }
   function parseLowAlert(text) {
-    const m = text.match(/(?:low(?:[- ]water)?\\s+)?(?:alert|threshold)(?:\\s+(?:to|at|of))?\\s*(\\d{1,2})\\s*%?/i)
-      || text.match(/set\\s+(?:the\\s+)?low(?:[- ]water)?\\s+(?:alert|level|threshold)\\s+(?:to\\s+)?(\\d{1,2})\\s*%?/i);
+    const m = text.match(/(?:low(?:[- ]water)?\s+)?(?:alert|threshold)(?:\s+(?:to|at|of))?\s*(\d{1,2})\s*%?/i)
+      || text.match(/set\s+(?:the\s+)?low(?:[- ]water)?\s+(?:alert|level|threshold)\s+(?:to\s+)?(\d{1,2})\s*%?/i);
     if (!m) return null;
     const value = Number(m[1]);
     return value >= 5 && value <= 40 ? value : null;
   }
   function parseCutoff(text) {
-    if (!/\\b(set|change|make|adjust|update)\\b/i.test(text)) return null;
-    const m = text.match(/(?:maximum|max|cut[ -]?off|stop|full[- ]tank)\\s*(?:water\\s*)?(?:level|threshold)?\\s*(?:to|at|of|=)?\\s*(\\d{1,3})\\s*%?/i)
-      || text.match(/(?:level|cut[ -]?off)\\s*(?:to|at)\\s*(\\d{1,3})\\s*%?/i);
+    if (!/\b(set|change|make|adjust|update)\b/i.test(text)) return null;
+    const m = text.match(/(?:maximum|max|cut[ -]?off|stop|full[- ]tank)\s*(?:water\s*)?(?:level|threshold)?\s*(?:to|at|of|=)?\s*(\d{1,3})\s*%?/i)
+      || text.match(/(?:level|cut[ -]?off)\s*(?:to|at)\s*(\d{1,3})\s*%?/i);
     if (!m) return null;
     const value = Number(m[1]);
     return value >= 50 && value <= 100 ? value : null;
