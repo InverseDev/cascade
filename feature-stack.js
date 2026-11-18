@@ -22,15 +22,19 @@
     const viewportHeight = window.innerHeight;
     const cardHeight = cards[0].getBoundingClientRect().height;
     const scrollDistance = window.scrollY - (deckTop - viewportHeight + 1);
+    const startDelay = 150;
+    const speed = 0.8;
     const toCenter = Math.max(1, (viewportHeight - cardHeight) / 2);
 
-    // Both moving cards finish their horizontal travel exactly as their
-    // vertical centre reaches the viewport centre.
-    const out = ease(clamp(scrollDistance / toCenter));
+    // Begin 150px later, then move at 80% of the previous scroll speed.
+    const openingDistance = Math.max(1, (toCenter - startDelay) / speed);
+    const out = ease(clamp((scrollDistance - startDelay) / openingDistance));
 
-    // Keep the deck spread while visible. Only begin folding it back once
-    // its top has passed above the viewport; finish when its bottom exits.
-    const tuck = ease(clamp((scrollDistance - viewportHeight) / Math.max(1, cardHeight)));
+    // Slow the return to 80% as well, while still finishing as the deck
+    // completely leaves the viewport.
+    const closingDistance = cardHeight / speed;
+    const closingStart = viewportHeight + cardHeight - closingDistance;
+    const tuck = ease(clamp((scrollDistance - closingStart) / closingDistance));
 
     const deckWidth = deck.clientWidth;
     const cardWidth = cards[0].getBoundingClientRect().width;
