@@ -52,6 +52,7 @@
 
   const launcher = root.querySelector(".cascade-chat-launcher");
   const mascotImage = launcher.querySelector(".cascade-mascot-launcher");
+  const nativeApp = Boolean(window.Capacitor?.isNativePlatform?.());
   const mascotPage = location.pathname.toLowerCase();
   mascotImage.src = mascotPage.includes("history") ? "assets/mascots/cascade-analytics.svg" : mascotPage.includes("alarms") ? "assets/mascots/cascade-summary.svg" : "assets/mascots/cascade-hero.svg";
   const headerMascot = root.querySelector(".cascade-chat-avatar");
@@ -143,11 +144,16 @@
     panel.classList.toggle("open", open);
     root.classList.toggle("chat-open", open);
     panel.setAttribute("aria-hidden", String(!open));
-    launcher.setAttribute("aria-expanded", String(open));
-    launcher.setAttribute("aria-label", open ? "Close Cascade AI assistant" : "Open Cascade AI assistant");
+    if (launcher) {
+      launcher.setAttribute("aria-expanded", String(open));
+      launcher.setAttribute("aria-label", open ? "Close Cascade AI assistant" : "Open Cascade AI assistant");
+    }
     // Do not autofocus: mobile browsers would open the on-screen keyboard as soon as chat opens.
   }
-  launcher.addEventListener("click", () => setOpen(!panel.classList.contains("open")));
+  if (nativeApp) launcher.remove();
+  else launcher.addEventListener("click", () => setOpen(!panel.classList.contains("open")));
+  window.setCascadeAssistantOpen = setOpen;
+  window.toggleCascadeAssistant = () => setOpen(!panel.classList.contains("open"));
   close.addEventListener("click", () => setOpen(false));
 
   // The chat is a viewport-level window and can be repositioned by dragging
