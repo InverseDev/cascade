@@ -15,32 +15,37 @@
 
   function update() {
     frame = 0;
-    const sectionRect = section.getBoundingClientRect();
-    const deckTop = deck.offsetTop;
-    const stickyTop = window.innerHeight * 0.16;
-    const travel = 420;
-    const start = sectionRect.top + window.scrollY + deckTop - window.innerHeight * 0.86;
-    const progress = clamp((window.scrollY - start) / travel);
+
+    // Use the deck's natural document position: no sticky positioning, so
+    // the cards track the viewport continuously from entering to leaving it.
+    const deckTop = deck.getBoundingClientRect().top + window.scrollY;
+    const viewportHeight = window.innerHeight;
+    const cardHeight = cards[0].getBoundingClientRect().height;
+    const scrollDistance = window.scrollY - (deckTop - viewportHeight + 1);
+    const toCenter = Math.max(1, (viewportHeight - cardHeight) / 2);
+
+    // Both moving cards finish their horizontal travel exactly as their
+    // vertical centre reaches the viewport centre.
+    const out = ease(clamp(scrollDistance / toCenter));
+
+    // Keep the deck spread while visible. Only begin folding it back once
+    // its top has passed above the viewport; finish when its bottom exits.
+    const tuck = ease(clamp((scrollDistance - viewportHeight) / Math.max(1, cardHeight)));
 
     const deckWidth = deck.clientWidth;
     const cardWidth = cards[0].getBoundingClientRect().width;
     const middle = Math.max(0, (deckWidth - cardWidth) / 2);
     const right = Math.max(middle, deckWidth - cardWidth);
 
-    // Card two arrives first; card three follows. Both then tuck behind card one.
-    const secondOut = ease(clamp(progress / 0.34));
-    const thirdOut = ease(clamp((progress - 0.16) / 0.46));
-    const tuck = ease(clamp((progress - 0.76) / 0.24));
-
-    const secondX = mix(0, middle, secondOut) * (1 - tuck);
-    const thirdX = mix(0, right, thirdOut) * (1 - tuck);
+    const secondX = mix(0, middle, out) * (1 - tuck);
+    const thirdX = mix(0, right, out) * (1 - tuck);
 
     cards[0].style.transform = 'translate3d(0,0,0)';
     cards[0].style.zIndex = '3';
     cards[1].style.transform = `translate3d(${secondX}px,0,0)`;
     cards[2].style.transform = `translate3d(${thirdX}px,0,0)`;
-    cards[1].style.zIndex = progress < 0.72 ? '4' : '2';
-    cards[2].style.zIndex = progress >= 0.34 && progress < 0.72 ? '5' : '1';
+    cards[1].style.zIndex = '4';
+    cards[2].style.zIndex = '5';
   }
 
   function requestUpdate() {
