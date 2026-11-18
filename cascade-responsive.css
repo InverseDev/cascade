@@ -1483,10 +1483,30 @@ body.dark-mode .site-header .menu-toggle:hover {
 }
 
 
-/* Desktop header balance: shift navigation and controls left while keeping the logo dock fixed. */
+
+
+/* Desktop header layout: keep the logo anchored and center the navigation in the available space. */
 @media (min-width: 769px) {
-  .site-header > :not(.brand) {
-    position: relative;
-    left: -24px;
+  .site-header {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) auto auto !important;
+    align-items: center !important;
+    column-gap: clamp(10px, 1.5vw, 22px) !important;
   }
+  .site-header > .brand {
+    grid-column: 1;
+    justify-self: start;
+  }
+  .site-header > .main-nav {
+    grid-column: 2;
+    justify-self: center !important;
+    position: static !important;
+    left: auto !important;
+    transform: none !important;
+    width: max-content;
+    max-width: 100%;
+  }
+  .site-header > .notification-toggle { grid-column: 3; position: static !important; left: auto !important; }
+  .site-header > .theme-toggle { grid-column: 4; position: static !important; left: auto !important; }
+  .site-header > .menu-toggle { display: none !important; }
 }
