@@ -1052,3 +1052,42 @@ body.dark-mode .closing-cta {
     padding: 22px 0 !important;
   }
 }
+
+
+/* Pricing section: use the same page canvas; let only the conservation quote stand out. */
+.cascade-pricing{background:transparent!important;background-image:none!important;padding:clamp(42px,5vw,68px) clamp(18px,6vw,7%)!important}
+.cascade-pricing::before,.cascade-pricing::after{display:none!important}
+.cascade-pricing .pricing-main-card,.cascade-pricing .pricing-spec-card{min-height:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;transform:none!important}
+.cascade-pricing .pricing-main-card{display:flex;flex-direction:column;justify-content:flex-start!important;align-items:flex-start!important;gap:0!important;padding:8px clamp(18px,3vw,38px) 8px 0!important;text-align:left!important}
+.cascade-pricing .pricing-main-card::before{display:none!important}
+.cascade-pricing .pricing-product-name{color:#737b96!important;font-size:12px!important;letter-spacing:.16em!important;font-weight:700!important}
+.cascade-pricing .pricing-value{justify-content:flex-start!important;align-items:baseline!important;margin:10px 0 0!important;gap:10px!important}
+.cascade-pricing .pricing-value h3{color:#25294c!important;background:none!important;-webkit-text-fill-color:currentColor!important;font-size:clamp(42px,4.8vw,60px)!important;font-weight:600!important;letter-spacing:-.035em!important}
+.cascade-pricing .pricing-value span{color:#777b91!important;font-size:13px!important;font-weight:500!important}
+.cascade-pricing .pricing-quote{width:100%;max-width:680px;margin:24px 0 0!important;padding:18px 22px!important;text-align:left!important;background:linear-gradient(105deg,rgba(118,87,246,.09),rgba(75,203,212,.09))!important;border-left:4px solid #7560df!important;border-radius:0 14px 14px 0!important}
+.cascade-pricing .pricing-quote h3{margin:0 0 8px!important;color:#5545b5!important;font-size:clamp(22px,2.2vw,30px)!important;line-height:1.2!important;font-weight:800!important}
+.cascade-pricing .pricing-quote p{margin:0!important;color:#59627e!important;font-size:clamp(14px,1.2vw,16px)!important;line-height:1.55!important;font-weight:500!important}
+.cascade-pricing .pricing-spec-card{justify-content:flex-start!important;padding:6px 0 6px clamp(18px,2.5vw,32px)!important;border-left:1px solid rgba(112,119,160,.2)!important}
+.cascade-pricing .pricing-spec-row{padding:10px 0 12px!important;border-bottom-color:rgba(112,119,160,.17)!important}
+.cascade-pricing .pricing-spec-row:first-child{padding-top:4px!important}
+.cascade-pricing .pricing-spec-row span{margin-bottom:4px!important;font-size:11px!important;letter-spacing:.13em!important}
+.cascade-pricing .pricing-spec-row p{font-size:14px!important;line-height:1.5!important;font-weight:500!important}
+.cascade-pricing .pricing-disclaimer{margin-top:12px!important}
+body.dark-mode .cascade-pricing{background:transparent!important}
+body.dark-mode .cascade-pricing .pricing-main-card,body.dark-mode .cascade-pricing .pricing-spec-card{background:transparent!important}
+body.dark-mode .cascade-pricing .pricing-value h3{color:#edf0ff!important}
+body.dark-mode .cascade-pricing .pricing-value span,body.dark-mode .cascade-pricing .pricing-product-name{color:#aeb8d0!important}
+body.dark-mode .cascade-pricing .pricing-quote{background:linear-gradient(105deg,rgba(145,125,255,.16),rgba(75,203,212,.1))!important;border-left-color:#a18cff!important}
+body.dark-mode .cascade-pricing .pricing-quote h3{color:#c4b8ff!important}
+body.dark-mode .cascade-pricing .pricing-quote p{color:#c0cbe0!important}
+body.dark-mode .cascade-pricing .pricing-spec-card{border-left-color:rgba(164,174,220,.2)!important}
+body.dark-mode .cascade-pricing .pricing-spec-row{border-bottom-color:rgba(164,174,220,.14)!important}
+@media(max-width:760px){
+ .cascade-pricing{padding:36px 20px!important}
+ .cascade-pricing .pricing-grid{grid-template-columns:minmax(0,1fr)!important;gap:24px!important}
+ .cascade-pricing .pricing-main-card{padding:0!important}
+ .cascade-pricing .pricing-value{flex-wrap:wrap}
+ .cascade-pricing .pricing-quote{margin-top:18px!important;padding:16px 17px!important}
+ .cascade-pricing .pricing-spec-card{padding:18px 0 0!important;border-left:0!important;border-top:1px solid rgba(112,119,160,.2)!important}
+ body.dark-mode .cascade-pricing .pricing-spec-card{border-top-color:rgba(164,174,220,.2)!important}
+}
