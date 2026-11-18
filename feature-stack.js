@@ -9,6 +9,10 @@
   section.classList.add('feature-stack-active');
 
   let frame = 0;
+  let animatedOut = null;
+  let targetOut = 0;
+  let lastScrollY = window.scrollY;
+  let scrollDirection = 1;
   const clamp = (v, min = 0, max = 1) => Math.min(max, Math.max(min, v));
   const ease = t => t * t * (3 - 2 * t);
   const mix = (a, b, t) => a + (b - a) * t;
@@ -28,7 +32,14 @@
 
     // Begin 150px later, then move at 80% of the previous scroll speed.
     const openingDistance = Math.max(1, (toCenter - startDelay) / speed);
-    const out = ease(clamp((scrollDistance - startDelay) / openingDistance));
+    targetOut = ease(clamp((scrollDistance - startDelay) / openingDistance));
+    if (animatedOut === null) animatedOut = targetOut;
+
+    // Ease more gently while scrolling down; keep the quicker, familiar
+    // response while scrolling back up.
+    const response = scrollDirection > 0 ? 0.12 : 0.28;
+    animatedOut += (targetOut - animatedOut) * response;
+    const out = animatedOut;
 
     // Slow the return to 80% as well, while still finishing as the deck
     // completely leaves the viewport.
@@ -50,9 +61,19 @@
     cards[2].style.transform = `translate3d(${thirdX}px,0,0)`;
     cards[1].style.zIndex = '4';
     cards[2].style.zIndex = '5';
+
+    // Continue easing after a scroll event until the cards catch up.
+    if (Math.abs(targetOut - animatedOut) > 0.001 && !frame) {
+      frame = requestAnimationFrame(update);
+    }
   }
 
   function requestUpdate() {
+    const nextScrollY = window.scrollY;
+    if (nextScrollY !== lastScrollY) {
+      scrollDirection = nextScrollY > lastScrollY ? 1 : -1;
+      lastScrollY = nextScrollY;
+    }
     if (!frame) frame = requestAnimationFrame(update);
   }
   window.addEventListener('scroll', requestUpdate, { passive: true });
