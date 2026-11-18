@@ -136,7 +136,12 @@
     valueRow.appendChild(button);
     button.addEventListener("click", () => {
       if (typeof window.saveSettings !== "function") return;
-      window.saveSettings();
+      const savedSuccessfully = window.saveSettings();
+      if (!savedSuccessfully) {
+        button.classList.remove("saved");
+        button.title = "Could not save: minimum level must stay below maximum level.";
+        return;
+      }
       try {
         const saved = JSON.parse(localStorage.getItem("cascade-dashboard-settings") || "null");
         const expected = Number(input.value);
