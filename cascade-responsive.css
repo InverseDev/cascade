@@ -1091,3 +1091,144 @@ body.dark-mode .cascade-pricing .pricing-spec-row{border-bottom-color:rgba(164,1
  .cascade-pricing .pricing-spec-card{padding:18px 0 0!important;border-left:0!important;border-top:1px solid rgba(112,119,160,.2)!important}
  body.dark-mode .cascade-pricing .pricing-spec-card{border-top-color:rgba(164,174,220,.2)!important}
 }
+
+
+/* Premium water-glass treatment for all four live dashboard cards. */
+.dashboard-grid > .dash-card {
+  isolation: isolate;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(94, 166, 224, .28) !important;
+  border-radius: 24px !important;
+  color: #183b5a !important;
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(91, 190, 238, .24), transparent 42%),
+    radial-gradient(ellipse at 0% 100%, rgba(105, 157, 245, .16), transparent 48%),
+    linear-gradient(145deg, rgba(255,255,255,.84), rgba(225,243,255,.68) 55%, rgba(239,247,255,.76)) !important;
+  box-shadow:
+    0 18px 48px rgba(35, 112, 174, .12),
+    0 3px 10px rgba(45, 112, 171, .06),
+    inset 0 1px 0 rgba(255,255,255,.92),
+    inset 0 -1px 0 rgba(102,174,221,.12) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(145%);
+  backdrop-filter: blur(22px) saturate(145%);
+  transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+}
+.dashboard-grid > .dash-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  width: 260px;
+  height: 260px;
+  right: -115px;
+  top: -145px;
+  border-radius: 50%;
+  border: 1px solid rgba(67, 164, 220, .16);
+  background:
+    radial-gradient(circle, rgba(99,194,236,.18) 0 25%, transparent 26% 39%, rgba(99,194,236,.09) 40% 41%, transparent 42%),
+    radial-gradient(circle, rgba(255,255,255,.68), rgba(111,190,232,.04) 68%, transparent 70%);
+  box-shadow: 0 0 0 18px rgba(105,190,231,.035), 0 0 0 38px rgba(105,190,231,.025);
+}
+.dashboard-grid > .dash-card::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(125deg, rgba(255,255,255,.42), transparent 28%, transparent 72%, rgba(92,180,224,.07));
+}
+.dashboard-grid > .dash-card > * {
+  position: relative;
+  z-index: 1;
+}
+.dashboard-grid > .dash-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(61, 157, 220, .43) !important;
+  box-shadow: 0 24px 56px rgba(35,112,174,.17), inset 0 1px 0 rgba(255,255,255,.96) !important;
+}
+.dashboard-grid > .dash-card .card-kicker {
+  color: #287bb1 !important;
+  letter-spacing: .14em;
+}
+.dashboard-grid > .dash-card p,
+.dashboard-grid > .dash-card .muted-copy,
+.dashboard-grid > .dash-card .sensor-meta {
+  color: #54718a;
+}
+.dashboard-grid > .dash-card .level-row strong,
+.dashboard-grid > .dash-card .range-value strong {
+  color: #145b91;
+}
+.dashboard-grid > .dash-card .level-track {
+  background: rgba(82,151,194,.16);
+  border: 1px solid rgba(91,164,207,.13);
+}
+.dashboard-grid > .dash-card .level-track > div {
+  background: linear-gradient(90deg, #42b9d9, #348fe0 58%, #647de0);
+  box-shadow: 0 0 14px rgba(56,157,218,.28);
+}
+.dashboard-grid > .dash-card .water-reading-guide,
+.dashboard-grid > .dash-card .setting-note,
+.dashboard-grid > .dash-card .motor-auth {
+  background: rgba(231,246,255,.56) !important;
+  border-color: rgba(91,163,207,.2) !important;
+  border-radius: 16px;
+}
+.dashboard-grid > .dash-card input[type="range"] {
+  accent-color: #238fd0;
+}
+.dashboard-grid > .dash-card .subtle-btn,
+.dashboard-grid > .dash-card .auth-btn {
+  border-color: rgba(58,145,204,.25);
+  background: linear-gradient(110deg, rgba(69,166,216,.14), rgba(91,125,220,.12));
+  color: #17699f;
+}
+.dashboard-grid > .dash-card .subtle-btn:hover,
+.dashboard-grid > .dash-card .auth-btn:hover {
+  background: linear-gradient(110deg, rgba(69,166,216,.24), rgba(91,125,220,.2));
+}
+body.dark-mode .dashboard-grid > .dash-card {
+  color: #e5f5ff !important;
+  border-color: rgba(91,180,226,.25) !important;
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(47,147,202,.23), transparent 44%),
+    radial-gradient(ellipse at 0% 100%, rgba(66,103,196,.17), transparent 48%),
+    linear-gradient(145deg, rgba(25,61,83,.88), rgba(21,48,72,.86) 56%, rgba(25,55,78,.9)) !important;
+  box-shadow: 0 20px 50px rgba(0,0,0,.2), inset 0 1px 0 rgba(211,242,255,.12), inset 0 -1px 0 rgba(94,174,219,.1) !important;
+}
+body.dark-mode .dashboard-grid > .dash-card::before {
+  border-color: rgba(102,198,237,.13);
+  background:
+    radial-gradient(circle, rgba(77,174,221,.16) 0 25%, transparent 26% 39%, rgba(77,174,221,.08) 40% 41%, transparent 42%),
+    radial-gradient(circle, rgba(158,220,246,.12), rgba(77,174,221,.025) 68%, transparent 70%);
+}
+body.dark-mode .dashboard-grid > .dash-card::after {
+  background: linear-gradient(125deg, rgba(190,232,255,.08), transparent 30%, transparent 72%, rgba(77,174,221,.06));
+}
+body.dark-mode .dashboard-grid > .dash-card .card-kicker { color: #82d5f2 !important; }
+body.dark-mode .dashboard-grid > .dash-card p,
+body.dark-mode .dashboard-grid > .dash-card .muted-copy,
+body.dark-mode .dashboard-grid > .dash-card .sensor-meta { color: #b2cfdf !important; }
+body.dark-mode .dashboard-grid > .dash-card .level-row strong,
+body.dark-mode .dashboard-grid > .dash-card .range-value strong { color: #e0f5ff !important; }
+body.dark-mode .dashboard-grid > .dash-card .water-reading-guide,
+body.dark-mode .dashboard-grid > .dash-card .setting-note,
+body.dark-mode .dashboard-grid > .dash-card .motor-auth {
+  background: rgba(10,35,55,.42) !important;
+  border-color: rgba(110,190,228,.2) !important;
+}
+body.dark-mode .dashboard-grid > .dash-card .subtle-btn,
+body.dark-mode .dashboard-grid > .dash-card .auth-btn {
+  color: #a6e4fb;
+  border-color: rgba(110,190,228,.28);
+  background: linear-gradient(110deg, rgba(55,155,202,.2), rgba(82,112,205,.2));
+}
+@media (max-width: 760px) {
+  .dashboard-grid > .dash-card { border-radius: 20px !important; }
+  .dashboard-grid > .dash-card:hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-grid > .dash-card { transition: none; }
+}
