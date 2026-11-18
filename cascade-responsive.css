@@ -903,20 +903,14 @@ body.dark-mode .cascade-pricing .pricing-spec-row p { color:#c0cbe0 !important; 
 }
 
 
-/* Cascade typography system: National 2 for display text, Montserrat for all UI/body copy. */
-@font-face {
-  font-family: "National 2";
-  src: url("https://raw.githubusercontent.com/the-pudding/falsetto-story/master/docs/assets/fonts/national/National2Web-Regular.woff") format("woff");
-  font-style: normal;
-  font-weight: 400 800;
-  font-display: swap;
-}
-html, body, body * {
-  font-family: "Montserrat", sans-serif !important;
-}
+
+
+/* Shared Cascade typography: Montserrat for body/UI, Poppins for every heading and subheading. */
 h1, h2, h3, h4, h5, h6,
+.eyebrow, .section-eyebrow, .section-label, .section-subtitle,
+[class*="subheading"], [class*="subtitle"], [class*="kicker"],
+.card-kicker, .stat-strip strong,
 .hero h1, .section-heading h2, .how-copy h2, .dashboard-heading h2,
-.pricing-heading h2, .pricing-quote h3, .closing-cta h2,
-.card-kicker, .stat-strip strong {
-  font-family: "National 2", "Montserrat", sans-serif !important;
+.pricing-heading h2, .pricing-quote h3, .closing-cta h2 {
+  font-family: "Poppins", "Montserrat", sans-serif !important;
 }
