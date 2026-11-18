@@ -11,7 +11,15 @@
     <section class="cascade-chat-panel" aria-label="Cascade AI assistant" aria-hidden="true">
       <header class="cascade-chat-head">
         <div class="cascade-chat-brand"><span class="cascade-chat-avatar">C</span><span><strong>Cascade Assistant</strong><small><i></i> Here to help</small></span></div>
-        <button class="cascade-chat-close" type="button" aria-label="Close chat">×</button>
+        <div class="cascade-chat-head-actions">
+          <label class="cascade-chat-language-label" for="cascade-chat-language">Language</label>
+          <select class="cascade-chat-language" id="cascade-chat-language" aria-label="Assistant language">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="bn">বাংলা</option>
+          </select>
+          <button class="cascade-chat-close" type="button" aria-label="Close chat">×</button>
+        </div>
       </header>
       <div class="cascade-chat-messages" role="log" aria-live="polite">
         <div class="cascade-chat-welcome">
@@ -46,7 +54,39 @@
   const form = root.querySelector("form");
   const input = form.elements.message;
   const messages = root.querySelector(".cascade-chat-messages");
+  const languageSelect = root.querySelector("#cascade-chat-language");
+  const LANGUAGE_KEY = "cascade-assistant-language";
+  const languageNames = { en: "English", hi: "Hindi", bn: "Bengali" };
+  let assistantLanguage = localStorage.getItem(LANGUAGE_KEY) || "en";
+  if (!["en", "hi", "bn"].includes(assistantLanguage)) assistantLanguage = "en";
+  languageSelect.value = assistantLanguage;
   let busy = false;
+
+  const uiText = {
+    en: { label:"Language", welcome:"How can I help you?", intro:"Ask me about your tank, water levels, alerts or pump controls. I can also help you adjust dashboard settings.", hello:"Hello! I'm your Cascade assistant. What would you like to know?", placeholder:"Ask about Cascade...", send:"Send message", foot:"AI responses may be inaccurate. Hardware actions require confirmation.", greeting:"Hi! How may I help you?" },
+    hi: { label:"भाषा", welcome:"मैं आपकी क्या मदद कर सकता हूँ?", intro:"अपने टैंक, पानी के स्तर, अलर्ट या पंप नियंत्रण के बारे में पूछें। मैं डैशबोर्ड सेटिंग बदलने में भी मदद कर सकता हूँ।", hello:"नमस्ते! मैं Cascade सहायक हूँ। आप क्या जानना चाहेंगे?", placeholder:"Cascade के बारे में पूछें...", send:"संदेश भेजें", foot:"AI के जवाब गलत हो सकते हैं। हार्डवेयर संबंधी कार्रवाइयों के लिए पुष्टि आवश्यक है।", greeting:"नमस्ते! मैं आपकी क्या मदद कर सकता हूँ?" },
+    bn: { label:"ভাষা", welcome:"আমি কীভাবে আপনাকে সাহায্য করতে পারি?", intro:"আপনার ট্যাঙ্ক, পানির স্তর, অ্যালার্ট বা পাম্প নিয়ন্ত্রণ সম্পর্কে জিজ্ঞাসা করুন। ড্যাশবোর্ড সেটিংস বদলাতেও সাহায্য করতে পারি।", hello:"নমস্কার! আমি Cascade সহকারী। কী জানতে চান?", placeholder:"Cascade সম্পর্কে জিজ্ঞাসা করুন...", send:"বার্তা পাঠান", foot:"AI-এর উত্তর ভুল হতে পারে। হার্ডওয়্যার সংক্রান্ত কাজের জন্য নিশ্চিতকরণ প্রয়োজন।", greeting:"নমস্কার! কীভাবে সাহায্য করতে পারি?" }
+  };
+  function applyLanguage() {
+    const t = uiText[assistantLanguage];
+    root.querySelector(".cascade-chat-language-label").textContent = t.label;
+    root.querySelector(".cascade-chat-welcome h3").textContent = t.welcome;
+    root.querySelector(".cascade-chat-welcome p").textContent = t.intro;
+    root.querySelector(".cascade-chat-form input").placeholder = t.placeholder;
+    root.querySelector(".cascade-chat-form input").setAttribute("aria-label", t.placeholder);
+    root.querySelector(".cascade-chat-form button").setAttribute("aria-label", t.send);
+    root.querySelector(".cascade-chat-foot").textContent = t.foot;
+    root.querySelector(".cascade-chat-greeting").textContent = t.greeting;
+    root.querySelector(".cascade-chat-welcome-label").textContent = assistantLanguage === "en" ? "CASCADE · SMART WATER SYSTEM" : assistantLanguage === "hi" ? "CASCADE · स्मार्ट जल प्रणाली" : "CASCADE · স্মার্ট জল ব্যবস্থাপনা";
+  }
+  languageSelect.addEventListener("change", () => {
+    assistantLanguage = languageSelect.value;
+    localStorage.setItem(LANGUAGE_KEY, assistantLanguage);
+    applyLanguage();
+    addMessage(assistantLanguage === "hi" ? "अब मैं हिन्दी में जवाब दूँगा। आप हिन्दी, বাংলা या English में लिख सकते हैं।" : assistantLanguage === "bn" ? "এখন থেকে আমি বাংলায় উত্তর দেব। আপনি हिन्दी, বাংলা বা English-এ লিখতে পারেন।" : "I'll reply in English. You can write in English, हिन्दी or বাংলা.", "bot");
+    saveChatLog();
+  });
+  applyLanguage();
 
   function setOpen(open) {
     panel.classList.toggle("open", open);
@@ -109,6 +149,18 @@
   }
   function localAnswer(text) {
     const q = text.toLowerCase();
+    if (assistantLanguage === "hi") {
+      if (/^(hi|hello|hey|नमस्ते|नमस्कार)/i.test(text)) return "नमस्ते! मैं Cascade की सुविधाओं और डैशबोर्ड का उपयोग समझाने में मदद कर सकता हूँ।";
+      if (/how.*work|working|process|flow|कैसे काम|कैसे चलता/.test(q)) return "Cascade में अल्ट्रासोनिक सेंसर पानी का स्तर मापता है। ESP32 रीडिंग को प्रोसेस करके डैशबोर्ड पर भेजता है और कॉन्फ़िगर होने पर रिले के ज़रिए पंप नियंत्रित कर सकता है।";
+      if (/feature|dashboard|tank|pump|alarm|history|report|सुविधा|डैशबोर्ड|टैंक|पंप|अलर्ट|इतिहास/.test(q)) return "डैशबोर्ड टैंक का स्तर, सेंसर रीडिंग, पंप की स्थिति और अलर्ट सेटिंग दिखाता है। Alarm Centre में रिमाइंडर और History & Reports में गतिविधियों का रिकॉर्ड मिलता है।";
+      return "मैं Cascade, सेंसर, डैशबोर्ड, पंप नियंत्रण और अलर्ट के बारे में मदद कर सकता हूँ।";
+    }
+    if (assistantLanguage === "bn") {
+      if (/^(hi|hello|hey|নমস্কার|হ্যালো)/i.test(text)) return "নমস্কার! Cascade-এর ফিচার এবং ড্যাশবোর্ড ব্যবহার করতে আমি সাহায্য করতে পারি।";
+      if (/how.*work|working|process|flow|কীভাবে কাজ|কিভাবে চলে/.test(q)) return "Cascade-এ আল্ট্রাসোনিক সেন্সর পানির স্তর মাপে। ESP32 রিডিং প্রসেস করে ড্যাশবোর্ডে পাঠায় এবং কনফিগার করা থাকলে রিলের মাধ্যমে পাম্প নিয়ন্ত্রণ করতে পারে।";
+      if (/feature|dashboard|tank|pump|alarm|history|report|ফিচার|ড্যাশবোর্ড|ট্যাঙ্ক|পাম্প|অ্যালার্ট|ইতিহাস/.test(q)) return "ড্যাশবোর্ডে ট্যাঙ্কের স্তর, সেন্সর রিডিং, পাম্পের অবস্থা এবং অ্যালার্ট সেটিং দেখা যায়। Alarm Centre-এ রিমাইন্ডার এবং History & Reports-এ কার্যকলাপের রেকর্ড থাকে।";
+      return "আমি Cascade, সেন্সর, ড্যাশবোর্ড, পাম্প নিয়ন্ত্রণ এবং অ্যালার্ট সম্পর্কে সাহায্য করতে পারি।";
+    }
     if (/^(hi|hello|hey)\b/.test(q)) return "Hello! I can explain Cascade's features and help you use the dashboard.";
     if (/how.*work|working|process|flow/.test(q)) return "Cascade uses an ultrasonic sensor to measure the water level. The ESP32 processes the reading, reports it to the dashboard and can control a pump through a relay when device-side automation is configured.";
     if (/feature|dashboard|tank overview|pump management|alarm|history|report/.test(q)) return "The dashboard shows the tank level, sensor distance, pump status, automation cutoff and low-water alert setting. Alarm Centre is for alerts, while History & Reports shows recorded system activity.";
@@ -261,8 +313,20 @@
     if (toggle) toggle.textContent = dark ? "☀️" : "🌙";
     return "Switched to " + (dark ? "dark" : "light") + " mode.";
   }
+  function normalizeActionText(text) {
+    return String(text)
+      .replace(/कम पानी का अलर्ट|लो वाटर अलर्ट|पानी कम होने का अलर्ट|জলের স্তর কমার অ্যালার্ট|কম পানির অ্যালার্ট|লো ওয়াটার অ্যালার্ট/gi, "low water alert")
+      .replace(/अधिकतम स्तर|मैक्सिमम लेवल|कट.?ऑफ स्तर|পানির সর্বোচ্চ স্তর|সর্বোচ্চ লেভেল|কাট.?অফ লেভেল/gi, "maximum cutoff")
+      .replace(/सेट करो|सेट करें|बदल दो|बदलें|रखो|कर दो|করো|সেট করো|সেট করুন|বদলে দাও|বদলাও/gi, "set")
+      .replace(/कितने प्रतिशत|कितना प्रतिशत|प्रतिशत|শতাংশ|কত পার্সেন্ট/gi, "percent")
+      .replace(/रद्द करो|रद्द करें|না|বাতিল করো|বাতিল করুন/gi, "cancel")
+      .replace(/खोलो|खोलें|दिखाओ|দেখাও|খুলুন/gi, "open")
+      .replace(/[০-৯]/g, ch => "০১২৩৪৫৬৭৮৯".indexOf(ch))
+      .replace(/[०-९]/g, ch => "०१२३४५६७८९".indexOf(ch));
+  }
+
   function runAction(text) {
-    const q = text.toLowerCase().trim();
+    const q = normalizeActionText(text).toLowerCase().trim();
 
     // Continue an unfinished request before interpreting the new message alone.
     if (pendingIntent?.type === "threshold") {
@@ -451,14 +515,14 @@
           .join("\n");
         const response = await fetch(API_URL, {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text, history, page: pageName() })
+          body: JSON.stringify({ message: text, history, page: pageName(), language: assistantLanguage, languageName: languageNames[assistantLanguage] })
         });
         if (!response.ok) throw new Error("Assistant service returned " + response.status);
         const data = await response.json();
-        typing.textContent = data.reply || "I couldn't generate a reply. Please try again.";
+        typing.textContent = data.reply || (assistantLanguage === "hi" ? "माफ़ कीजिए, जवाब नहीं बन पाया। फिर कोशिश करें।" : assistantLanguage === "bn" ? "দুঃখিত, উত্তর তৈরি করা যায়নি। আবার চেষ্টা করুন।" : "I couldn't generate a reply. Please try again.");
       }
     } catch (error) {
-      typing.textContent = "I couldn't reach the AI service. Please try again later.";
+      typing.textContent = assistantLanguage === "hi" ? "AI सेवा से संपर्क नहीं हो पाया। कृपया बाद में कोशिश करें।" : assistantLanguage === "bn" ? "AI পরিষেবার সঙ্গে যোগাযোগ করা যায়নি। পরে আবার চেষ্টা করুন।" : "I couldn't reach the AI service. Please try again later.";
       console.error("Cascade assistant:", error);
     } finally {
       typing.classList.remove("typing");
