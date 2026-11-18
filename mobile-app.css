@@ -239,3 +239,7 @@ html.cascade-native-app body.dark-mode .cascade-drawer-divider { background:#2a4
 html.cascade-native-app body.dark-mode .cascade-drawer-auth-slot .motor-auth-message,html.cascade-native-app body.dark-mode .motor-auth-required { color:#a0b0c4; }
 html.cascade-native-app.cascade-assistant-active .cascade-app-topbar { display:none !important; }
 html.cascade-native-app.cascade-assistant-active body { padding-top:0 !important; }
+
+html.cascade-native-app .motor-auth-required[hidden] { display:none !important; }
+.cascade-drawer-account-link { display:block;padding:12px;border-radius:12px;color:#2563eb;font:650 14px system-ui,sans-serif;text-decoration:none;background:#edf4ff; }
+html.cascade-native-app body.dark-mode .cascade-drawer-account-link { color:#a9cbff;background:#1a3555; }
