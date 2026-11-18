@@ -906,20 +906,57 @@ body.dark-mode .cascade-pricing .pricing-spec-row p { color:#c0cbe0 !important; 
     break-inside: auto;
   }
   .dashboard-grid > .water-card .dash-tank-wrap {
-    margin-top: auto !important;
-    padding-top: 24px;
-    gap: 24px;
+    margin-top: 22px !important;
+    padding-top: 0;
+    gap: 28px;
   }
   .dashboard-grid > .water-card .dash-tank {
-    width: 112px;
-    height: 178px;
+    width: 132px;
+    height: 214px;
+    flex: 0 0 132px;
   }
   .dashboard-grid > .water-card .tank-reading b {
-    font-size: 56px;
+    font-size: 60px;
   }
   .dashboard-grid > .water-card .tank-reading small {
     font-size: 18px;
   }
+  .water-reading-guide {
+    margin-top: 22px;
+    padding: 17px 18px;
+    border: 1px solid rgba(118, 135, 190, .17);
+    border-radius: 15px;
+    background: linear-gradient(120deg, rgba(111, 139, 220, .07), rgba(76, 192, 205, .07));
+  }
+  .water-reading-guide .guide-kicker {
+    display: block;
+    color: #7774b5;
+    font: 700 10px/1.4 "Montserrat", sans-serif;
+    letter-spacing: .13em;
+  }
+  .water-reading-guide p {
+    margin: 7px 0 13px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .guide-scale {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    color: var(--muted, #7b8297);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .guide-scale span { display: inline-flex; align-items: center; gap: 6px; }
+  .guide-scale i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .guide-scale .scale-low { background: #e6a34c; }
+  .guide-scale .scale-mid { background: #6c9fe8; }
+  .guide-scale .scale-high { background: #42b9a3; }
+  body.dark-mode .water-reading-guide {
+    background: linear-gradient(120deg, rgba(145, 125, 255, .09), rgba(65, 190, 204, .08));
+    border-color: rgba(161, 174, 220, .15);
+  }
+  body.dark-mode .water-reading-guide .guide-kicker { color: #aaa0ff; }
 }
 @media (max-width: 760px) {
   .dashboard-grid {
