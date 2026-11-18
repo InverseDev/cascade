@@ -24,6 +24,9 @@
     cover.setAttribute('data-logo-cover', '');
     host.prepend(cover);
   }
+  const DIST = 520;                                   // px of scrolling the flight takes
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wide = matchMedia('(min-width: 861px)');
   const header = dock.closest('.site-header');
   let headerContent = null;
   if (header && wide.matches) {
@@ -33,9 +36,6 @@
     siblings.forEach(el => headerContent.appendChild(el));
     header.appendChild(headerContent);
   }
-  const DIST = 520;                                   // px of scrolling the flight takes
-  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const wide = matchMedia('(min-width: 861px)');
   const lerp = (a, b, t) => a + (b - a) * t;
   const ease = t => 1 - (1 - t) ** 3;
   const css = document.createElement('style');
