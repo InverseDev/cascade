@@ -270,19 +270,20 @@ function updateLowLevel() {
   document.getElementById("lowValue").textContent = lowWaterLevel + "%";
 }
 function saveSettings() {
+  const isNative = Boolean(window.Capacitor?.isNativePlatform?.());
   if (lowWaterLevel >= cutoffLevel) {
-    alert("Low-water alert must be below the cutoff level.");
-    return;
+    if (!isNative) alert("Low-water alert must be below the cutoff level.");
+    return false;
   }
   try {
     localStorage.setItem("cascade-dashboard-settings", JSON.stringify({ cutoffLevel, lowWaterLevel }));
     addActivity(`Thresholds updated: maximum ${cutoffLevel}%, minimum ${lowWaterLevel}%.`);
-    if (!window.Capacitor?.isNativePlatform?.()) {
-      alert("Dashboard preferences saved on this browser. Device-side automation is not active yet.");
-    }
+    if (!isNative) alert("Dashboard preferences saved on this browser. Device-side automation is not active yet.");
+    return true;
   } catch (error) {
     console.error("Settings save failed:", error);
-    alert("Could not save dashboard preferences in this browser.");
+    if (!isNative) alert("Could not save dashboard preferences in this browser.");
+    return false;
   }
 }
 async function enableNotifications() {
