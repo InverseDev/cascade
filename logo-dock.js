@@ -24,7 +24,7 @@
     cover.setAttribute('data-logo-cover', '');
     host.prepend(cover);
   }
-  const DIST = 520;                                   // px of scrolling the flight takes
+  const DIST = 156;                                   // finish the flight in 30% of the previous scroll distance
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const wide = matchMedia('(min-width: 861px)');
   const header = dock.closest('.site-header');
@@ -37,12 +37,12 @@
     header.appendChild(headerContent);
   }
   const lerp = (a, b, t) => a + (b - a) * t;
-  const ease = t => t * t * (3 - 2 * t); // monotonic easing: no overshoot or rebound
+  const ease = t => 1 - (1 - t) ** 3;
   const css = document.createElement('style');
   css.textContent =
     '.cm-fly{position:fixed;left:0;top:0;z-index:2147483647;max-width:none;height:auto;box-sizing:border-box;' +
-    'transform-origin:0 0;pointer-events:none;will-change:transform;transition:none!important;filter:drop-shadow(0 8px 18px rgba(35,70,90,.14));' +
-    'opacity:1}' +
+    'transform-origin:0 0;pointer-events:none;will-change:transform;filter:drop-shadow(0 8px 18px rgba(35,70,90,.14));' +
+    'animation:cm-fly-in .9s .15s cubic-bezier(.22,1,.36,1) both}' +
     '.site-header .cm-header-content{display:flex;align-items:center;justify-content:flex-end;gap:clamp(14px,2vw,30px);min-width:0;will-change:transform}' +
     '.site-header .cm-header-content .main-nav{flex:0 1 auto;min-width:0}' +
     '@keyframes cm-fly-in{from{opacity:0}}' +
@@ -85,9 +85,8 @@
     const w = c.width + 'px';
     if (fly.style.width !== w) fly.style.width = w;
     const s = lerp(1, d.width / c.width, e);
-    const x = e >= 1 ? d.left : lerp(c.left, d.left, e);
-    const y = e >= 1 ? d.top : lerp(c.top, d.top, e);
-    fly.style.transform = `translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,0) scale(${s.toFixed(5)})`;
+    fly.style.transform =
+      `translate3d(${lerp(c.left, d.left, e).toFixed(1)}px,${lerp(c.top, d.top, e).toFixed(1)}px,0) scale(${s.toFixed(4)})`;
   }
   const onScroll = () => busy || (busy = true, requestAnimationFrame(frame));
   addEventListener('scroll', onScroll, { passive: true });
