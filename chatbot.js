@@ -443,7 +443,7 @@
         const conversation = [...messages.querySelectorAll(".cascade-chat-message:not(.typing)")].slice(-25, -1);
         const history = conversation.slice(-20)
           .map(node => (node.classList.contains("user") ? "Visitor: " : "Assistant: ") + node.textContent)
-          .join("\\n");
+          .join("\n");
         const response = await fetch(API_URL, {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text, history, page: pageName() })
