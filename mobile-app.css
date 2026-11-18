@@ -314,3 +314,5 @@ html.cascade-native-app body.dark-mode .cascade-drawer-theme {
   color:#d8e6f8 !important;
 }
 html.cascade-native-app body.dark-mode .cascade-drawer-divider { background:#263b56 !important; }
+
+html.cascade-native-app #cascade-chat .cascade-chat-avatar { display:none !important; }
