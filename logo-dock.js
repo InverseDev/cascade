@@ -38,6 +38,14 @@
   }
   const lerp = (a, b, t) => a + (b - a) * t;
   const ease = t => 1 - (1 - t) ** 3;
+  const smooth = t => t * t * (3 - 2 * t);
+  // Header controls complete 50%, then 30%, then the final 20% of
+  // their travel across the three equal parts of the logo's scroll distance.
+  const headerProgress = p => {
+    if (p <= 1 / 3) return 0.5 * smooth(p * 3);
+    if (p <= 2 / 3) return 0.5 + 0.3 * smooth((p - 1 / 3) * 3);
+    return 0.8 + 0.2 * smooth((p - 2 / 3) * 3);
+  };
   const css = document.createElement('style');
   css.textContent =
     '.cm-fly{position:fixed;left:0;top:0;z-index:2147483647;max-width:none;height:auto;box-sizing:border-box;' +
@@ -69,9 +77,13 @@
     const p = Math.min(1, scrollY / DIST), e = ease(p);
     const c = cover.getBoundingClientRect(), d = dock.getBoundingClientRect();
     if (headerContent) {
+      // Measure the natural position without the previous frame's transform,
+      // avoiding cumulative layout feedback while the header slides.
+      headerContent.style.transform = 'none';
       const h = headerContent.getBoundingClientRect();
       const centeredLeft = (innerWidth - h.width) / 2;
-      const shift = (centeredLeft - h.left) * (1 - e);
+      const fullShift = centeredLeft - h.left;
+      const shift = fullShift * (1 - headerProgress(p));
       headerContent.style.transform = `translate3d(${shift.toFixed(1)}px,0,0)`;
     }
     if (!c.width || !d.width) return;                 // images not loaded yet
