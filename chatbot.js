@@ -54,6 +54,8 @@
   const form = root.querySelector("form");
   const input = form.elements.message;
   const messages = root.querySelector(".cascade-chat-messages");
+  const initialGreeting = messages.querySelector(".cascade-chat-message.bot");
+  if (initialGreeting) initialGreeting.dataset.initialGreeting = "true";
   const languageSelect = root.querySelector("#cascade-chat-language");
   const LANGUAGE_KEY = "cascade-assistant-language";
   const languageNames = { en: "English", hi: "Hindi", bn: "Bengali" };
@@ -78,6 +80,14 @@
     root.querySelector(".cascade-chat-foot").textContent = t.foot;
     root.querySelector(".cascade-chat-greeting").textContent = t.greeting;
     root.querySelector(".cascade-chat-welcome-label").textContent = assistantLanguage === "en" ? "CASCADE · SMART WATER SYSTEM" : assistantLanguage === "hi" ? "CASCADE · स्मार्ट जल प्रणाली" : "CASCADE · স্মার্ট জল ব্যবস্থাপনা";
+    const greeting = messages.querySelector(".cascade-chat-message.bot");
+    if (greeting && greeting.dataset.initialGreeting === "true") greeting.textContent = t.hello;
+    const suggestionLabels = assistantLanguage === "hi"
+      ? ["सिस्टम कैसे काम करता है?","डैशबोर्ड की सुविधाएँ","कम पानी का अलर्ट बदलें","अधिकतम स्तर बदलें"]
+      : assistantLanguage === "bn"
+        ? ["সিস্টেম কীভাবে কাজ করে?","ড্যাশবোর্ডের ফিচার","কম পানির অ্যালার্ট বদলান","সর্বোচ্চ স্তর বদলান"]
+        : ["How does the system work?","Explore dashboard features","Change low-water alert","Adjust maximum level"];
+    root.querySelectorAll(".cascade-chat-suggestions button").forEach((button,index) => { button.textContent = suggestionLabels[index] || button.textContent; });
   }
   languageSelect.addEventListener("change", () => {
     assistantLanguage = languageSelect.value;
