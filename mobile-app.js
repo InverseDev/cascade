@@ -6,6 +6,7 @@
   window.__cascadeNativeShell = true;
   const root = document.documentElement;
   root.classList.add("cascade-native-app");
+  if (localStorage.getItem("fluidops-theme") === "dark") document.body.classList.add("dark-mode");
   const path = window.location.pathname.toLowerCase();
   const isHistory = path.endsWith("history.html");
   const isAlarms = path.endsWith("alarms.html");
@@ -63,7 +64,7 @@
   syncAuthView();
   const themeMenu=overlay.querySelector(".cascade-drawer-theme");
   themeMenu.classList.toggle("enabled",document.body.classList.contains("dark-mode"));
-  themeMenu.addEventListener("click",()=>{const themeButton=document.getElementById("themeToggle");if(themeButton)themeButton.click();themeMenu.classList.toggle("enabled",document.body.classList.contains("dark-mode"));});
+  themeMenu.addEventListener("click",()=>{const dark=document.body.classList.toggle("dark-mode");localStorage.setItem("fluidops-theme",dark?"dark":"light");themeMenu.classList.toggle("enabled",dark);});
   async function requestAppNotifications(){const plugin=Capacitor?.Plugins?.LocalNotifications;if(!plugin||typeof plugin.checkPermissions!=="function")return;try{if(plugin.createChannel)await plugin.createChannel({id:"cascade-alerts",name:"Cascade alerts",description:"Water level and pump alerts",importance:4});const permission=await plugin.checkPermissions();if(permission.display==="prompt"||permission.display==="prompt-with-rationale")await plugin.requestPermissions();}catch(error){console.warn("Cascade notification permission:",error);}}
   requestAppNotifications();
   if(active==="dashboard"&&!window.location.hash)history.replaceState(null,"",window.location.pathname+"#dashboard");
