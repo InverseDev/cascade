@@ -883,4 +883,20 @@ body.dark-mode .cascade-pricing .pricing-spec-row { border-color:rgba(164,174,22
 body.dark-mode .cascade-pricing .pricing-spec-row p { color:#c0cbe0 !important; }
 @media(max-width:760px) { .cascade-pricing { padding:48px 6% !important; }.cascade-pricing .pricing-main-card,.cascade-pricing .pricing-spec-card { padding:25px 22px !important; } }
 
-
+/* Keep dashboard cards content-sized on desktop and tablet.
+   Mobile keeps its existing card sizing and spacing unchanged. */
+@media (min-width: 601px) {
+  .dashboard-grid {
+    align-items: start !important;
+    align-content: start !important;
+    grid-auto-rows: max-content !important;
+  }
+  .dashboard-grid > .dash-card {
+    height: auto !important;
+    min-height: 270px;
+    align-self: start !important;
+  }
+  .dashboard-grid > .water-card {
+    min-height: 0 !important;
+  }
+}
