@@ -117,6 +117,20 @@ alarmList.addEventListener("click", function(event) {
 });
 // INITIAL LOAD
 loadAlarms();
+// Persist the Alarm Centre alert toggles as browser preferences.
+const alertPreferenceIds = ["lowWaterAlertEnabled", "motorAlertEnabled", "cutoffAlertEnabled"];
+let savedAlertPreferences = {};
+try { savedAlertPreferences = JSON.parse(localStorage.getItem("cascade-alert-preferences") || "{}"); } catch (_) {}
+alertPreferenceIds.forEach(id => {
+    const control = document.getElementById(id);
+    if (!control) return;
+    if (typeof savedAlertPreferences[id] === "boolean") control.checked = savedAlertPreferences[id];
+    control.addEventListener("change", () => {
+        savedAlertPreferences[id] = control.checked;
+        localStorage.setItem("cascade-alert-preferences", JSON.stringify(savedAlertPreferences));
+    });
+});
+
 // Alarm Sound Preview
 const soundPresetControl =
     document.getElementById("alarmSoundPreset");
