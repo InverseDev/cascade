@@ -69,11 +69,41 @@
     return "I can answer common questions about Cascade, its sensor, dashboard, pump controls and alerts. For open-ended AI answers, the Gemini backend still needs to be configured by the site owner.";
   }
   function parseLowAlert(text) {
-    const m = text.match(/(?:low(?:[- ]water)?\s+)?(?:alert|threshold)(?:\s+(?:to|at|of))?\s*(\d{1,2})\s*%?/i)
-      || text.match(/set\s+(?:the\s+)?low(?:[- ]water)?\s+(?:alert|level|threshold)\s+(?:to\s+)?(\d{1,2})\s*%?/i);
+    const m = text.match(/(?:low(?:[- ]water)?\\s+)?(?:alert|threshold)(?:\\s+(?:to|at|of))?\\s*(\\d{1,2})\\s*%?/i)
+      || text.match(/set\\s+(?:the\\s+)?low(?:[- ]water)?\\s+(?:alert|level|threshold)\\s+(?:to\\s+)?(\\d{1,2})\\s*%?/i);
     if (!m) return null;
     const value = Number(m[1]);
     return value >= 5 && value <= 40 ? value : null;
+  }
+  function parseCutoff(text) {
+    if (!/\\b(set|change|make|adjust|update)\\b/i.test(text)) return null;
+    const m = text.match(/(?:maximum|max|cut[ -]?off|stop|full[- ]tank)\\s*(?:water\\s*)?(?:level|threshold)?\\s*(?:to|at|of|=)?\\s*(\\d{1,3})\\s*%?/i)
+      || text.match(/(?:level|cut[ -]?off)\\s*(?:to|at)\\s*(\\d{1,3})\\s*%?/i);
+    if (!m) return null;
+    const value = Number(m[1]);
+    return value >= 50 && value <= 100 ? value : null;
+  }
+  function askCutoffConfirmation(value) {
+    const current = document.getElementById("cutoff");
+    if (!current) return "I couldn't find the maximum-level cutoff control on this page.";
+    const old = Number(current.value);
+    const prompt = addMessage("Change the maximum tank level (automatic cutoff) from " + old + "% to " + value + "%? This saves a preference in this browser only; it does not update the ESP32.", "bot");
+    const actions = document.createElement("div");
+    actions.className = "cascade-chat-confirm";
+    const yes = document.createElement("button");
+    yes.type = "button"; yes.textContent = "Confirm change";
+    const no = document.createElement("button");
+    no.type = "button"; no.textContent = "Cancel";
+    actions.append(yes, no);
+    prompt.appendChild(actions);
+    yes.addEventListener("click", () => {
+      current.value = String(value);
+      if (typeof window.updateCutoff === "function") window.updateCutoff();
+      if (typeof window.saveSettings === "function") window.saveSettings();
+      addMessage("Saved the maximum-level cutoff preference at " + value + "%. This is local to this browser and is not yet synced to the ESP32.", "bot");
+      actions.remove();
+    }, { once: true });
+    no.addEventListener("click", () => { addMessage("No changes made.", "bot"); actions.remove(); }, { once: true });
   }
   function askLowAlertConfirmation(value) {
     const current = document.getElementById("lowLevel");
@@ -102,6 +132,8 @@
     addMessage(text, "user");
     const value = parseLowAlert(text);
     if (value !== null) { askLowAlertConfirmation(value); return; }
+    const cutoff = parseCutoff(text);
+    if (cutoff !== null) { askCutoffConfirmation(cutoff); return; }
     busy = true;
     const typing = addTyping();
     try {
