@@ -314,7 +314,7 @@
       return "This browser does not support notifications.";
     }
 
-    const alertPref = q.match(/\\b(enable|turn on|disable|turn off)\\b.*\\b(low water|low-water|motor|cutoff|cut-off)\\b.*\\b(alert|alerts|notification|notifications)\\b|\\b(enable|turn on|disable|turn off)\\b.*\\b(alert|alerts|notifications)\\b.*\\b(low water|low-water|motor|cutoff|cut-off)\\b/);
+    const alertPref = q.match(/\b(enable|turn on|disable|turn off)\b.*\b(low water|low-water|motor|cutoff|cut-off)\b.*\b(alert|alerts|notification|notifications)\b|\b(enable|turn on|disable|turn off)\b.*\b(alert|alerts|notifications)\b.*\b(low water|low-water|motor|cutoff|cut-off)\b/);
     if (alertPref) {
       const enabled = /enable|turn on/.test(q);
       const targetText = (alertPref[2] || alertPref[6] || "").replace(/-/g,"");
