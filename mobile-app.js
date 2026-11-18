@@ -193,8 +193,8 @@
       if (permission.display === "granted") return;
       if (permission.display === "prompt" || permission.display === "prompt-with-rationale") {
         if (localStorage.getItem("cascade-native-notification-prompted") !== "1") {
-          await plugin.requestPermissions();
           localStorage.setItem("cascade-native-notification-prompted", "1");
+          await plugin.requestPermissions();
         }
       }
     } catch (error) {
