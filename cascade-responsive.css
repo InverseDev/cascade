@@ -1481,3 +1481,12 @@ body.dark-mode .site-header .menu-toggle:hover {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
+
+
+/* Desktop header balance: shift navigation and controls left while keeping the logo dock fixed. */
+@media (min-width: 769px) {
+  .site-header > :not(.brand) {
+    position: relative;
+    left: -24px;
+  }
+}
