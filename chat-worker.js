@@ -36,7 +36,7 @@ export default {
       });
       const data = await upstream.json();
       if (!upstream.ok) return Response.json({ error: "Gemini request failed.", detail: data.error?.message || "Unknown API error." }, { status: 502, headers: cors });
-      const reply = data.output_text || (data.output || []).map(item => item.text || item.content?.map(part => part.text || "").join("")).join("\n").trim();
+      const reply = data.output_text || (data.steps || []).filter(step => step.type === "model_output").flatMap(step => step.content || []).map(part => part.text || "").join("\n").trim();
       return Response.json({ reply: reply || "I couldn't form a response. Please try again." }, { headers: { ...cors, "Cache-Control": "no-store" } });
     } catch (error) {
       return Response.json({ error: "Assistant request failed.", detail: String(error) }, { status: 500, headers: cors });
