@@ -554,6 +554,24 @@ gsap.to(".glow-two", {
   document.getElementById("menuToggle").addEventListener("click", () => nav.classList.toggle("open"));
   nav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => nav.classList.remove("open")));
 }
+// Restore browser-saved dashboard preferences before rendering the controls.
+try {
+  const savedPreferences = JSON.parse(localStorage.getItem("cascade-dashboard-settings") || "null");
+  if (savedPreferences && typeof savedPreferences === "object") {
+    if (Number.isFinite(Number(savedPreferences.cutoffLevel))) cutoffLevel = Number(savedPreferences.cutoffLevel);
+    if (Number.isFinite(Number(savedPreferences.lowWaterLevel))) lowWaterLevel = Number(savedPreferences.lowWaterLevel);
+    const cutoffInput = document.getElementById("cutoff");
+    const lowInput = document.getElementById("lowLevel");
+    if (cutoffInput) cutoffInput.value = String(cutoffLevel);
+    if (lowInput) lowInput.value = String(lowWaterLevel);
+    const cutoffLabel = document.getElementById("cutoffValue");
+    const lowLabel = document.getElementById("lowValue");
+    if (cutoffLabel) cutoffLabel.textContent = cutoffLevel + "%";
+    if (lowLabel) lowLabel.textContent = lowWaterLevel + "%";
+  }
+} catch (error) {
+  console.warn("Could not restore dashboard preferences:", error);
+}
 updateDashboard();
 setupMotion();
 setupThreeScene();
