@@ -371,6 +371,9 @@
       .replace(/कम पानी का अलर्ट|low pani alert|paani kam hone ka alert|kam paani ka alert/gi, "low water alert")
       .replace(/low water ka alert|low water alert ko|pani kam ka alert/gi, "low water alert")
       .replace(/maximum level|maximum pani level|max level|upar wala cutoff|motor band level|paani bharne ka level/gi, "maximum cutoff")
+      .replace(/motor\\s+(?:ko\\s+)?band\\s+(?:kar\\s+dena|kar\\s+do|karna|karo)(?:\\s+par)?/gi, "set maximum cutoff")
+      .replace(/paani\\s+(?:ke\\s+)?(?:upar|zyada|bharne|bhadne)(?:\\s+par|\\s+pe)?/gi, "maximum cutoff")
+      .replace(/partishat|pratishat|percentage/gi, "percent")
       .replace(/kam kar do|kam karo|badha do|bada do|ghata do|set kar do|set karo|rakh do|rakhna|karna hai|kar do/gi, "set")
       .replace(/kitna percent|kitne percent|kitna pratishat|kitna percentage/gi, "percent")
       .replace(/jal ka star|pani ka level|paani ka level|tank ka level/gi, "water level")
@@ -419,7 +422,7 @@
       return "Created the alarm “" + a.name + "” for " + a.time + (a.repeat ? " every day." : " on " + a.date + ".");
     }
 
-    if (/^(hi|hello|hey)\b/.test(q)) return "Hello! I can manage dashboard preferences, navigate pages, create alarms, filter or export history, change themes and help with pump controls.";
+    if (/^(hi|hello|hey|namaste|नमस्ते|नमस्कार|নমস্কার|হ্যালো)[.!?,\s]*$/i.test(q)) return assistantLanguage === "hi" ? "नमस्ते! मैं डैशबोर्ड सेटिंग, अलर्ट, हिस्ट्री और पंप नियंत्रण में मदद कर सकता हूँ।" : assistantLanguage === "bn" ? "নমস্কার! ড্যাশবোর্ড সেটিংস, অ্যালার্ট, ইতিহাস এবং পাম্প নিয়ন্ত্রণে সাহায্য করতে পারি।" : "Hello! I can manage dashboard preferences, navigate pages, create alarms, filter or export history, change themes and help with pump controls.";
     const lowIntent = /low.?water|low level|low.*percent|low.*threshold|alert threshold|water alert/.test(q) && /set|change|adjust|make|update|want|new|percentage|percent|threshold|limit/.test(q);
     const cutoffIntent = /cut.?off|maximum level|max level|full.?tank/.test(q) && /set|change|adjust|make|update|want|new|percentage|threshold/.test(q);
     if (lowIntent || cutoffIntent) {
