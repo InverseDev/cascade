@@ -1,0 +1,9 @@
+{
+  "appId": "com.inversedev.cascade",
+  "appName": "Cascade",
+  "webDir": "www",
+  "backgroundColor": "#f7f7ff",
+  "android": {
+    "allowMixedContent": false
+  }
+}
