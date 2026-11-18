@@ -135,3 +135,13 @@ body.dark-mode #cascade-chat .cascade-language-option small{color:#aab2cb!import
  #cascade-chat .cascade-language-menu{right:-42px!important;width:min(252px,calc(100vw - 34px))!important}
 }
 @media(prefers-reduced-motion:reduce){#cascade-chat .cascade-language-menu,#cascade-chat .cascade-language-chevron{animation:none!important;transition:none!important}}
+
+
+/* Compact the four starter prompts so they don't dominate the chat. */
+#cascade-chat .cascade-chat-suggestions{gap:7px!important;margin:1px 0!important}
+#cascade-chat .cascade-chat-suggestions button{min-height:44px!important;padding:7px 9px!important;font-size:10px!important;line-height:1.35!important;border-radius:11px!important}
+@media(max-width:600px){
+ #cascade-chat .cascade-chat-messages{gap:10px!important;padding:15px 13px!important}
+ #cascade-chat .cascade-chat-suggestions{gap:6px!important}
+ #cascade-chat .cascade-chat-suggestions button{min-height:40px!important;padding:6px 8px!important;font-size:9.5px!important;line-height:1.3!important}
+}
