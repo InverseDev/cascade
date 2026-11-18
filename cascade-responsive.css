@@ -1470,7 +1470,7 @@ body.dark-mode .site-header .menu-toggle:hover {
 
 /* Header refinements: desktop uses the full nav; hamburger is mobile-only. */
 .site-header .menu-toggle { display: none !important; }
-@media (max-width: 650px) {
+@media (max-width: 768px) {
   .site-header .menu-toggle { display: inline-grid !important; }
 }
 
