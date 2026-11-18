@@ -188,3 +188,54 @@ html.cascade-native-app body.dark-mode .summary-card { background: #12243b !impo
 html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-messages { background: #0b1728 !important; }
 html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-form { background: #12243b !important; }
 @media (prefers-reduced-motion: reduce) { .cascade-app-nav-item { transition: none !important; } }
+
+
+/* Minimal customer-facing Android app chrome and account drawer. */
+html.cascade-native-app body { padding-top:calc(58px + env(safe-area-inset-top,0px)) !important; }
+.cascade-app-topbar { position:fixed;z-index:100040;top:0;left:0;right:0;height:calc(54px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 17px 0;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.96);border-bottom:1px solid var(--cascade-app-line);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px); }
+.cascade-app-wordmark { color:#16365b;font:750 19px/1 system-ui,sans-serif;letter-spacing:-.6px; }
+.cascade-app-menu-button,.cascade-drawer-close { width:42px;height:42px;border:0;border-radius:13px;background:transparent;color:#244466;display:grid;place-items:center; }
+.cascade-app-menu-button svg { width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round; }
+.cascade-app-drawer-overlay { position:fixed;z-index:100060;inset:0;background:rgba(5,16,31,.42);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s,visibility .22s; }
+.cascade-app-drawer-overlay.open { opacity:1;visibility:visible;pointer-events:auto; }
+.cascade-app-drawer { position:absolute;top:0;right:0;bottom:0;width:min(340px,88vw);padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(22px + env(safe-area-inset-bottom,0px));overflow-y:auto;background:#fff;color:#182b43;box-shadow:-18px 0 50px rgba(4,20,40,.18);transform:translateX(100%);transition:transform .24s ease; }
+.cascade-app-drawer-overlay.open .cascade-app-drawer { transform:translateX(0); }
+.cascade-drawer-top { display:flex;align-items:center;justify-content:space-between;margin-bottom:24px; }
+.cascade-drawer-top strong { font:750 21px system-ui,sans-serif; }
+.cascade-drawer-close { font-size:28px; }
+.cascade-drawer-links { display:grid;gap:4px; }
+.cascade-drawer-links a { display:flex;align-items:center;min-height:46px;padding:0 11px;border-radius:12px;color:#344b66;text-decoration:none;font:600 14px system-ui,sans-serif; }
+.cascade-drawer-links a:active { background:#edf3fb; }
+.cascade-drawer-divider { height:1px;background:#e8edf3;margin:16px 0; }
+.cascade-drawer-theme { width:100%;min-height:48px;padding:0 10px;border:0;background:transparent;display:flex;align-items:center;justify-content:space-between;color:#263d58;font:600 14px system-ui,sans-serif; }
+.cascade-theme-switch { width:38px;height:22px;border-radius:99px;background:#c9d2df;position:relative; }
+.cascade-theme-switch:after { content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;transition:transform .2s; }
+.cascade-drawer-theme.enabled .cascade-theme-switch { background:#3478dc; }
+.cascade-drawer-theme.enabled .cascade-theme-switch:after { transform:translateX(16px); }
+.cascade-drawer-account h3 { margin:12px 0;font:700 15px system-ui,sans-serif; }
+.cascade-drawer-auth-slot .motor-auth { margin:0;padding:0;border:0;background:transparent;box-shadow:none; }
+.cascade-drawer-auth-slot #motorLoginControls { display:grid;gap:9px; }
+.cascade-drawer-auth-slot #motorLoginControls label { color:#66778b;font-size:12px; }
+.cascade-drawer-auth-slot input { width:100%;box-sizing:border-box; }
+.cascade-drawer-auth-slot .auth-btn { width:100%; }
+.cascade-drawer-auth-slot .motor-auth-message { font-size:11px;line-height:1.4;color:#8794a6; }
+.cascade-drawer-auth-slot #motorSessionControls { display:grid;gap:10px; }
+.cascade-drawer-auth-slot .motor-user-label { color:#344b66;font-size:13px; }
+html.cascade-native-app .cascade-app-bottom-nav { z-index:100030; }
+html.cascade-native-app .site-header,html.cascade-native-app .cascade-footer,html.cascade-native-app .hero,html.cascade-native-app .stats-strip,html.cascade-native-app .features-section,html.cascade-native-app .how-section,html.cascade-native-app .cascade-pricing,html.cascade-native-app .closing-cta,html.cascade-native-app .notification-panel,html.cascade-native-app .cascade-chat-launcher,html.cascade-native-app .cascade-chat-greeting { display:none !important; }
+html.cascade-native-app .dashboard-section { padding-top:8px !important; }
+html.cascade-native-app .dashboard-heading .eyebrow,html.cascade-native-app .dashboard-heading p,html.cascade-native-app .water-reading-guide,html.cascade-native-app .setting-note,html.cascade-native-app .dashboard-footnote,html.cascade-native-app .subtle-btn[onclick*="enableNotifications"],html.cascade-native-app .sensor-meta,html.cascade-native-app .motor-card #motorMessage { display:none !important; }
+html.cascade-native-app .dashboard-heading h2 { font-size:20px !important; }
+html.cascade-native-app .card-kicker { font-size:10px !important;letter-spacing:.7px !important; }
+html.cascade-native-app .muted-copy { display:none !important; }
+html.cascade-native-app .motor-auth-required { padding:12px 0 2px;color:#74849a;font:600 13px system-ui,sans-serif; }
+html.cascade-native-app .motor-auth-required[hidden],html.cascade-native-app .motor-card .button-row[hidden] { display:none !important; }
+html.cascade-native-app .motor-card .motor-auth { display:none !important; }
+html.cascade-native-app body.dark-mode .cascade-app-topbar { background:rgba(11,23,40,.97);border-color:#26364c; }
+html.cascade-native-app body.dark-mode .cascade-app-wordmark,html.cascade-native-app body.dark-mode .cascade-app-menu-button { color:#e8f1ff; }
+html.cascade-native-app body.dark-mode .cascade-app-drawer { background:#12243b;color:#eef4ff; }
+html.cascade-native-app body.dark-mode .cascade-drawer-links a,html.cascade-native-app body.dark-mode .cascade-drawer-theme,html.cascade-native-app body.dark-mode .cascade-drawer-auth-slot .motor-user-label { color:#d4e1f2; }
+html.cascade-native-app body.dark-mode .cascade-drawer-divider { background:#2a405a; }
+html.cascade-native-app body.dark-mode .cascade-drawer-auth-slot .motor-auth-message,html.cascade-native-app body.dark-mode .motor-auth-required { color:#a0b0c4; }
+html.cascade-native-app.cascade-assistant-active .cascade-app-topbar { display:none !important; }
+html.cascade-native-app.cascade-assistant-active body { padding-top:0 !important; }
