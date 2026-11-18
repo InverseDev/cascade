@@ -17,9 +17,9 @@
     frame = 0;
     const sectionRect = section.getBoundingClientRect();
     const deckTop = deck.offsetTop;
-    const stickyTop = window.innerHeight * 0.19;
-    const travel = Math.max(1, section.offsetHeight - deckTop - deck.offsetHeight);
-    const start = sectionRect.top + window.scrollY + deckTop - stickyTop;
+    const stickyTop = window.innerHeight * 0.16;
+    const travel = 420;
+    const start = sectionRect.top + window.scrollY + deckTop - window.innerHeight * 0.86;
     const progress = clamp((window.scrollY - start) / travel);
 
     const deckWidth = deck.clientWidth;
@@ -28,9 +28,9 @@
     const right = Math.max(middle, deckWidth - cardWidth);
 
     // Card two arrives first; card three follows. Both then tuck behind card one.
-    const secondOut = ease(clamp(progress / 0.38));
-    const thirdOut = ease(clamp((progress - 0.34) / 0.34));
-    const tuck = ease(clamp((progress - 0.72) / 0.28));
+    const secondOut = ease(clamp(progress / 0.34));
+    const thirdOut = ease(clamp((progress - 0.16) / 0.46));
+    const tuck = ease(clamp((progress - 0.76) / 0.24));
 
     const secondX = mix(0, middle, secondOut) * (1 - tuck);
     const thirdX = mix(0, right, thirdOut) * (1 - tuck);
