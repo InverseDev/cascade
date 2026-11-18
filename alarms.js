@@ -14,12 +14,52 @@ function loadAlarms() {
         scheduledAlarms = [];
     }
     renderAlarms();
+    scheduledAlarms.forEach(alarm => syncNativeAlarm(alarm));
 }
 function saveAlarms() {
-    localStorage.setItem(
-        ALARM_KEY,
-        JSON.stringify(scheduledAlarms)
-    );
+    localStorage.setItem(ALARM_KEY, JSON.stringify(scheduledAlarms));
+}
+function getLocalNotifications() {
+    const capacitor = window.Capacitor;
+    if (!capacitor?.isNativePlatform?.()) return null;
+    return capacitor.registerPlugin?.("LocalNotifications") || capacitor.Plugins?.LocalNotifications || null;
+}
+function nativeAlarmNotificationId(alarmId) {
+    let hash = 0;
+    for (const char of String(alarmId)) hash = (hash * 31 + char.charCodeAt(0)) | 0;
+    return 200000 + (Math.abs(hash) % 1000000000);
+}
+async function syncNativeAlarm(alarm) {
+    const plugin = getLocalNotifications();
+    if (!plugin || !alarm?.enabled) return;
+    try {
+        const id = nativeAlarmNotificationId(alarm.id);
+        await plugin.cancel({ notifications: [{ id }] });
+        let at;
+        if (alarm.repeat) {
+            const [hour, minute] = alarm.time.split(":").map(Number);
+            at = new Date();
+            at.setHours(hour, minute, 0, 0);
+            if (at <= new Date()) at.setDate(at.getDate() + 1);
+        } else {
+            at = new Date(`${alarm.date || new Date().toLocaleDateString("en-CA")}T${alarm.time}:00`);
+            if (at <= new Date()) return;
+        }
+        const schedule = alarm.repeat ? { at, repeats: true, every: "day" } : { at };
+        await plugin.schedule({ notifications: [{
+            id, title: alarm.name || "Cascade reminder",
+            body: "Your scheduled Cascade reminder.",
+            schedule, channelId: "cascade-alerts"
+        }] });
+    } catch (error) {
+        console.warn("Could not schedule Cascade alarm notification:", error);
+    }
+}
+async function cancelNativeAlarm(alarmId) {
+    const plugin = getLocalNotifications();
+    if (!plugin) return;
+    try { await plugin.cancel({ notifications: [{ id: nativeAlarmNotificationId(alarmId) }] }); }
+    catch (error) { console.warn("Could not cancel Cascade alarm notification:", error); }
 }
 function escapeAlarmText(value) {
     const element = document.createElement("span");
@@ -59,6 +99,7 @@ alarmForm.addEventListener("submit", function(event) {
     };
     scheduledAlarms.push(alarm);
     saveAlarms();
+    syncNativeAlarm(alarm);
     renderAlarms();
     alarmForm.reset();
     message.textContent = "Alarm successfully created!";
@@ -109,6 +150,8 @@ function renderAlarms() {
 alarmList.addEventListener("click", function(event) {
     const button = event.target.closest(".delete-alarm");
     if (!button) return;
+    const removed = scheduledAlarms.find(alarm => alarm.id === button.dataset.id);
+    if (removed) cancelNativeAlarm(removed.id);
     scheduledAlarms = scheduledAlarms.filter(
         alarm => alarm.id !== button.dataset.id
     );
