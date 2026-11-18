@@ -314,7 +314,7 @@
 
     }, { once: true });
     no.addEventListener("click", () => {
-      actions.remove(); setPending(null); addMessage("Cancelled. No changes made.", "bot"); saveChatLog();
+      actions.remove(); setPending(null); addMessage("Cancelled. No changes made.", "bot")
     }, { once: true });
     return true;
   }
@@ -574,7 +574,7 @@
     addMessage(text, "user");
 
     const actionReply = runAction(text);
-    if (typeof actionReply === "string") { addMessage(actionReply, "bot"); saveChatLog(); return; }
+    if (typeof actionReply === "string") { addMessage(actionReply, "bot") return; }
     if (actionReply === true || actionReply === false) return;
     busy = true;
     const typing = addTyping();
