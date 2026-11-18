@@ -5,7 +5,7 @@
   root.id = "cascade-chat";
   root.innerHTML = `
     <button class="cascade-chat-launcher" type="button" aria-label="Open Cascade AI assistant" aria-expanded="false">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2c-4.9 0-8.8 3.2-8.8 7.2 0 2.1 1.1 4 3 5.3l-.8 4 4.1-2c.8.2 1.6.3 2.5.3 4.9 0 8.8-3.2 8.8-7.2S16.9 3.2 12 3.2Z"/><path d="M8 10.5h8M8 13.5h5"/></svg>
+      <img class="cascade-mascot-launcher" src="assets/mascots/cascade-hero.svg" alt="" aria-hidden="true">
     </button>
     <section class="cascade-chat-panel" aria-label="Cascade AI assistant" aria-hidden="true">
       <header class="cascade-chat-head">
@@ -37,6 +37,9 @@
   document.documentElement.appendChild(root);
 
   const launcher = root.querySelector(".cascade-chat-launcher");
+  const mascotImage = launcher.querySelector(".cascade-mascot-launcher");
+  const mascotPage = location.pathname.toLowerCase();
+  mascotImage.src = mascotPage.includes("history") ? "assets/mascots/cascade-analytics.svg" : mascotPage.includes("alarms") ? "assets/mascots/cascade-summary.svg" : "assets/mascots/cascade-hero.svg";
   const panel = root.querySelector(".cascade-chat-panel");
   const close = root.querySelector(".cascade-chat-close");
   const form = root.querySelector("form");
