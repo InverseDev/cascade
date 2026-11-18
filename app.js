@@ -327,8 +327,8 @@ async function enableNotifications() {
       if (permission.display === "granted") return;
       const alreadyAsked = localStorage.getItem("cascade-native-notification-prompted") === "1";
       if (!alreadyAsked && (permission.display === "prompt" || permission.display === "prompt-with-rationale")) {
-        await nativePlugin.requestPermissions();
         localStorage.setItem("cascade-native-notification-prompted", "1");
+        await nativePlugin.requestPermissions();
       }
     } catch (error) { console.error("App notification permission:", error); }
     return;
