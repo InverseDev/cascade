@@ -70,6 +70,18 @@ To download it:
 
 GitHub Pages continues deploying the website from the same root-level files. The Android workflow copies those same files into `www/` before syncing and building the app.
 
+## Android app interface
+
+The Capacitor build now enables a dedicated Android app shell when it runs inside the native Android container. The public website keeps its existing desktop/mobile navigation and appearance.
+
+The Android shell adds:
+- A compact Cascade-branded app bar with the live device connection state sourced from the existing dashboard.
+- Persistent bottom navigation for Dashboard, History, Alarms, and Assistant.
+- Android safe-area spacing, touch-sized controls, and app-focused layouts.
+- The existing HTML, CSS, JavaScript, Supabase, and Cloudflare Worker flows remain shared; this does not create a second backend.
+
+The shell is intentionally limited to the native Capacitor runtime. Opening the website in Chrome does not activate the app-only navigation.
+
 ## How updates work
 
 - Push website code to GitHub: GitHub Pages deploys the website.
