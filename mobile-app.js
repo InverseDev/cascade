@@ -2,6 +2,7 @@
   "use strict";
   const Capacitor = window.Capacitor;
   if (!Capacitor || typeof Capacitor.isNativePlatform !== "function" || !Capacitor.isNativePlatform()) return;
+  const LocalNotifications = Capacitor.registerPlugin?.("LocalNotifications") || Capacitor.Plugins?.LocalNotifications || null;
   if (window.__cascadeNativeShell) return;
   window.__cascadeNativeShell = true;
 
@@ -157,19 +158,21 @@
   // Android's permission prompt is requested once per installation. After
   // that, notification delivery uses LocalNotifications, never Web Notifications.
   async function requestAppNotifications() {
-    const plugin = Capacitor?.Plugins?.LocalNotifications;
-    if (!plugin || typeof plugin.checkPermissions !== "function") return;
+    const plugin = LocalNotifications;
+    if (!plugin || typeof plugin.checkPermissions !== "function") {
+      console.warn("Cascade LocalNotifications plugin is unavailable. Run npm install and npx cap sync android.");
+      return;
+    }
     try {
       if (plugin.createChannel) {
-        await plugin.createChannel({id:"cascade-alerts",name:"Cascade alerts",description:"Water level and pump alerts",importance:4});
+        await plugin.createChannel({id:"cascade-alerts",name:"Cascade alerts",description:"Water level, pump and reminder alerts",importance:4});
       }
       const permission = await plugin.checkPermissions();
       if (permission.display === "granted") return;
       if (permission.display === "prompt" || permission.display === "prompt-with-rationale") {
-        const asked = localStorage.getItem("cascade-native-notification-prompted") === "1";
-        if (!asked) {
-          localStorage.setItem("cascade-native-notification-prompted", "1");
+        if (localStorage.getItem("cascade-native-notification-prompted") !== "1") {
           await plugin.requestPermissions();
+          localStorage.setItem("cascade-native-notification-prompted", "1");
         }
       }
     } catch (error) {
@@ -177,6 +180,14 @@
     }
   }
   requestAppNotifications();
+
+  // chatbot.js builds its launcher after this script; remove that launcher
+  // from the native app while keeping the assistant panel available to its tab.
+  const removeMascotLauncher = () => {
+    document.querySelectorAll(".cascade-chat-launcher").forEach(node => node.remove());
+  };
+  removeMascotLauncher();
+  new MutationObserver(removeMascotLauncher).observe(document.body, {childList:true,subtree:true});
 
   if (active === "dashboard" && !window.location.hash) history.replaceState(null,"",window.location.pathname + "#dashboard");
   setActive(active);
