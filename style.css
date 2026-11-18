@@ -45,7 +45,7 @@ body.dark-mode {
 
 html{scroll-behavior:smooth;scroll-padding-top:90px}
 /* body{
-    font-family:'DM Sans',sans-serif;
+    font-family:'Montserrat',sans-serif;
     background:
     radial-gradient(
         ellipse at 10% 15%,
@@ -74,7 +74,7 @@ html{scroll-behavior:smooth;scroll-padding-top:90px}
 /* body{
     background:linear-gradient(145deg,#bcc6f5,#d4d0f7,#e0d4fa,#b9def7,#e3d6ff,#e8e5f8,#ffffff);
 } */
-body{font-family:'DM Sans',system-ui,sans-serif}
+body{font-family:'Montserrat',system-ui,sans-serif}
 body{
     background:linear-gradient(145deg,
     rgb(174, 231, 253),
@@ -119,7 +119,7 @@ a{text-decoration:none;color:inherit}button,input{font:inherit}
     display:flex;
     align-items:center;
     gap:9px;
-    font:40px 'Titan One',sans-serif;
+    font:40px 'National 2',sans-serif;
     letter-spacing:-1.2px;
     background:linear-gradient(100deg,#7657f6 5%,#a18cff 58%,#48cbd1 110%);
     -webkit-background-clip:text;
@@ -129,7 +129,7 @@ a{text-decoration:none;color:inherit}button,input{font:inherit}
     display:flex;
     align-items:center;
     gap:9px;
-    font:40px 'Titan One',sans-serif;}
+    font:40px 'National 2',sans-serif;}
     /* letter-spacing:-1.2px;
     background:linear-gradient(100deg,#7657f6 5%,#a18cff 58%,#48cbd1 110%);
     -webkit-background-clip:text;
@@ -296,7 +296,7 @@ a{text-decoration:none;color:inherit}button,input{font:inherit}
     100% {color:#7657f6; width:7.5px;height:7.5px;}
 }
 .hero h1{
-    font:clamp(54px,6vw,78px)/.99 'Titan One',sans-serif;
+    font:clamp(54px,6vw,78px)/.99 'National 2',sans-serif;
     letter-spacing:-2.5px;
     margin:24px 0 22px;
     color:#17162b}
@@ -722,18 +722,18 @@ body.motor-running .pipe-side:after{
     margin:0 auto 45px}
 .section-heading .eyebrow{justify-content:center; font-size: 30px;}
 .section-heading h2{
-    font:clamp(36px,4vw,50px)/1.12 'Titan One',sans-serif;
+    font:clamp(36px,4vw,50px)/1.12 'National 2',sans-serif;
     font-size: 60px;
     letter-spacing:-1px;
     margin:15px 0}
 .how-copy h2{
-    font:clamp(36px,4vw,50px)/1.12 'Titan One',sans-serif;
+    font:clamp(36px,4vw,50px)/1.12 'National 2',sans-serif;
     font-size: 40px;
     letter-spacing:-1px;
     margin:15px 0}
 .dashboard-heading h2,
 .closing-cta h2{
-    font:clamp(36px,4vw,50px)/1.12 'Titan One',sans-serif;
+    font:clamp(36px,4vw,50px)/1.12 'National 2',sans-serif;
     font-size: 60px;
     letter-spacing:-1px;
     margin:15px 0}
@@ -1849,7 +1849,7 @@ body.dark-mode .status-pill.unknown{color:#edc18e;background:#3a2b20}
 .motor-auth input{display:block;width:100%;margin:8px 0;padding:12px 13px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px;outline:none}
 .motor-auth input:focus{border-color:#8b78ed;box-shadow:0 0 0 3px #8b78ed22}
 .motor-auth-message{margin-top:9px;font-size:11px;line-height:1.55;color:var(--muted)}
-.auth-btn{padding:10px 13px;border:0;border-radius:9px;background:linear-gradient(110deg,#8b78ed,#6f9de9);color:#fff;font:700 12px 'DM Sans',sans-serif;cursor:pointer}
+.auth-btn{padding:10px 13px;border:0;border-radius:9px;background:linear-gradient(110deg,#8b78ed,#6f9de9);color:#fff;font:700 12px 'Montserrat',sans-serif;cursor:pointer}
 .secondary-auth-btn{margin-left:8px;background:var(--surface);color:var(--ink);border:1px solid var(--line)}
 .motor-user-label{display:inline-block;font-size:12px;color:var(--muted);overflow-wrap:anywhere}
 .motor-auth [hidden]{display:none!important}
@@ -1896,7 +1896,7 @@ body.dark-mode .motor-auth input{background:#171b2d;border-color:#393b58;color:#
     font-size: 30px;
 }
 .text{
-    font:clamp(35px,6vw,35px)/.99 'Titan One',sans-serif;
+    font:clamp(35px,6vw,35px)/.99 'National 2',sans-serif;
     font-weight: 400px;
 }
 .text:hover{
@@ -1910,7 +1910,7 @@ body.dark-mode .motor-auth input{background:#171b2d;border-color:#393b58;color:#
     color: #677274;
     font-size: 16px;
     line-height: 1.9;
-    font-family: 'Segoe UI', 'Open Sans', 'Helvetica Neue';
+    font-family: 'Montserrat', 'Montserrat', 'Montserrat';
 }
 /* FOOTER COLUMNS */
 .footer-column {
@@ -2042,7 +2042,7 @@ body.dark-mode .motor-auth input{background:#171b2d;border-color:#393b58;color:#
     font-weight: 1000;
     letter-spacing: 2px;
     color: #d7e7e6;
-    font-family: 'Segoe UI', 'Open Sans', 'Helvetica Neue';
+    font-family: 'Montserrat', 'Montserrat', 'Montserrat';
 }
 .pricing-value {
     display: flex;
