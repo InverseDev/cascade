@@ -291,7 +291,7 @@
     }
 
     if (/^(hi|hello|hey)\\b/.test(q)) return "Hello! I can manage dashboard preferences, navigate pages, create alarms, filter or export history, change themes and help with pump controls.";
-    const lowIntent = /low.?water|low level|alert threshold|water alert/.test(q) && /set|change|adjust|make|update|want|new|percentage|threshold/.test(q);
+    const lowIntent = /low.?water|low level|low.*percent|low.*threshold|alert threshold|water alert/.test(q) && /set|change|adjust|make|update|want|new|percentage|threshold/.test(q);
     const cutoffIntent = /cut.?off|maximum level|max level|full.?tank/.test(q) && /set|change|adjust|make|update|want|new|percentage|threshold/.test(q);
     if (lowIntent || cutoffIntent) {
       const kind = lowIntent ? "low" : "cutoff";
@@ -314,6 +314,18 @@
       return "This browser does not support notifications.";
     }
 
+    const alertPref = q.match(/\\b(enable|turn on|disable|turn off)\\b.*\\b(low water|low-water|motor|cutoff|cut-off)\\b.*\\b(alert|alerts|notification|notifications)\\b|\\b(enable|turn on|disable|turn off)\\b.*\\b(alert|alerts|notifications)\\b.*\\b(low water|low-water|motor|cutoff|cut-off)\\b/);
+    if (alertPref) {
+      const enabled = /enable|turn on/.test(q);
+      const targetText = (alertPref[2] || alertPref[6] || "").replace(/-/g,"");
+      const target = /low water/.test(targetText) ? "lowWaterAlertEnabled" : /motor/.test(targetText) ? "motorAlertEnabled" : /cutoff/.test(targetText) ? "cutoffAlertEnabled" : null;
+      if (!target) return "Which alert do you mean: low-water, motor, or automatic-cutoff alerts?";
+      const checkbox = document.getElementById(target);
+      if (!checkbox) { navigateTo("alerts"); return "Opening Alarm Centre. Ask me again there to change that alert."; }
+      checkbox.checked = enabled;
+      checkbox.dispatchEvent(new Event("change", { bubbles:true }));
+      return (enabled ? "Enabled " : "Disabled ") + target.replace("Enabled","").replace(/([A-Z])/g," $1").toLowerCase() + " alerts.";
+    }
     const alarmCreate = /\\b(create|add|schedule|set up)\\b.*\\balarm\\b/.test(q);
     if (alarmCreate) {
       const alarm = { name:"", time:"", date:"", repeat:/daily|every day|repeat/.test(q) };
@@ -394,7 +406,7 @@
       } else {
         const history = [...messages.querySelectorAll(".cascade-chat-message:not(.typing)")].slice(-24)
           .map(node => (node.classList.contains("user") ? "Visitor: " : "Assistant: ") + node.textContent)
-          .join("\\n");
+          .join("\n");
         const response = await fetch(API_URL, {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text, history, page: pageName() })
