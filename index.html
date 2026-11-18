@@ -143,15 +143,12 @@
       <div class="feature-grid">
         <article class="feature-card reveal"><h3>Live water insights</h3>
           <p>Keep an eye on your tank level with a clear, real-time visual overview.</p>
-          <div class="feature-motion water-motion" aria-hidden="true"><span class="water-tank"><i></i><b></b></span><span class="water-readout">72%</span></div>
           <span class="feature-number">01</span></article>
         <article class="feature-card featured-card reveal"><h3>Intelligent motor control</h3>
           <p>Operate your pump with a tap and let automatic cutoff handle the rest.</p>
-          <div class="feature-motion motor-motion" aria-hidden="true"><span class="motor-ring"><i></i></span><span class="motor-pulse"></span></div>
           <span class="feature-number">02</span></article>
         <article class="feature-card reveal"><h3>Helpful alerts</h3>
           <p>Get notified when water runs low or when your tank reaches its set limit.</p>
-          <div class="feature-motion alert-motion" aria-hidden="true"><span class="alert-toast"><i></i><b></b><em></em></span><span class="alert-dot"></span></div>
           <span class="feature-number">03</span></article>
       </div>
     </section>
@@ -198,6 +195,15 @@
             <div class="level-track"><div id="waterBar"></div></div>
             <div class="litres-row"><span id="litres">Distance: -- cm</span><span>SENSOR DATA</span></div>
             <p class="sensor-meta" id="sensorMeta">Waiting for the first ESP32 reading…</p>
+            <div class="water-reading-guide">
+              <span class="guide-kicker">UNDERSTANDING YOUR READING</span>
+              <p>The level is calculated from the latest sensor measurement. A higher percentage means more water is available in your tank.</p>
+              <div class="guide-scale" aria-label="Water level scale from empty to full">
+                <span><i class="scale-low"></i> Low</span>
+                <span><i class="scale-mid"></i> Mid-level</span>
+                <span><i class="scale-high"></i> Full</span>
+              </div>
+            </div>
             <div class="dash-tank-wrap"><div class="dash-tank">
               <div class="dash-tank-water" id="dashWater"><div class="dash-wave"></div></div>
               <div class="dash-tank-glare"></div></div>
