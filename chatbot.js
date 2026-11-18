@@ -32,7 +32,9 @@
       </form>
       <div class="cascade-chat-foot">AI responses may be inaccurate. Hardware actions require confirmation.</div>
     </section>`;
-  document.body.appendChild(root);
+  // Mount outside the page body so transforms/overflow on the site cannot
+  // trap the assistant inside the document layout.
+  document.documentElement.appendChild(root);
 
   const launcher = root.querySelector(".cascade-chat-launcher");
   const panel = root.querySelector(".cascade-chat-panel");
@@ -51,6 +53,42 @@
   }
   launcher.addEventListener("click", () => setOpen(!panel.classList.contains("open")));
   close.addEventListener("click", () => setOpen(false));
+
+  // The chat is a viewport-level window and can be repositioned by dragging
+  // its header. Keep the whole panel inside the visible screen.
+  const dragHandle = root.querySelector(".cascade-chat-head");
+  let drag = null;
+  dragHandle.addEventListener("pointerdown", event => {
+    if (event.target.closest("button")) return;
+    const rect = panel.getBoundingClientRect();
+    drag = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    panel.style.left = rect.left + "px";
+    panel.style.top = rect.top + "px";
+    panel.style.right = "auto";
+    panel.style.bottom = "auto";
+    dragHandle.setPointerCapture(event.pointerId);
+    dragHandle.style.cursor = "grabbing";
+  });
+  dragHandle.addEventListener("pointermove", event => {
+    if (!drag) return;
+    const maxLeft = Math.max(8, window.innerWidth - panel.offsetWidth - 8);
+    const maxTop = Math.max(8, window.innerHeight - panel.offsetHeight - 8);
+    panel.style.left = Math.min(maxLeft, Math.max(8, event.clientX - drag.x)) + "px";
+    panel.style.top = Math.min(maxTop, Math.max(8, event.clientY - drag.y)) + "px";
+  });
+  function stopDragging() {
+    drag = null;
+    dragHandle.style.cursor = "";
+  }
+  dragHandle.addEventListener("pointerup", stopDragging);
+  dragHandle.addEventListener("pointercancel", stopDragging);
+  window.addEventListener("resize", () => {
+    if (!panel.style.left || !panel.classList.contains("open")) return;
+    const rect = panel.getBoundingClientRect();
+    panel.style.left = Math.min(Math.max(8, rect.left), Math.max(8, window.innerWidth - panel.offsetWidth - 8)) + "px";
+    panel.style.top = Math.min(Math.max(8, rect.top), Math.max(8, window.innerHeight - panel.offsetHeight - 8)) + "px";
+  });
+
 
   function addMessage(text, who) {
     const el = document.createElement("div");
