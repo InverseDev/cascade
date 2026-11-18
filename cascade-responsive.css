@@ -1029,3 +1029,26 @@ h1, h2, h3, h4, h5, h6,
     justify-content: flex-start;
   }
 }
+
+
+/* Closing call-to-action belongs to the main page flow, not a separate footer-style panel. */
+.closing-cta {
+  width: min(100% - 64px, 1180px) !important;
+  margin: 54px auto 42px !important;
+  padding: 34px 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+body.dark-mode .closing-cta {
+  background: transparent !important;
+  border: 0 !important;
+}
+@media (max-width: 700px) {
+  .closing-cta {
+    width: calc(100% - 32px) !important;
+    margin: 34px auto 28px !important;
+    padding: 22px 0 !important;
+  }
+}
