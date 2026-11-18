@@ -388,6 +388,17 @@
   function runAction(text) {
     const q = normalizeActionText(text).toLowerCase().trim();
 
+    if (pendingIntent?.type === "threshold-pair") {
+      const values = q.match(/\d{1,3}/g) || [];
+      if (values.length >= 2) {
+        const low = Number(values[0]), high = Number(values[1]);
+        setPending(null);
+        if (low < 5 || low > 40 || high < 50 || high > 100 || low >= high) return "Please give a low-water alert from 5–40% first, then a higher cutoff from 50–100%.";
+        return confirmAction("Set the low-water alert to " + low + "% and maximum cutoff to " + high + "%? These are browser preferences only; they do not program the ESP32.", () => applySettings({ lowWaterLevel:low, cutoffLevel:high }));
+      }
+      if (/\b(cancel|never mind|nevermind)\b/.test(q)) { setPending(null); return "Cancelled. No settings changed."; }
+      return "Please send both values, for example: 15% and 88%.";
+    }
     // Continue an unfinished request before interpreting the new message alone.
     if (pendingIntent?.type === "threshold") {
       const m = q.match(/(?:^|\b)(\d{1,3})\s*%?(?:\s|$)/)
