@@ -141,7 +141,7 @@
     panel.setAttribute("aria-hidden", String(!open));
     launcher.setAttribute("aria-expanded", String(open));
     launcher.setAttribute("aria-label", open ? "Close Cascade AI assistant" : "Open Cascade AI assistant");
-    if (open) setTimeout(() => input.focus(), 120);
+    // Do not autofocus: mobile browsers would open the on-screen keyboard as soon as chat opens.
   }
   launcher.addEventListener("click", () => setOpen(!panel.classList.contains("open")));
   close.addEventListener("click", () => setOpen(false));
