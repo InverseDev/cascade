@@ -97,7 +97,7 @@
       closeLanguageMenu();
       applyLanguage();
       addMessage(assistantLanguage === "hi" ? "अब मैं हिन्दी में जवाब दूँगा। आप हिन्दी या Romanized Hindi (Hinglish) में लिख सकते हैं।" : assistantLanguage === "bn" ? "এখন থেকে আমি বাংলায় উত্তর দেব। আপনি বাংলা বা Romanized Bangla (Banglish)-এ লিখতে পারেন।" : "I'll reply in English. You can write in English, हिन्दी or বাংলা.", "bot");
-      saveChatLog();
+
     });
   });
   document.addEventListener("pointerdown", event => {
@@ -275,31 +275,13 @@
     }, { once: true });
     no.addEventListener("click", () => { addMessage("No changes made.", "bot"); actions.remove(); }, { once: true });
   }
+  // Conversation content and pending follow-up context exist only in memory.
+  // A page refresh starts a fresh assistant conversation.
   const CHAT_LOG_KEY = "cascade-assistant-chat-v1";
   const CHAT_PENDING_KEY = "cascade-assistant-pending-v1";
+  try { localStorage.removeItem(CHAT_LOG_KEY); localStorage.removeItem(CHAT_PENDING_KEY); } catch (_) {}
   let pendingIntent = null;
-  try { pendingIntent = JSON.parse(localStorage.getItem(CHAT_PENDING_KEY) || "null"); } catch (_) {}
-  function setPending(intent) {
-    pendingIntent = intent;
-    if (intent) localStorage.setItem(CHAT_PENDING_KEY, JSON.stringify(intent));
-    else localStorage.removeItem(CHAT_PENDING_KEY);
-  }
-  function saveChatLog() {
-    const log = [...messages.querySelectorAll(".cascade-chat-message:not(.typing)")].slice(-30)
-      .map(node => ({ who: node.classList.contains("user") ? "user" : "bot", text: node.querySelector(".cascade-chat-confirm") ? node.firstChild.textContent : node.textContent }));
-    try { localStorage.setItem(CHAT_LOG_KEY, JSON.stringify(log)); } catch (_) {}
-  }
-  function restoreChatLog() {
-    try {
-      const log = JSON.parse(localStorage.getItem(CHAT_LOG_KEY) || "[]");
-      if (!Array.isArray(log) || !log.length) return;
-      messages.querySelectorAll(".cascade-chat-message,.cascade-chat-suggestions").forEach(node => node.remove());
-      log.slice(-24).forEach(item => {
-        if (item && typeof item.text === "string") addMessage(item.text, item.who === "user" ? "user" : "bot");
-      });
-    } catch (_) {}
-  }
-  restoreChatLog();
+  function setPending(intent) { pendingIntent = intent; }
 
   function pageName() {
     const path = location.pathname.toLowerCase();
@@ -329,7 +311,7 @@
       actions.remove();
       const result = action();
       addMessage(typeof result === "string" ? result : success, "bot");
-      saveChatLog();
+
     }, { once: true });
     no.addEventListener("click", () => {
       actions.remove(); setPending(null); addMessage("Cancelled. No changes made.", "bot"); saveChatLog();
@@ -590,7 +572,7 @@
   async function send(text) {
     if (busy || !text.trim()) return;
     addMessage(text, "user");
-    saveChatLog();
+
     const actionReply = runAction(text);
     if (typeof actionReply === "string") { addMessage(actionReply, "bot"); saveChatLog(); return; }
     if (actionReply === true || actionReply === false) return;
@@ -619,7 +601,7 @@
     } finally {
       typing.classList.remove("typing");
       busy = false;
-      saveChatLog();
+
       messages.scrollTop = messages.scrollHeight;
     }
   }
