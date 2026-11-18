@@ -1510,3 +1510,11 @@ body.dark-mode .site-header .menu-toggle:hover {
   .site-header > .theme-toggle { grid-column: 4; position: static !important; left: auto !important; }
   .site-header > .menu-toggle { display: none !important; }
 }
+
+/* Desktop header alignment: shift every header item except the Cascade logo
+   80px to the left, as requested. */
+@media (min-width: 769px) {
+  .site-header > :not(.brand) {
+    translate: -80px 0 !important;
+  }
+}
