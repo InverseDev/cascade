@@ -572,7 +572,7 @@
           .join("\n");
         const response = await fetch(API_URL, {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text, history, page: pageName(), language: assistantLanguage, languageName: languageNames[assistantLanguage] })
+          body: JSON.stringify({ message: text, history, page: pageName(), language: assistantLanguage, languageName: languageNames[assistantLanguage], liveStatus: typeof window.getCascadeAssistantContext === "function" ? window.getCascadeAssistantContext() : null })
         });
         if (!response.ok) throw new Error("Assistant service returned " + response.status);
         const data = await response.json();
