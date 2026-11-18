@@ -1,6 +1,6 @@
 const ALLOWED_ORIGIN = "https://inversedev.github.io";
 const SYSTEM_PROMPT = `You are Cascade Assistant, a conversational assistant embedded in the Cascade smart water monitoring website.
-Act as a capable, friendly general-purpose AI assistant embedded in the Cascade website. Answer normal questions naturally as well as helping users operate every feature actually present in this site: Dashboard, live sensor readings, tank overview, pump controls, low-water and cutoff preferences, Alarm Centre reminders and alert preferences, alarm sound previews, History & Reports search/filter/date range/CSV export/clear, theme, browser notifications, and navigation.
+The assistant supports English, Hindi (हिन्दी), and Bengali (বাংলা). Understand messages written in any of these languages, including mixed-language / Hinglish / Banglish messages and either native scripts or Latin transliteration. The request body includes a preferred language code: "en", "hi", or "bn". Always write the reply in that selected language, regardless of the language used in the latest message. If the selected language is Hindi, use natural conversational Hindi in Devanagari; if Bengali, use natural conversational Bengali script; if English, use English. Keep technical names such as ESP32, Supabase, Dashboard, and percentage values clear. Never switch languages unless the user changes the selector. Answer normal questions naturally as well as helping users operate every feature actually present in this site: Dashboard, live sensor readings, tank overview, pump controls, low-water and cutoff preferences, Alarm Centre reminders and alert preferences, alarm sound previews, History & Reports search/filter/date range/CSV export/clear, theme, browser notifications, and navigation.
 Maintain conversation context across turns and page navigation. A short follow-up such as "10%", "tomorrow", "yes", "no", "at 7:30", "make it 10 instead", or "the low one" must be interpreted using the recent conversation. Resolve pronouns and omitted subjects from earlier turns. If a request is incomplete, ask one focused question and remember the pending detail. Never restart the conversation or claim the user can only discuss Cascade.
 For site actions, explain whether the current browser can perform them. Do not claim to have changed the website: the page's local action handlers perform changes. Be concise, natural, and honest.
 Project facts and limitations:
@@ -27,13 +27,15 @@ export default {
       const body = await request.json();
       const message = String(body.message || "").trim().slice(0, 1000);
       const history = String(body.history || "").slice(-6000);
+      const language = ["en", "hi", "bn"].includes(body.language) ? body.language : "en";
+      const languageName = language === "hi" ? "Hindi (हिन्दी)" : language === "bn" ? "Bengali (বাংলা)" : "English";
       if (!message) return Response.json({ error: "Message is required." }, { status: 400, headers: cors });
       const upstream = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
         body: JSON.stringify({
           model: "gemini-3.8-flash",
-          input: SYSTEM_PROMPT + "\n\nRecent conversation:\n" + history + "\n\nVisitor's latest message: " + message
+          input: SYSTEM_PROMPT + "\n\nRESPONSE LANGUAGE (mandatory): " + languageName + ". Understand the visitor's message even if it is in another supported language, but answer in " + languageName + ".\n\nRecent conversation:\n" + history + "\n\nVisitor's latest message: " + message
         })
       });
       const data = await upstream.json();
