@@ -54,11 +54,11 @@ function updateDashboard() {
 
   const motorIsOn = sensorOnline && motorStatus === "on";
   const motorStatusNode = document.getElementById("motorStatus");
-  if (motorStatusNode) motorStatusNode.textContent = motorStatus.toUpperCase();
+  if (motorStatusNode) motorStatusNode.textContent = sensorOnline && motorStatus !== "unknown" ? motorStatus.toUpperCase() : "—";
   const motorMessage = document.getElementById("motorMessage");
   if (motorMessage) {
     motorMessage.textContent = !sensorOnline
-      ? "Device feedback is unavailable. Pump state is unknown."
+      ? "Device feedback is unavailable."
       : motorStatus === "on"
         ? "The device reports that the motor is ON."
         : motorStatus === "off"
