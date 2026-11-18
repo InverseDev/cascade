@@ -55,3 +55,28 @@ body.dark-mode #cascade-chat .cascade-chat-form input{color:#f0efff!important;bo
 #cascade-chat .cascade-chat-launcher::after{content:"";position:absolute;inset:-5px;border:2px solid #68c9ed;border-radius:50%;opacity:0;transform:scale(.88);transition:transform .25s,opacity .25s;pointer-events:none}
 #cascade-chat .cascade-chat-launcher:hover::after{opacity:.8;transform:scale(1)}
 @media(prefers-reduced-motion:reduce){#cascade-chat .cascade-mascot-launcher{transition:none!important}#cascade-chat .cascade-chat-launcher::after{transition:none!important}}
+
+
+/* Mascot-first launcher: the character itself is the button, not an icon in a badge. */
+#cascade-chat{position:fixed!important;right:22px!important;bottom:18px!important;width:116px!important;height:126px!important;z-index:100020!important;pointer-events:none!important}
+#cascade-chat .cascade-chat-launcher{all:unset!important;position:absolute!important;right:0!important;bottom:0!important;width:112px!important;height:116px!important;display:grid!important;place-items:center!important;overflow:visible!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:inherit!important;cursor:pointer!important;pointer-events:auto!important;isolation:auto!important;transition:transform .2s ease!important}
+#cascade-chat .cascade-chat-launcher::after{display:none!important;content:none!important}
+#cascade-chat .cascade-mascot-launcher{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transform:none!important;filter:drop-shadow(0 7px 5px #183a6540)!important;transition:filter .2s ease,transform .2s ease!important}
+#cascade-chat .cascade-chat-launcher:hover{transform:translateY(-4px)!important;box-shadow:none!important}
+#cascade-chat .cascade-chat-launcher:hover .cascade-mascot-launcher{transform:scale(1.045)!important;filter:drop-shadow(0 10px 7px #183a6550)!important}
+#cascade-chat .cascade-chat-launcher:focus-visible{outline:3px solid #58bce8!important;outline-offset:5px!important;border-radius:18px!important}
+#cascade-chat .cascade-chat-greeting{position:absolute!important;right:82px!important;bottom:91px!important;z-index:2!important;width:max-content!important;max-width:min(235px,calc(100vw - 145px))!important;padding:11px 15px!important;border:2px solid #214b80!important;border-radius:18px 18px 18px 5px!important;background:#fff!important;color:#173b68!important;box-shadow:0 7px 20px #1b396526!important;font:700 12px/1.35 "Poppins","Montserrat",sans-serif!important;letter-spacing:-.1px!important;pointer-events:none!important;transform-origin:bottom right!important;animation:cascadeBubbleIn .55s cubic-bezier(.2,.8,.2,1) both!important}
+#cascade-chat .cascade-chat-greeting::after{content:""!important;position:absolute!important;right:15px!important;bottom:-9px!important;width:14px!important;height:14px!important;background:#fff!important;border-right:2px solid #214b80!important;border-bottom:2px solid #214b80!important;transform:rotate(45deg)!important}
+#cascade-chat.chat-open .cascade-chat-greeting{opacity:0!important;visibility:hidden!important;transform:translateY(7px) scale(.92)!important;animation:none!important}
+@keyframes cascadeBubbleIn{0%{opacity:0;transform:translateY(9px) scale(.88)}70%{opacity:1;transform:translateY(-2px) scale(1.025)}100%{opacity:1;transform:translateY(0) scale(1)}}
+#cascade-chat .cascade-chat-panel{right:0!important;bottom:126px!important}
+@media(max-width:600px){
+ #cascade-chat{right:10px!important;bottom:10px!important;width:100px!important;height:112px!important}
+ #cascade-chat .cascade-chat-launcher{width:98px!important;height:104px!important}
+ #cascade-chat .cascade-chat-greeting{right:69px!important;bottom:82px!important;max-width:min(205px,calc(100vw - 120px))!important;padding:9px 12px!important;font-size:10px!important}
+ #cascade-chat .cascade-chat-panel{right:-0px!important;bottom:112px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #cascade-chat .cascade-chat-launcher,#cascade-chat .cascade-mascot-launcher{transition:none!important}
+ #cascade-chat .cascade-chat-greeting{animation:none!important}
+}
