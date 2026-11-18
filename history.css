@@ -400,7 +400,7 @@
 }
 /* Match the original Cascade typography */
 .history-page {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     body{
     background:linear-gradient(145deg,
     rgb(200, 240, 255),
@@ -411,7 +411,7 @@
 }
 .history-brand,
 .history-title h1 {
-    font-family: 'Titan One', cursive;
+    font-family: 'National 2', cursive;
     font-weight: 400;
 }
 /* HISTORY Mobile page design */
@@ -748,3 +748,7 @@ body.history-page:not(.dark-mode) #historyThemeToggle:hover {
     object-fit: contain;
     object-position: left center;
 }
+
+/* Use the shared Cascade typography pair on this page as well. */
+html, body, body * { font-family: "Montserrat", sans-serif !important; }
+h1, h2, h3, h4, h5, h6, .alarm-page-heading, .history-page-heading { font-family: "National 2", "Montserrat", sans-serif !important; }
