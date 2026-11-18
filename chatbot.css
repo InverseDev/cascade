@@ -80,3 +80,16 @@ body.dark-mode #cascade-chat .cascade-chat-form input{color:#f0efff!important;bo
  #cascade-chat .cascade-chat-launcher,#cascade-chat .cascade-mascot-launcher{transition:none!important}
  #cascade-chat .cascade-chat-greeting{animation:none!important}
 }
+
+
+/* Multilingual language picker */
+#cascade-chat .cascade-chat-head-actions{display:flex!important;align-items:center!important;gap:8px!important}
+#cascade-chat .cascade-chat-language-label{color:#dce8ff!important;font:600 9px "Montserrat",sans-serif!important}
+#cascade-chat .cascade-chat-language{height:34px!important;max-width:112px!important;padding:0 25px 0 9px!important;border:1px solid #ffffff55!important;border-radius:9px!important;color:#fff!important;background:#ffffff18!important;font:600 10px "Montserrat",sans-serif!important;cursor:pointer!important}
+#cascade-chat .cascade-chat-language option{color:#202944!important;background:#fff!important}
+#cascade-chat .cascade-chat-close{flex:0 0 34px!important}
+@media(max-width:390px){
+ #cascade-chat .cascade-chat-language-label{display:none!important}
+ #cascade-chat .cascade-chat-language{max-width:94px!important}
+ #cascade-chat .cascade-chat-head-actions{gap:6px!important}
+}
