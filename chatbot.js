@@ -54,6 +54,8 @@
   const mascotImage = launcher.querySelector(".cascade-mascot-launcher");
   const mascotPage = location.pathname.toLowerCase();
   mascotImage.src = mascotPage.includes("history") ? "assets/mascots/cascade-analytics.svg" : mascotPage.includes("alarms") ? "assets/mascots/cascade-summary.svg" : "assets/mascots/cascade-hero.svg";
+  const headerMascot = root.querySelector(".cascade-chat-avatar");
+  if (headerMascot) headerMascot.src = mascotImage.src;
   const panel = root.querySelector(".cascade-chat-panel");
   const close = root.querySelector(".cascade-chat-close");
   const form = root.querySelector("form");
