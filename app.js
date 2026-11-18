@@ -276,8 +276,10 @@ function saveSettings() {
   }
   try {
     localStorage.setItem("cascade-dashboard-settings", JSON.stringify({ cutoffLevel, lowWaterLevel }));
-    addActivity(`Dashboard preferences saved locally: maximum ${cutoffLevel}%, minimum ${lowWaterLevel}%.`);
-    alert("Dashboard preferences saved on this browser. Device-side automation is not active yet.");
+    addActivity(`Thresholds updated: maximum ${cutoffLevel}%, minimum ${lowWaterLevel}%.`);
+    if (!window.Capacitor?.isNativePlatform?.()) {
+      alert("Dashboard preferences saved on this browser. Device-side automation is not active yet.");
+    }
   } catch (error) {
     console.error("Settings save failed:", error);
     alert("Could not save dashboard preferences in this browser.");
