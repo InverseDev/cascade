@@ -9,7 +9,7 @@ body{
     rgba(179, 206, 255, 0.934),rgb(174, 186, 255));
 }}
 html{scroll-behavior:smooth;scroll-padding-top:90px}
-body{font-family:'DM Sans',system-ui,sans-serif}
+body{font-family:'Montserrat',system-ui,sans-serif}
 body{
     background:linear-gradient(145deg,
     rgb(174, 231, 253),
@@ -33,7 +33,7 @@ body{
 .alarm-brand {
     text-decoration: none;
     font-size: 27px;
-    font:clamp(35px,6vw,35px)/.99 'Titan One',sans-serif;
+    font:clamp(35px,6vw,35px)/.99 'National 2',sans-serif;
     background:linear-gradient(100deg,#7657f6 5%,#a18cff 58%,#48cbd1 110%);
     -webkit-background-clip:text;
     background-clip:text;
@@ -692,10 +692,10 @@ body.alarm-page select {
     rgb(174, 231, 254),
     rgba(179, 206, 255, 0.934),rgb(174, 186, 255));
 }
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif;
 } */
 .alarm-page-heading h1 {
-    font-family: 'Titan One', cursive;
+    font-family: 'National 2', cursive;
     font-weight: 400;
 }
 /* Match Cascade Website Typography
@@ -703,7 +703,7 @@ body.alarm-page,
 body.alarm-page button,
 body.alarm-page input,
 body.alarm-page select {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif;
 } */
 /* Cascade Brand Typography */
 /* .alarm-brand {
@@ -714,7 +714,7 @@ body.alarm-page select {
     rgb(174, 231, 254),
     rgba(179, 206, 255, 0.934),rgb(174, 186, 255));
 }
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 800;
     letter-spacing: -1px;
 }
@@ -726,14 +726,14 @@ body.alarm-page select {
     rgb(174, 231, 254),
     rgba(179, 206, 255, 0.934),rgb(174, 186, 255));
 }
-    font-family: 'Titan One', cursive;
+    font-family: 'National 2', cursive;
     font-weight: 400;
 }
 .alarm-page,
 .alarm-page button,
 .alarm-page input,
 .alarm-page select {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif;
 } */
 /* ===== ALARM PAGE DARK MODE ===== */
 body.dark-mode.alarm-page {
@@ -811,7 +811,7 @@ body.dark-mode #alarmThemeToggle {
 }
 /* Match Main Website Cascade Logo */
 /* body.alarm-page alarm-brand {
-    font-family: 'Titan One', cursive !important;
+    font-family: 'National 2', cursive !important;
     font-size: 27px;
     font-weight: 400;
     letter-spacing: normal;
@@ -1042,3 +1042,6 @@ body.alarm-page:not(.dark-mode) .alarm-page-footer {
     background-color: rgb(202, 197, 245);
     transform: translateY(-2px);
 }
+/* Use the shared Cascade typography pair on this page as well. */
+html, body, body * { font-family: "Montserrat", sans-serif !important; }
+h1, h2, h3, h4, h5, h6, .alarm-page-heading, .history-page-heading { font-family: "National 2", "Montserrat", sans-serif !important; }
