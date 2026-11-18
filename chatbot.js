@@ -113,16 +113,21 @@
   };
   function applyLanguage() {
     const t = uiText[assistantLanguage];
-    root.querySelector(".cascade-chat-welcome h3").textContent = t.welcome;
-    root.querySelector(".cascade-chat-welcome p").textContent = t.intro;
-    root.querySelector(".cascade-chat-form input").placeholder = t.placeholder;
-    root.querySelector(".cascade-chat-form input").setAttribute("aria-label", t.placeholder);
-    root.querySelector(".cascade-chat-form button").setAttribute("aria-label", t.send);
-    root.querySelector(".cascade-chat-foot").textContent = t.foot;
-    root.querySelector(".cascade-chat-greeting").textContent = t.greeting;
-    root.querySelector(".cascade-chat-welcome-label").textContent = assistantLanguage === "en" ? "CASCADE · SMART WATER SYSTEM" : assistantLanguage === "hi" ? "CASCADE · स्मार्ट जल प्रणाली" : "CASCADE · স্মার্ট জল ব্যবস্থাপনা";
-    const greeting = messages.querySelector(".cascade-chat-message.bot");
-    if (greeting && greeting.dataset.initialGreeting === "true") greeting.textContent = t.hello;
+    const welcomeHeading = root.querySelector(".cascade-chat-welcome h3");
+    if (welcomeHeading) welcomeHeading.textContent = t.welcome;
+    const messageInput = root.querySelector(".cascade-chat-form input");
+    if (messageInput) {
+      messageInput.placeholder = t.placeholder;
+      messageInput.setAttribute("aria-label", t.placeholder);
+    }
+    const sendButton = root.querySelector(".cascade-chat-form button");
+    if (sendButton) sendButton.setAttribute("aria-label", t.send);
+    const footnote = root.querySelector(".cascade-chat-foot");
+    if (footnote) footnote.textContent = assistantLanguage === "en"
+      ? "Hardware actions require confirmation."
+      : assistantLanguage === "hi"
+        ? "हार्डवेयर कार्रवाइयों के लिए पुष्टि आवश्यक है।"
+        : "হার্ডওয়্যার কাজের জন্য নিশ্চিতকরণ প্রয়োজন।";
     const suggestionLabels = assistantLanguage === "hi"
       ? ["सिस्टम कैसे काम करता है?","डैशबोर्ड की सुविधाएँ","कम पानी का अलर्ट बदलें","अधिकतम स्तर बदलें"]
       : assistantLanguage === "bn"
