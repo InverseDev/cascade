@@ -16,14 +16,30 @@
     position: absolute !important;
     inset: 0 auto auto 0;
     width: min(360px, 31vw);
-    min-height: 280px;
-    height: 100%;
+    min-height: 170px;
+    height: auto !important;
+    padding: 22px 24px 48px !important;
     margin: 0;
     opacity: 1 !important;
     will-change: transform;
     transform-origin: center center;
     transition: box-shadow .35s ease;
     backface-visibility: hidden;
+  }
+  .features-section.feature-stack-active .feature-card h3 {
+    margin: 0 0 7px !important;
+    font-size: 20px;
+    line-height: 1.3;
+  }
+  .features-section.feature-stack-active .feature-card p {
+    margin: 0 !important;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .features-section.feature-stack-active .feature-card .feature-number {
+    right: 18px;
+    bottom: 10px;
+    font-size: 25px;
   }
   .features-section.feature-stack-active .feature-card:nth-child(1) { z-index: 3; }
   .features-section.feature-stack-active .feature-card:nth-child(2) { z-index: 4; }
