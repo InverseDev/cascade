@@ -556,11 +556,11 @@
   function parseAlarmDate(value) {
     const input = String(value || "").trim().toLowerCase();
     const now = new Date();
-    if (/\btoday\b/.test(input)) {
+    if (/\btoday\b|\baaj\b|आज|আজ/.test(input)) {
       const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
     }
-    if (/\btomorrow\b/.test(input)) {
+    if (/\btomorrow\b|\bkal\b|कल|আগামীকাল|কাল/.test(input)) {
       const d = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
       return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
     }
