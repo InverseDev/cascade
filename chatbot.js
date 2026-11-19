@@ -504,7 +504,7 @@
       .replace(/मोटर बंद करो|मोटर बंद कर दो|पंप बंद करो|पंप बंद कर दो|मोटर रोक दो|पंप रोक दो/gi, "motor off")
       .replace(/মোটর চালু করো|মোটর চালু করুন|পাম্প চালু করো|পাম্প চালু করুন/gi, "motor on")
       .replace(/মোটর বন্ধ করো|মোটর বন্ধ করুন|পাম্প বন্ধ করো|পাম্প বন্ধ করুন|মোটর বন্ধ করো|পাম্প বন্ধ করো/gi, "motor off")
-      .replace(/motor\\s+(?:ko\\s+)?band\\s+(?:kar dena|kar do|karna|karo)|pump\\s+(?:ko\\s+)?band\\s+(?:kar do|karo)/gi, "motor off")
+      .replace(/motor\s+(?:ko\\s+)?band\\s+(?:kar dena|kar do|karna|karo)|pump\s+(?:ko\\s+)?band\\s+(?:kar do|karo)/gi, "motor off")
       .replace(/अलार्म लगाओ|अलार्म लगा दो|अलार्म बनाओ|रिमाइंडर लगाओ|রিমাইন্ডার দাও|অ্যালার্ম দাও|অ্যালার্ম সেট করো/gi, "create alarm")
       .replace(/अलार्म दिखाओ|मेरे अलार्म दिखाओ|অ্যালার্ম দেখাও|রিমাইন্ডার দেখাও/gi, "list alarms")
       .replace(/रद्द करो|रद्द करें|না|বাতিল করো|বাতিল করুন/gi, "cancel")
@@ -802,6 +802,17 @@
       return (enabled ? "Enabled " : "Disabled ") + target.replace("Enabled","").replace(/([A-Z])/g," $1").toLowerCase() + " alerts.";
     }
     if (/\b(list|show|view|what are|my)\b.*\b(alarms?|reminders?)\b/.test(q) || /\b(list alarms|show alarms)\b/.test(q)) return listAlarmSummary();
+    const alarmToggle = q.match(/\b(enable|turn on|disable|turn off)\b.*\balarm\b/i);
+    if (alarmToggle) {
+      const alarms = window.CascadeAlarms?.list?.() || [];
+      const target = alarms.find(a => q.includes(String(a.name).toLowerCase()));
+      if (!target) return alarms.length ? "Which alarm should I " + (/disable|turn off/.test(q) ? "disable" : "enable") + "? Your alarms are: " + alarms.map(a=>a.name).join(", ") + "." : "There are no saved alarms.";
+      const enabled = !/disable|turn off/.test(q);
+      return confirmAction((enabled ? "Enable" : "Disable") + " the alarm “" + target.name + "”?", () => {
+        try { window.CascadeAlarms.update(target.id,{enabled}); return (enabled ? "Enabled " : "Disabled ") + "“" + target.name + "”."; }
+        catch(error) { return error.message; }
+      });
+    }
     const editAlarm = q.match(/\b(?:change|edit|update|move|reschedule)\b.*\balarm\b/i);
     if (editAlarm) {
       const alarms = window.CascadeAlarms?.list?.() || [];
@@ -821,10 +832,20 @@
       const name = text.match(/\balarm\s+(?:called|named)\s+["“]?(.+?)["”]?(?=\s+(?:at|on)\b|$)/i)
         || text.match(/\balarm\s+for\s+(.+?)(?=\s+(?:at|on)\b|$)/i)
         || text.match(/\bremind me to\s+(.+?)(?=\s+(?:at|on|tomorrow|today)\b|$)/i);
-      if (name) alarm.name = name[1].trim().replace(/[“”"]/g, "");
+      if (name) {
+        const proposedName = name[1].trim().replace(/[“”"]/g, "");
+        alarm.name = parseAlarmTime(proposedName) ? "Cascade reminder" : proposedName;
+      }
       alarm.time = parseAlarmTime(text) || "";
       alarm.date = parseAlarmDate(text) || "";
       if (/daily|every day/.test(q)) alarm.repeat = true;
+      if (alarm.time && !alarm.date && !alarm.repeat) {
+        const [hour,minute] = alarm.time.split(":").map(Number);
+        const now = new Date();
+        const target = new Date(); target.setHours(hour,minute,0,0);
+        if (target <= now) target.setDate(target.getDate()+1);
+        alarm.date = target.getFullYear()+"-"+String(target.getMonth()+1).padStart(2,"0")+"-"+String(target.getDate()).padStart(2,"0");
+      }
       const missing = !alarm.name ? "name" : !alarm.time ? "time (e.g. 9:15pm, 9 AM or 21:15)" : (!alarm.date && !alarm.repeat) ? "date (e.g. 19/11/2026, 19-11-2026, 2026-11-19 or tomorrow)" : null;
       if (missing) { setPending({type:"alarm-field",field:missing.startsWith("name")?"name":missing.startsWith("time")?"time":"date",alarm}); return "I can create that. What is the alarm " + missing + "?"; }
       setPending({type:"alarm-field",field:"repeat",alarm});
