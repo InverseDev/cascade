@@ -508,7 +508,7 @@
       .replace(/মোটর চালু করো|মোটর চালু করুন|পাম্প চালু করো|পাম্প চালু করুন/gi, "motor on")
       .replace(/মোটর বন্ধ করো|মোটর বন্ধ করুন|পাম্প বন্ধ করো|পাম্প বন্ধ করুন|মোটর বন্ধ করো|পাম্প বন্ধ করো/gi, "motor off")
       .replace(/motor\s+(?:ko\s+)?band\s+(?:kar dena|kar do|karna|karo)|pump\s+(?:ko\s+)?band\s+(?:kar do|karo)/gi, "motor off")
-      .replace(/अलार्म लगाओ|अलार्म लगा दो|अलार्म बनाओ|रिमाइंडर लगाओ|রিমাইন্ডার দাও|অ্যালার্ম দাও|অ্যালার্ম সেট করো/gi, "create alarm")
+      .replace(/अलार्म लगाओ|अलार्म लगा दो|अलार्म बनाओ|रिमाइंडर लगाओ|রিমাইন্ডার দাও|অ্যালার্ম দাও|অ্যালার্ম সেট করো|alarm lagao|alarm laga do|reminder lagao|reminder laga do/gi, "create alarm")
       .replace(/अलार्म दिखाओ|मेरे अलार्म दिखाओ|অ্যালার্ম দেখাও|রিমাইন্ডার দেখাও/gi, "list alarms")
       .replace(/रद्द करो|रद्द करें|না|বাতিল করো|বাতিল করুন/gi, "cancel")
       .replace(/खोलो|खोलें|दिखाओ|দেখাও|খুলুন/gi, "open")
