@@ -220,9 +220,9 @@
   let busy = false;
 
   const uiText = {
-    en: { label:"Language", welcome:"How can I help you?", intro:"Ask me about your tank, water levels, alerts or pump controls. I can also help you adjust dashboard settings.", hello:"Hello! I'm your Cascade assistant. What would you like to know?", placeholder:"Ask about Cascade...", send:"Send message", foot:"AI responses may be inaccurate. Hardware actions require confirmation.", greeting:"Hi! How may I help you?" },
-    hi: { label:"भाषा", welcome:"मैं आपकी क्या मदद कर सकता हूँ?", intro:"अपने टैंक, पानी के स्तर, अलर्ट या पंप नियंत्रण के बारे में पूछें। मैं डैशबोर्ड सेटिंग बदलने में भी मदद कर सकता हूँ।", hello:"नमस्ते! मैं Cascade सहायक हूँ। आप क्या जानना चाहेंगे?", placeholder:"Cascade के बारे में पूछें...", send:"संदेश भेजें", foot:"AI के जवाब गलत हो सकते हैं। हार्डवेयर संबंधी कार्रवाइयों के लिए पुष्टि आवश्यक है।", greeting:"नमस्ते! मैं आपकी क्या मदद कर सकता हूँ?" },
-    bn: { label:"ভাষা", welcome:"আমি কীভাবে আপনাকে সাহায্য করতে পারি?", intro:"আপনার ট্যাঙ্ক, পানির স্তর, অ্যালার্ট বা পাম্প নিয়ন্ত্রণ সম্পর্কে জিজ্ঞাসা করুন। ড্যাশবোর্ড সেটিংস বদলাতেও সাহায্য করতে পারি।", hello:"নমস্কার! আমি Cascade সহকারী। কী জানতে চান?", placeholder:"Cascade সম্পর্কে জিজ্ঞাসা করুন...", send:"বার্তা পাঠান", foot:"AI-এর উত্তর ভুল হতে পারে। হার্ডওয়্যার সংক্রান্ত কাজের জন্য নিশ্চিতকরণ প্রয়োজন।", greeting:"নমস্কার! কীভাবে সাহায্য করতে পারি?" }
+    en: { label:"Language", welcome:"How can I help you?", intro:"Ask me about your tank, water levels, alerts or pump controls. I can also help you adjust dashboard settings.", hello:"Hello! I'm your Cascade assistant. What would you like to know?", placeholder:"Ask or command Cascade...", send:"Send message", foot:"AI responses may be inaccurate. Hardware actions require confirmation.", greeting:"Hi! How may I help you?" },
+    hi: { label:"भाषा", welcome:"मैं आपकी क्या मदद कर सकता हूँ?", intro:"अपने टैंक, पानी के स्तर, अलर्ट या पंप नियंत्रण के बारे में पूछें। मैं डैशबोर्ड सेटिंग बदलने में भी मदद कर सकता हूँ।", hello:"नमस्ते! मैं Cascade सहायक हूँ। आप क्या जानना चाहेंगे?", placeholder:"Cascade से पूछें या कोई काम कहें...", send:"संदेश भेजें", foot:"AI के जवाब गलत हो सकते हैं। हार्डवेयर संबंधी कार्रवाइयों के लिए पुष्टि आवश्यक है।", greeting:"नमस्ते! मैं आपकी क्या मदद कर सकता हूँ?" },
+    bn: { label:"ভাষা", welcome:"আমি কীভাবে আপনাকে সাহায্য করতে পারি?", intro:"আপনার ট্যাঙ্ক, পানির স্তর, অ্যালার্ট বা পাম্প নিয়ন্ত্রণ সম্পর্কে জিজ্ঞাসা করুন। ড্যাশবোর্ড সেটিংস বদলাতেও সাহায্য করতে পারি।", hello:"নমস্কার! আমি Cascade সহকারী। কী জানতে চান?", placeholder:"Cascade-কে প্রশ্ন করুন বা কাজ বলুন...", send:"বার্তা পাঠান", foot:"AI-এর উত্তর ভুল হতে পারে। হার্ডওয়্যার সংক্রান্ত কাজের জন্য নিশ্চিতকরণ প্রয়োজন।", greeting:"নমস্কার! কীভাবে সাহায্য করতে পারি?" }
   };
   function applyLanguage() {
     const t = uiText[assistantLanguage];
@@ -233,7 +233,7 @@
       messageInput.placeholder = t.placeholder;
       messageInput.setAttribute("aria-label", t.placeholder);
     }
-    const sendButton = root.querySelector(".cascade-chat-form button");
+    const sendButton = root.querySelector('.cascade-chat-form button[type="submit"]');
     if (sendButton) sendButton.setAttribute("aria-label", t.send);
     const footnote = root.querySelector(".cascade-chat-foot");
     if (footnote) footnote.textContent = assistantLanguage === "en"
@@ -242,10 +242,10 @@
         ? "हार्डवेयर कार्रवाइयों के लिए पुष्टि आवश्यक है।"
         : "হার্ডওয়্যার কাজের জন্য নিশ্চিতকরণ প্রয়োজন।";
     const suggestionLabels = assistantLanguage === "hi"
-      ? ["सिस्टम कैसे काम करता है?","डैशबोर्ड की सुविधाएँ","कम पानी का अलर्ट बदलें","अधिकतम स्तर बदलें"]
+      ? ["पिछले 9 दिनों का पानी","मोटर बंद करें","अलार्म बनाएँ","पानी के डेटा का विश्लेषण"]
       : assistantLanguage === "bn"
-        ? ["সিস্টেম কীভাবে কাজ করে?","ড্যাশবোর্ডের ফিচার","কম পানির অ্যালার্ট বদলান","সর্বোচ্চ স্তর বদলান"]
-        : ["How does the system work?","Explore dashboard features","Change low-water alert","Adjust maximum level"];
+        ? ["গত ৯ দিনের পানির ব্যবহার","মোটর বন্ধ করুন","অ্যালার্ম তৈরি করুন","পানির ডেটা বিশ্লেষণ"]
+        : ["9-day water usage","Turn motor off","Create an alarm","Analyse my water data"];
     root.querySelectorAll(".cascade-chat-suggestions button").forEach((button,index) => { button.textContent = suggestionLabels[index] || button.textContent; });
   }
   applyLanguage();
