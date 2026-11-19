@@ -512,30 +512,35 @@
 
   // Accept common 12-hour/24-hour time formats and Indian day/month/year dates.
   function parseAlarmTime(value) {
-    const input = String(value || "").trim().toLowerCase().replace(/\./g, ":").replace(/\s+/g, " ");
-    let m = input.match(/\b(\d{1,2})(?::(\d{1,2}))?\s*(a\.?m\.?|p\.?m\.?)\b/i);
+    const input = String(value || "").trim().toLowerCase().replace(/\\./g, ":").replace(/\\s+/g, " ");
+    let m = input.match(/\\b(\\d{1,2})(?::|\\s+)(\\d{1,2})\\s*(a\\.?m\\.?|p\\.?m\\.?)\\b/i);
     if (m) {
-      let hour = Number(m[1]), minute = Number(m[2] || 0);
-      const meridiem = m[3].replace(/\./g, "").toLowerCase();
+      let hour = Number(m[1]), minute = Number(m[2]);
+      const meridiem = m[3].replace(/\\./g, "").toLowerCase();
       if (hour < 1 || hour > 12 || minute > 59) return null;
       if (meridiem === "pm" && hour !== 12) hour += 12;
       if (meridiem === "am" && hour === 12) hour = 0;
       return String(hour).padStart(2,"0") + ":" + String(minute).padStart(2,"0");
     }
-    m = input.match(/\b(\d{1,2}):(\d{2})\b/);
+    m = input.match(/\\b(\\d{1,2})(?::|\\s+)(\\d{2})\\b/);
     if (m) {
       const hour=Number(m[1]), minute=Number(m[2]);
       if(hour>23||minute>59)return null;
       return String(hour).padStart(2,"0")+":"+String(minute).padStart(2,"0");
     }
-    m = input.match(/\b(?:at|around|by)\s+(\d{1,2})(?:\s*(?:o'?clock|baje|ta))?\b|\b(\d{1,2})\s*(?:o'?clock|baje|ta)\b/i);
+    m = input.match(/\\b(\\d{1,2}):((?:[0-5]\\d))\\b/);
+    if (m) {
+      const hour=Number(m[1]), minute=Number(m[2]);
+      if(hour>23||minute>59)return null;
+      return String(hour).padStart(2,"0")+":"+String(minute).padStart(2,"0");
+    }
+    m = input.match(/\\b(?:at|around|by)\\s+(\\d{1,2})(?:\\s*(?:o'?clock|baje|ta))?\\b|\\b(\\d{1,2})\\s*(?:o'?clock|baje|ta)\\b/i);
     if (m) {
       const hour=Number(m[1] || m[2]);
       if(hour<0||hour>23)return null;
       return String(hour).padStart(2,"0")+":00";
     }
-    // A short reply like "7" or "tomorrow 7" is accepted as 07:00.
-    m = input.match(/(?:^|\s)(\d{1,2})\s*$/);
+    m = input.match(/(?:^|\\s)(\\d{1,2})\\s*$/);
     if (m) {
       const hour=Number(m[1]);
       if(hour>=0&&hour<=23)return String(hour).padStart(2,"0")+":00";
@@ -845,10 +850,11 @@
       || /मुझे याद दिला|याद दिलाना|अलार्म लगाओ|অ্যালার্ম দাও|মনে করিয়ে দিও/.test(q);
     if (alarmCreate) {
       const alarm = {name:"",time:parseAlarmTime(text)||"",date:parseAlarmDate(text)||"",repeat:/\b(daily|every day|everyday|प्रतिदिन|প্রতিদিন)\b/.test(q)};
-      const nameMatch = text.match(/\b(?:remind me to|remind me about|reminder to|alarm called|alarm named|alarm for|remind me)\s+(.+?)(?=\s+(?:at|on|tomorrow|today|daily|every day)\b|$)/i);
+      const namedMatch = text.match(/\\b(?:named|called)\\s+(.+?)(?=\\s+(?:at|on|tomorrow|today|daily|every day)\\b|\\s+for\\s+\\d{1,2}(?:\\s+\\d{2})?\\s*(?:a\\.?m\\.?|p\\.?m\\.?)?\\b|$)/i);
+      const nameMatch = namedMatch || text.match(/\\b(?:remind me to|remind me about|reminder to|alarm for|remind me)\\s+(.+?)(?=\\s+(?:at|on|tomorrow|today|daily|every day)\\b|\\s+\\d{1,2}(?::|\\s+)\\d{2}\\s*(?:a\\.?m\\.?|p\\.?m\\.?)?\\b|$)/i);
       if(nameMatch) {
-        const candidate=nameMatch[1].trim().replace(/^[“"]|[”"]$/g,"");
-        if(!parseAlarmTime(candidate) && !parseAlarmDate(candidate)) alarm.name=candidate.slice(0,80);
+        const candidate=nameMatch[1].trim().replace(/^[“"]|[”"]$/g,"").replace(/\\s+for\\s*$/i,"");
+        if(candidate && !parseAlarmTime(candidate) && !parseAlarmDate(candidate)) alarm.name=candidate.slice(0,80);
       }
       if(!alarm.time) {
         setPending({type:"alarm-field",field:"time",alarm});
