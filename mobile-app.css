@@ -718,3 +718,81 @@ html.cascade-native-app .system-alerts-panel .alarm-panel-icon {
   width:38px !important;
   height:38px !important;
 }
+
+
+/* v13: decisive Android layout overrides. */
+html.cascade-native-app #cascade-chat .cascade-chat-panel { background:#0d1b2b !important; }
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-panel,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-panel * { color:#e5f1fc !important; }
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-panel,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-head,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-messages,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-welcome,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-form,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-foot { background:#0d1b2b !important; }
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-head { background:#142a40 !important; }
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-message { background:#1b354c !important; border-color:#35536b !important; }
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-message.user { background:#155477 !important; }
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-suggestions button { background:#1b354c !important; }
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-form input { background:#1a3045 !important; border-color:#3b566e !important; }
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-language-menu { background:#17364e !important; }
+
+/* Grid layout prevents flex-shrink from collapsing the System Alerts title. */
+html.cascade-native-app .system-alerts-panel .alarm-panel-heading {
+  display:grid !important; grid-template-columns:38px minmax(0,1fr) !important;
+  grid-template-rows:auto !important; align-items:center !important; column-gap:10px !important;
+  width:100% !important; min-width:0 !important; writing-mode:horizontal-tb !important;
+}
+html.cascade-native-app .system-alerts-panel .alarm-panel-heading .alarm-panel-icon {
+  grid-column:1 !important; grid-row:1 !important; width:38px !important; height:38px !important;
+}
+html.cascade-native-app .system-alerts-panel .alarm-panel-heading > div:last-child {
+  grid-column:2 !important; grid-row:1 !important; display:block !important;
+  width:100% !important; min-width:0 !important; max-width:none !important;
+}
+html.cascade-native-app .system-alerts-panel .alarm-panel-heading h2 {
+  display:block !important; width:auto !important; max-width:none !important;
+  white-space:normal !important; word-break:keep-all !important; overflow-wrap:normal !important;
+  writing-mode:horizontal-tb !important; text-orientation:mixed !important;
+  font-size:16px !important; line-height:1.25 !important;
+}
+
+/* Threshold cards size to their contents, without legacy notes/actions. */
+html.cascade-native-app .setting-card,
+html.cascade-native-app .alert-card {
+  height:auto !important; min-height:0 !important; align-self:start !important;
+  display:flex !important; flex-direction:column !important; justify-content:flex-start !important;
+  gap:0 !important; padding-bottom:14px !important;
+}
+html.cascade-native-app .setting-card .muted-copy,
+html.cascade-native-app .alert-card .muted-copy,
+html.cascade-native-app .setting-card .setting-note,
+html.cascade-native-app .alert-card .setting-note,
+html.cascade-native-app .setting-card > .subtle-btn,
+html.cascade-native-app .alert-card > .subtle-btn {
+  display:none !important; height:0 !important; margin:0 !important; padding:0 !important;
+}
+html.cascade-native-app .setting-card .range-value,
+html.cascade-native-app .alert-card .range-value { margin-top:8px !important; }
+html.cascade-native-app .setting-card .range-input,
+html.cascade-native-app .alert-card .range-input { margin:8px 0 2px !important; }
+html.cascade-native-app .setting-card .range-ends,
+html.cascade-native-app .alert-card .range-ends { margin:0 !important; padding:0 !important; }
+html.cascade-native-app .dashboard-grid { align-items:start !important; }
+
+/* Brief confirmation popup after a successful save. */
+html.cascade-native-app #cascade-settings-toast {
+  position:fixed !important; z-index:100200 !important; left:50% !important;
+  bottom:calc(88px + env(safe-area-inset-bottom,0px)) !important;
+  transform:translate(-50%,12px) !important; padding:10px 16px !important;
+  border:1px solid rgba(255,255,255,.12) !important; border-radius:999px !important;
+  color:#fff !important; background:#173b32 !important;
+  box-shadow:0 8px 28px rgba(0,0,0,.22) !important;
+  font:600 13px/1.2 "Montserrat",sans-serif !important;
+  opacity:0 !important; visibility:hidden !important;
+  transition:opacity .18s ease,transform .18s ease,visibility .18s ease !important;
+  pointer-events:none !important;
+}
+html.cascade-native-app #cascade-settings-toast.visible {
+  opacity:1 !important; visibility:visible !important; transform:translate(-50%,0) !important;
+}
