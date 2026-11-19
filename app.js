@@ -529,8 +529,11 @@ function addActivity(message) {
   const time = document.createElement("time");
   time.textContent = new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
   item.append(dot, text, time);
-  list.prepend(item);
-  while (list.children.length > 8) list.lastElementChild.remove();
+  // The activity panel may be absent on compact/mobile layouts.
+  if (list) {
+    list.prepend(item);
+    while (list.children.length > 8) list.lastElementChild.remove();
+  }
     // Add notification to Notification Center
     const notificationList = document.getElementById("notificationList");
     const notificationCount = document.getElementById("notificationCount");
