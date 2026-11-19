@@ -652,3 +652,69 @@ html.cascade-native-app .alarm-panel-icon {
   width:38px !important;
   height:38px !important;
 }
+
+
+/* HARD FIX v12: native app only. */
+html.cascade-native-app body.dark-mode #cascade-chat,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-panel,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-head,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-messages,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-welcome,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-form,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-foot {
+  background:#0d1b2b !important;
+  color:#e6f1fc !important;
+}
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-head {
+  background:#142b42 !important;
+}
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-message,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-suggestions button {
+  background:#1b354d !important;
+  color:#e6f1fc !important;
+  border-color:#34516b !important;
+}
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-message.user {
+  background:#155477 !important;
+  color:#f1f8ff !important;
+}
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-form input {
+  background:#1a3045 !important;
+  color:#f1f7ff !important;
+  border-color:#38536b !important;
+}
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-form input::placeholder { color:#9aafc2 !important; }
+
+/* Explicitly prevent narrow flex children from stacking letters vertically. */
+html.cascade-native-app .system-alerts-panel .alarm-panel-heading {
+  display:flex !important;
+  flex-flow:row nowrap !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:10px !important;
+  min-width:0 !important;
+}
+html.cascade-native-app .system-alerts-panel .alarm-panel-heading > div:last-child {
+  display:flex !important;
+  flex:1 1 0% !important;
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+  width:auto !important;
+}
+html.cascade-native-app .system-alerts-panel .alarm-panel-heading h2 {
+  display:block !important;
+  width:auto !important;
+  max-width:none !important;
+  flex:none !important;
+  white-space:normal !important;
+  word-break:normal !important;
+  overflow-wrap:break-word !important;
+  writing-mode:horizontal-tb !important;
+  text-orientation:mixed !important;
+}
+html.cascade-native-app .system-alerts-panel .alarm-panel-icon {
+  flex:0 0 38px !important;
+  width:38px !important;
+  height:38px !important;
+}
