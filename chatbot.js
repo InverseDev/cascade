@@ -496,6 +496,9 @@
   }
   function normalizeActionText(text) {
     return String(text)
+      // Protect motor verbs before generic Hindi/Bengali verb normalisation.
+      .replace(/मोटर चालू करो|मोटर चालू कर दो|पंप चालू करो|पंप चालू कर दो|মোটর চালু করো|মোটর চালু করুন|পাম্প চালু করো|পাম্প চালু করুন|motor\\s+(?:ko\\s+)?(?:chalu|start)\\s+(?:kar do|karo)|pump\\s+(?:ko\\s+)?(?:chalu|start)\\s+(?:kar do|karo)/gi, "motor on")
+      .replace(/मोटर बंद करो|मोटर बंद कर दो|पंप बंद करो|পাম্প বন্ধ করো|মोटर रोक दो|পাম্প বন্ধ করুন|motor\\s+(?:ko\\s+)?band\\s+(?:kar dena|kar do|karna|karo)|pump\\s+(?:ko\\s+)?band\\s+(?:kar do|karo)/gi, "motor off")
       .replace(/कम पानी का अलर्ट|लो वाटर अलर्ट|पानी कम होने का अलर्ट|জলের স্তর কমার অ্যালার্ট|কম পানির অ্যালার্ট|লো ওয়াটার অ্যালার্ট/gi, "low water alert")
       .replace(/अधिकतम स्तर|मैक्सिमम लेवल|कट.?ऑफ स्तर|পানির সর্বোচ্চ স্তর|সর্বোচ্চ লেভেল|কাট.?অফ লেভেল/gi, "maximum cutoff")
       .replace(/सेट करो|सेट करें|बदल दो|बदलें|रखो|कर दो|করো|সেট করো|সেট করুন|বদলে দাও|বদলাও/gi, "set")
