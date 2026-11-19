@@ -701,7 +701,7 @@
     }
     if (pendingIntent?.type === "alarm-field") {
       const a = pendingIntent.alarm;
-      const suppliedTime = parseAlarmTime(text);
+      const suppliedTime = parseAlarmTime(text) || parseAlarmTime(q);
       const suppliedDate = parseAlarmDate(text);
       if (suppliedTime) a.time = suppliedTime;
       if (suppliedDate) a.date = suppliedDate;
@@ -845,7 +845,9 @@
     if (alarmCreate) {
       const alarm = {name:"",time:parseAlarmTime(text)||"",date:parseAlarmDate(text)||"",repeat:/\b(daily|every day|everyday|प्रतिदिन|প্রতিদিন)\b/.test(q)};
       const namedMatch = text.match(/\b(?:named|called)\s+(.+?)(?=\s+(?:at|on|tomorrow|today|daily|every day)\b|\s+for\s+\d{1,2}(?:\s+\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?\b|$)/i);
-      const nameMatch = namedMatch || text.match(/\b(?:remind me to|remind me about|reminder to|alarm for|remind me)\s+(.+?)(?=\s+(?:at|on|tomorrow|today|daily|every day)\b|\s+\d{1,2}(?::|\s+)\d{2}\s*(?:a\.?m\.?|p\.?m\.?)?\b|$)/i);
+      const actionNameMatch = text.match(/\b(?:create|add|schedule|set|make)\s+(?:an?\s+)?(?:daily|everyday|every\s+day)\s+(.+?)\s+alarm\b/i)
+        || text.match(/\b(?:create|add|schedule|set|make)\s+(?:an?\s+)?(.+?)\s+alarm\b/i);
+      const nameMatch = namedMatch || actionNameMatch || text.match(/\b(?:remind me to|remind me about|reminder to|alarm for|remind me)\s+(.+?)(?=\s+(?:at|on|tomorrow|today|daily|every day)\b|\s+\d{1,2}(?::|\s+)\d{2}\s*(?:a\.?m\.?|p\.?m\.?)?\b|$)/i);
       if(nameMatch) {
         const candidate=nameMatch[1].trim().replace(/^[“"]|[”"]$/g,"").replace(/\s+for\s*$/i,"");
         if(candidate && !parseAlarmTime(candidate) && !parseAlarmDate(candidate)) alarm.name=candidate.slice(0,80);
