@@ -166,6 +166,59 @@ alarmList.addEventListener("click", function(event) {
 });
 // INITIAL LOAD
 loadAlarms();
+// Public, validated alarm API used by Cascade AI. Keeps browser and native
+// Android notifications in sync instead of writing localStorage directly.
+window.CascadeAlarms = {
+    list() { return scheduledAlarms.map(alarm => ({ ...alarm })); },
+    create({ name, time, date = null, repeat = false }) {
+        const cleanName = String(name || "").trim().slice(0, 80);
+        if (!cleanName || !/^([01]\\d|2[0-3]):[0-5]\\d$/.test(String(time || ""))) {
+            throw new Error("A name and valid 24-hour time are required.");
+        }
+        const selectedDate = repeat ? null : String(date || new Date().toLocaleDateString("en-CA"));
+        if (!repeat) {
+            const scheduled = new Date(selectedDate + "T" + time + ":00");
+            if (Number.isNaN(scheduled.getTime()) || scheduled <= new Date()) {
+                throw new Error("Please choose a future date and time.");
+            }
+        }
+        const alarm = { id: Date.now().toString() + Math.random().toString(36).slice(2, 6), name: cleanName, time, date: selectedDate, repeat: !!repeat, enabled: true, createdAt: new Date().toISOString() };
+        scheduledAlarms.push(alarm);
+        saveAlarms();
+        syncNativeAlarm(alarm);
+        renderAlarms();
+        const message = document.getElementById("alarmFormMessage");
+        if (message) message.textContent = "Alarm successfully created by Cascade AI.";
+        return { ...alarm };
+    },
+    remove(id) {
+        const alarm = scheduledAlarms.find(item => String(item.id) === String(id));
+        if (!alarm) return false;
+        cancelNativeAlarm(alarm.id);
+        scheduledAlarms = scheduledAlarms.filter(item => String(item.id) !== String(id));
+        saveAlarms();
+        renderAlarms();
+        return true;
+    },
+    update(id, changes = {}) {
+        const alarm = scheduledAlarms.find(item => String(item.id) === String(id));
+        if (!alarm) throw new Error("I couldn't find that alarm.");
+        const next = { ...alarm, ...changes };
+        if (changes.time && !/^([01]\\d|2[0-3]):[0-5]\\d$/.test(next.time)) throw new Error("Invalid alarm time.");
+        if (!next.repeat) {
+            const scheduled = new Date(String(next.date || new Date().toLocaleDateString("en-CA")) + "T" + next.time + ":00");
+            if (Number.isNaN(scheduled.getTime()) || scheduled <= new Date()) throw new Error("The updated alarm must be in the future.");
+        }
+        Object.assign(alarm, next);
+        saveAlarms();
+        cancelNativeAlarm(alarm.id);
+        syncNativeAlarm(alarm);
+        renderAlarms();
+        return { ...alarm };
+    }
+};
+
+
 // Persist the Alarm Centre alert toggles as browser preferences.
 const alertPreferenceIds = ["lowWaterAlertEnabled", "motorAlertEnabled", "cutoffAlertEnabled"];
 let savedAlertPreferences = {};
