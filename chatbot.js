@@ -619,6 +619,20 @@
         .filter(item => Date.parse(item.timestamp) >= Date.now() - days * 86400000)
         .slice(0, 80);
       if (!valid.length) return JSON.stringify({ periodDays:days, sensorRows:0, message:"No valid sensor readings were recorded in this period. The device may have been offline or its sensor was faulty. Local activity events are included separately.", localActivity:local });
+      const dailyBuckets = new Map();
+      valid.forEach(row => {
+        const day = new Date(row.at).toLocaleDateString("en-CA");
+        const bucket = dailyBuckets.get(day) || { sum:0, count:0, min:100, max:0, first:row.level, last:row.level, samples:0 };
+        bucket.sum += row.level; bucket.count++; bucket.min = Math.min(bucket.min,row.level);
+        bucket.max = Math.max(bucket.max,row.level); bucket.last = row.level; bucket.samples++;
+        dailyBuckets.set(day,bucket);
+      });
+      const dailySummary = [...dailyBuckets.entries()].map(([date,b]) => ({
+        date, averageLevelPercent:Number((b.sum/b.count).toFixed(2)),
+        minimumLevelPercent:Number(b.min.toFixed(2)), maximumLevelPercent:Number(b.max.toFixed(2)),
+        firstLevelPercent:Number(b.first.toFixed(2)), lastLevelPercent:Number(b.last.toFixed(2)),
+        sampleCount:b.samples
+      }));
       let cumulativeDrop = 0, refillRises = 0, motorOnSamples = 0;
       for (let i=0;i<valid.length;i++) {
         if (valid[i].motor === "on") motorOnSamples++;
@@ -639,7 +653,8 @@
         tankCapacityLitres:Number.isFinite(capacity) && capacity > 0 ? capacity : null,
         refillRiseEvents:refillRises, motorOnSamples,
         sampleWindowStart:valid[0].at, sampleWindowEnd:valid[valid.length-1].at,
-        dailyReadings:valid.filter((row,index)=>index===0 || index===valid.length-1 || index % Math.max(1,Math.floor(valid.length/35))===0).slice(0,40),
+        dailySummary,
+        sampleReadings:valid.filter((row,index)=>index===0 || index===valid.length-1 || index % Math.max(1,Math.floor(valid.length/35))===0).slice(0,40),
         localActivity:local,
         interpretation:"Cumulative observed level drops are an estimate, not a precise water-consumption measurement. Refills, gaps between readings and sensor noise can affect it. Litres are provided only when TANK_CAPACITY_LITRES is configured."
       };
