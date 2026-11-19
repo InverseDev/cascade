@@ -776,6 +776,7 @@ themeToggle.addEventListener("click", () => {
 
  
 // Read-only live context for the website's AI assistant.
+window.fetchLatestReading = fetchLatestReading;
 window.getCascadeAssistantContext = function () {
   return {
     waterLevelPercent: Number.isFinite(waterLevel) ? waterLevel : null,
