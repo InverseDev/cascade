@@ -136,6 +136,24 @@
     themeMenu.classList.toggle("enabled", dark);
   });
 
+  // Small confirmation toast shared by both threshold save controls.
+  function showSettingsSavedToast() {
+    let toast = document.getElementById("cascade-settings-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "cascade-settings-toast";
+      toast.setAttribute("role", "status");
+      toast.setAttribute("aria-live", "polite");
+      toast.textContent = "Settings saved";
+      document.body.appendChild(toast);
+    }
+    toast.classList.remove("visible");
+    void toast.offsetWidth;
+    toast.classList.add("visible");
+    clearTimeout(window.__cascadeSettingsToastTimer);
+    window.__cascadeSettingsToastTimer = setTimeout(() => toast.classList.remove("visible"), 1900);
+  }
+
   // Native save controls sit in the top-right corner of each threshold card.
   function addThresholdSave(cardSelector, inputId, label) {
     const card = document.querySelector(cardSelector);
@@ -159,6 +177,7 @@
         button.title = "Check that the minimum level is below the maximum level.";
         return;
       }
+      showSettingsSavedToast();
       try {
         const saved = JSON.parse(localStorage.getItem("cascade-dashboard-settings") || "null");
         const key = inputId === "cutoff" ? "cutoffLevel" : "lowWaterLevel";
