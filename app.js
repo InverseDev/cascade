@@ -413,8 +413,17 @@ async function fetchLatestReading() {
     const staleAfter = Number(CASCADE_CONFIG.STALE_AFTER_MS || 30000);
     const age = Number.isFinite(timestamp) ? Date.now() - timestamp : Infinity;
     const fresh = age >= -60000 && age <= staleAfter;
-    const reportedSensorStatus = String(row.sensor_status || "unknown").toLowerCase();
-    const declaredOnline = reportedSensorStatus === "online";
+    // Older ESP32 firmware uploads only the measurement fields and does not
+    // include sensor_status. A fresh, valid reading is itself proof that the
+    // device is communicating. Respect an explicit "offline" / "error" value,
+    // but do not reject rows merely because sensor_status is absent.
+    const hasReportedSensorStatus = row.sensor_status !== null &&
+      row.sensor_status !== undefined &&
+      String(row.sensor_status).trim() !== "";
+    const reportedSensorStatus = hasReportedSensorStatus
+      ? String(row.sensor_status).trim().toLowerCase()
+      : null;
+    const declaredOnline = !hasReportedSensorStatus || reportedSensorStatus === "online";
 
     waterLevel = Number.isFinite(level) && level >= 0 && level <= 100
       ? level : null;
