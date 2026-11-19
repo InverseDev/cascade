@@ -24,8 +24,9 @@ Project facts and limitations:
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
+    const allowedOrigin = ALLOWED_ORIGINS.has(origin);
     const cors = {
-      "Access-Control-Allow-Origin": origin === ALLOWED_ORIGIN ? origin : "null",
+      "Access-Control-Allow-Origin": allowedOrigin ? origin : "null",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
       "Vary": "Origin"
@@ -51,18 +52,18 @@ export default {
         lowWaterAlertPercent: Number.isFinite(Number(live.lowWaterAlertPercent)) ? Number(live.lowWaterAlertPercent) : null,
         maximumCutoffPercent: Number.isFinite(Number(live.maximumCutoffPercent)) ? Number(live.maximumCutoffPercent) : null
       }) : "No live dashboard sensor context is available.";
-      // Try the primary model first, then lighter stable models if Google reports temporary capacity pressure.
-      const models = ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.8-flash"];
+      // Use the supported Gemini generateContent REST API.
+      const models = ["gemini-3.5-flash-lite", "gemini-3.8-flash"];
       let upstream, data, usedModel = models[0];
+      const prompt = SYSTEM_PROMPT + "\\n\\nRESPONSE LANGUAGE (mandatory): " + languageName + ". Understand the visitor's message even if it is in another supported language, but answer in " + languageName + ".\\n\\nLIVE DASHBOARD CONTEXT (use this for questions about current water level, sensor, or pump; do not invent missing values):\\n" + liveContext + "\\n\\nRecent conversation:\\n" + history + "\\n\\nVisitor's latest message: " + message;
       for (let i = 0; i < models.length; i++) {
         usedModel = models[i];
-        upstream = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
+        upstream = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + usedModel + ":generateContent", {
           method: "POST",
           headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
           body: JSON.stringify({
-            model: usedModel,
-            generation_config: { thinking_level: "minimal", max_output_tokens: 512 },
-            input: SYSTEM_PROMPT + "\n\nRESPONSE LANGUAGE (mandatory): " + languageName + ". Understand the visitor's message even if it is in another supported language, but answer in " + languageName + ".\n\nLIVE DASHBOARD CONTEXT (use this for questions about current water level, sensor, or pump; do not invent missing values):\n" + liveContext + "\n\nRecent conversation:\n" + history + "\n\nVisitor's latest message: " + message
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: { maxOutputTokens: 512 }
           })
         });
         data = await upstream.json();
@@ -75,7 +76,10 @@ export default {
         detail: data.error?.message || "Unknown API error.",
         model: usedModel
       }, { status: 502, headers: cors });
-      const reply = data.output_text || (data.steps || []).filter(step => step.type === "model_output").flatMap(step => step.content || []).map(part => part.text || "").join("\n").trim();
+      const reply = (data.candidates || [])
+        .flatMap(candidate => candidate.content?.parts || [])
+        .map(part => part.text || "")
+        .join("\\n").trim();
       return Response.json({ reply: reply || "I couldn't form a response. Please try again." }, { headers: { ...cors, "Cache-Control": "no-store" } });
     } catch (error) {
       return Response.json({ error: "Assistant request failed.", detail: String(error) }, { status: 500, headers: cors });
