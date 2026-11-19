@@ -276,10 +276,12 @@ async function sendMotorCommand(command) {
     addActivity(message);
     const motorMessage = document.getElementById("motorMessage");
     if (motorMessage) motorMessage.textContent = message;
+    return true;
   } catch (error) {
     console.error("Cascade motor command error:", error);
     alert(error.message || "Could not send the motor command.");
     addActivity(`Motor ${command} command failed: ${error.message || "request error"}`);
+    return false;
   } finally {
     motorCommandInFlight = false;
     updateMotorControls();
