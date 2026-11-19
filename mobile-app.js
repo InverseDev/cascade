@@ -136,22 +136,43 @@
     themeMenu.classList.toggle("enabled", dark);
   });
 
-  // Small confirmation toast shared by both threshold save controls.
-  function showSettingsSavedToast(message = "Settings saved") {
+  // Green confirmation popup shared by the minimum and maximum save buttons.
+  function showSettingsSavedToast(message = "Settings saved", isError = false) {
     let toast = document.getElementById("cascade-settings-toast");
     if (!toast) {
       toast = document.createElement("div");
       toast.id = "cascade-settings-toast";
       toast.setAttribute("role", "status");
       toast.setAttribute("aria-live", "polite");
-      toast.textContent = message;
       document.body.appendChild(toast);
     }
-    toast.classList.remove("visible");
-    void toast.offsetWidth;
-    toast.classList.add("visible");
+    toast.textContent = message;
+    const important = (name, value) => toast.style.setProperty(name, value, "important");
+    important("position", "fixed");
+    important("z-index", "2147483647");
+    important("left", "50%");
+    important("bottom", "calc(96px + env(safe-area-inset-bottom, 0px))");
+    important("transform", "translate(-50%, 0)");
+    important("display", "block");
+    important("width", "max-content");
+    important("max-width", "calc(100vw - 40px)");
+    important("box-sizing", "border-box");
+    important("padding", "11px 18px");
+    important("border-radius", "999px");
+    important("border", "1px solid rgba(255,255,255,.16)");
+    important("background", isError ? "#8b3030" : "#16834a");
+    important("color", "#ffffff");
+    important("font", "600 14px/1.25 Montserrat, sans-serif");
+    important("text-align", "center");
+    important("box-shadow", "0 8px 26px rgba(0,0,0,.28)");
+    important("opacity", "1");
+    important("visibility", "visible");
+    important("pointer-events", "none");
     clearTimeout(window.__cascadeSettingsToastTimer);
-    window.__cascadeSettingsToastTimer = setTimeout(() => toast.classList.remove("visible"), 1900);
+    window.__cascadeSettingsToastTimer = setTimeout(() => {
+      important("opacity", "0");
+      important("visibility", "hidden");
+    }, 2100);
   }
 
   // Native save controls sit in the top-right corner of each threshold card.
@@ -168,13 +189,14 @@
     button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3h2Z"/><path d="M7 3v6h10V3M7 21v-8h10v8"/></svg>';
     header.appendChild(button);
     button.addEventListener("click", () => {
-      if (typeof window.saveSettings !== "function") { showSettingsSavedToast("Could not save settings"); return; }
+      if (typeof window.saveSettings !== "function") { showSettingsSavedToast("Could not save settings", true); return; }
       button.disabled = true;
       const savedSuccessfully = window.saveSettings();
       button.disabled = false;
       if (!savedSuccessfully) {
         button.classList.remove("saved");
         button.title = "Check that the minimum level is below the maximum level.";
+        showSettingsSavedToast("Check minimum and maximum levels", true);
         return;
       }
       showSettingsSavedToast();
