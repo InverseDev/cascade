@@ -380,23 +380,23 @@
   // Accept common 12-hour/24-hour time formats and Indian day/month/year dates.
   function parseAlarmTime(value) {
     const input = String(value || "").trim().toLowerCase().replace(/\./g, ":").replace(/\s+/g, " ");
-    let m = input.match(/\\b(\\d{1,2})(?::(\\d{1,2}))?\\s*(a\\.?m\\.?|p\\.?m\\.?)\\b/i);
+    let m = input.match(/\b(\d{1,2})(?::(\d{1,2}))?\s*(a\.?m\.?|p\.?m\.?)\b/i);
     if (m) {
       let hour = Number(m[1]);
       const minute = Number(m[2] || 0);
-      const meridiem = m[3].replace(/\\./g, "").toLowerCase();
+      const meridiem = m[3].replace(/\./g, "").toLowerCase();
       if (hour < 1 || hour > 12 || minute > 59) return null;
       if (meridiem === "pm" && hour !== 12) hour += 12;
       if (meridiem === "am" && hour === 12) hour = 0;
       return String(hour).padStart(2, "0") + ":" + String(minute).padStart(2, "0");
     }
-    m = input.match(/\\b(\\d{1,2}):(\\d{2})\\b/);
+    m = input.match(/\b(\d{1,2}):(\d{2})\b/);
     if (m) {
       const hour = Number(m[1]), minute = Number(m[2]);
       if (hour > 23 || minute > 59) return null;
       return String(hour).padStart(2, "0") + ":" + String(minute).padStart(2, "0");
     }
-    m = input.match(/\\b(\\d{1,2})\\s*(a\\.?m\\.?|p\\.?m\\.?)\\b/i);
+    m = input.match(/\b(\d{1,2})\s*(a\.?m\.?|p\.?m\.?)\b/i);
     if (m) return parseAlarmTime(m[1] + " " + m[2]);
     return null;
   }
@@ -404,22 +404,25 @@
   function parseAlarmDate(value) {
     const input = String(value || "").trim().toLowerCase();
     const now = new Date();
-    if (/\\btoday\\b/.test(input)) return new Date(now.getFullYear(), now.getMonth(), now.getDate()).toLocaleDateString("en-CA");
-    if (/\\btomorrow\\b/.test(input)) {
-      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    if (/\btoday\b/.test(input)) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+    }
+    if (/\btomorrow\b/.test(input)) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
       return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
     }
     let y, month, day, m;
-    if ((m = input.match(/\\b(\\d{4})[-/.](\\d{1,2})[-/.](\\d{1,2})\\b/))) {
+    if ((m = input.match(/\b(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})\b/))) {
       y=Number(m[1]); month=Number(m[2]); day=Number(m[3]);
-    } else if ((m = input.match(/\\b(\\d{1,2})[-/.](\\d{1,2})[-/.](\\d{4})\\b/))) {
+    } else if ((m = input.match(/\b(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})\b/))) {
       day=Number(m[1]); month=Number(m[2]); y=Number(m[3]);
     } else {
       const months = {jan:0,january:0,feb:1,february:1,mar:2,march:2,apr:3,april:3,may:4,jun:5,june:5,jul:6,july:6,aug:7,august:7,sep:8,sept:8,september:8,oct:9,october:9,nov:10,november:10,dec:11,december:11};
-      m = input.match(/\\b(\\d{1,2})\\s+([a-z]+)\\s+(\\d{4})\\b/i);
+      m = input.match(/\b(\d{1,2})\s+([a-z]+)\s+(\d{4})\b/i);
       if (m && Object.prototype.hasOwnProperty.call(months,m[2])) { day=Number(m[1]); month=months[m[2]]+1; y=Number(m[3]); }
       else {
-        m = input.match(/\\b([a-z]+)\\s+(\\d{1,2}),?\\s+(\\d{4})\\b/i);
+        m = input.match(/\b([a-z]+)\s+(\d{1,2}),?\s+(\d{4})\b/i);
         if (!m || !Object.prototype.hasOwnProperty.call(months,m[1])) return null;
         month=months[m[1]]+1; day=Number(m[2]); y=Number(m[3]);
       }
@@ -459,11 +462,8 @@
     if (pendingIntent?.type === "alarm-field") {
       const field = pendingIntent.field;
       if (field === "name") pendingIntent.alarm.name = text.trim();
-      if (field === "time" && /^([01]\d|2[0-3]):[0-5]\d$/.test(q)) pendingIntent.alarm.time = q;
-      if (field === "date" && /^(\d{4}-\d{2}-\d{2}|today|tomorrow)$/i.test(q)) {
-        const d = new Date(); if (q === "tomorrow") d.setDate(d.getDate()+1);
-        pendingIntent.alarm.date = q === "today" || q === "tomorrow" ? d.toLocaleDateString("en-CA") : q;
-      }
+      if (field === "time") { const parsedTime = parseAlarmTime(text); if (parsedTime) pendingIntent.alarm.time = parsedTime; }
+      if (field === "date") { const parsedDate = parseAlarmDate(text); if (parsedDate) pendingIntent.alarm.date = parsedDate; }
       if (field === "repeat" && /^(yes|daily|repeat)$/i.test(q)) pendingIntent.alarm.repeat = true;
       if (field === "repeat" && /^(no|once|one time)$/i.test(q)) pendingIntent.alarm.repeat = false;
       const a = pendingIntent.alarm;
@@ -571,11 +571,8 @@
       const alarm = { name:"", time:"", date:"", repeat:/daily|every day|repeat/.test(q) };
       const name = text.match(/alarm(?: called| named)?\s+["“]?([^,]+?)["”]?(?:\s+at\s+|$)/i);
       if (name && !/^for|^at$/i.test(name[1])) alarm.name = name[1].trim();
-      const time = text.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/);
-      if (time) alarm.time = time[1].padStart(2,"0")+":"+time[2];
-      if (/tomorrow/i.test(q)) { const d=new Date(); d.setDate(d.getDate()+1); alarm.date=d.toLocaleDateString("en-CA"); }
-      else if (/today/i.test(q)) alarm.date=new Date().toLocaleDateString("en-CA");
-      else { const date=text.match(/\b(20\d{2}-\d{2}-\d{2})\b/); if(date) alarm.date=date[1]; }
+      alarm.time = parseAlarmTime(text) || "";
+      alarm.date = parseAlarmDate(text) || "";
       if (/daily|every day/.test(q)) alarm.repeat = true;
       const missing = !alarm.name ? "name" : !alarm.time ? "time (e.g. 9:15pm, 9 AM or 21:15)" : (!alarm.date && !alarm.repeat) ? "date (e.g. 19/11/2026, 19-11-2026, 2026-11-19 or tomorrow)" : null;
       if (missing) { setPending({type:"alarm-field",field:missing.startsWith("name")?"name":missing.startsWith("time")?"time":"date",alarm}); return "I can create that. What is the alarm " + missing + "?"; }
