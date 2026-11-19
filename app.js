@@ -118,19 +118,16 @@ function updateDashboard() {
 
   const levelState = document.getElementById("levelState");
   if (levelState) {
-    levelState.textContent = waitingForReading ? "Waiting for sensor" :
-      !sensorOnline ? "Last reading · offline" :
+    levelState.textContent = waitingForReading ? "Awaiting reading" :
       pct <= lowWaterLevel ? "Low water" :
       pct >= cutoffLevel ? "High water" : "Healthy level";
   }
 
   const alertMessage = document.getElementById("alertMessage");
   if (alertMessage) {
-    if (!sensorOnline) {
-      alertMessage.textContent = waitingForReading
-        ? "Waiting for the first sensor reading."
-        : "⚠ Device offline. Showing the last received reading.";
-      alertMessage.classList.toggle("warning", !waitingForReading);
+    if (waitingForReading) {
+      alertMessage.textContent = "";
+      alertMessage.classList.remove("warning");
       previousLowState = false;
     } else if (pct <= lowWaterLevel) {
       alertMessage.textContent = "⚠ Minimum threshold reached. The pump start rule is set, but automatic starting is not active until ESP32 automation is implemented.";
@@ -154,7 +151,7 @@ function updateDashboard() {
     if (!latestReadingAt) sensorMeta.textContent = "No sensor reading received yet.";
     else {
       const time = new Date(latestReadingAt).toLocaleString();
-      sensorMeta.textContent = `${distanceText} · Last update: ${time}${sensorOnline ? " · live" : ` · offline: ${latestOfflineReason}`}`;
+      sensorMeta.textContent = `${distanceText} · Last update: ${time}`;
     }
   }
 }
@@ -177,7 +174,7 @@ function updateMotorControls() {
   if (authMessage) {
     if (!signedIn) authMessage.textContent = "Sign in with the owner account to enable motor commands.";
     else if (motorCommandInFlight) authMessage.textContent = "Sending command… waiting for the device channel.";
-    else if (!sensorOnline) authMessage.textContent = "Device is offline. ON is blocked; OFF can be sent when the device reconnects.";
+    else if (!sensorOnline) authMessage.textContent = "Fresh sensor data is required before motor ON can be enabled.";
     else if (waterLevel >= cutoffLevel) authMessage.textContent = `Tank is at or above ${cutoffLevel}%. Motor ON is blocked.`;
     else authMessage.textContent = "Owner account signed in. Commands are sent to the ESP32; status changes only after device feedback.";
   }
@@ -349,8 +346,7 @@ function setSensorOffline(message, state = "offline", label = "DEVICE OFFLINE") 
     previousConnectionState = state;
   }
   updateDashboard();
-  const sensorMeta = document.getElementById("sensorMeta");
-  if (sensorMeta && message) sensorMeta.textContent = message;
+  // Connectivity diagnostics stay internal; keep the reading area focused on measurements.
 }
 
 async function fetchLatestReading() {
@@ -433,8 +429,7 @@ async function fetchLatestReading() {
     latestReadingAt = Number.isFinite(timestamp) ? timestamp : null;
     sensorOnline = fresh && declaredOnline && waterLevel !== null;
 
-    // Keep the exact reason for an offline state visible while diagnosing
-    // device connectivity; this avoids silently masking a valid Supabase read.
+    // Keep connectivity diagnostics in the console; the dashboard stays focused on readings.
     const ageSeconds = Number.isFinite(age) ? Math.round(age / 1000) : "unknown";
     latestOfflineReason = !Number.isFinite(timestamp) ? "invalid created_at timestamp"
       : age < -60000 ? "database timestamp is more than 60s in the future"
