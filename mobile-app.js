@@ -137,14 +137,14 @@
   });
 
   // Small confirmation toast shared by both threshold save controls.
-  function showSettingsSavedToast() {
+  function showSettingsSavedToast(message = "Settings saved") {
     let toast = document.getElementById("cascade-settings-toast");
     if (!toast) {
       toast = document.createElement("div");
       toast.id = "cascade-settings-toast";
       toast.setAttribute("role", "status");
       toast.setAttribute("aria-live", "polite");
-      toast.textContent = "Settings saved";
+      toast.textContent = message;
       document.body.appendChild(toast);
     }
     toast.classList.remove("visible");
@@ -168,7 +168,7 @@
     button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3h2Z"/><path d="M7 3v6h10V3M7 21v-8h10v8"/></svg>';
     header.appendChild(button);
     button.addEventListener("click", () => {
-      if (typeof window.saveSettings !== "function") return;
+      if (typeof window.saveSettings !== "function") { showSettingsSavedToast("Could not save settings"); return; }
       button.disabled = true;
       const savedSuccessfully = window.saveSettings();
       button.disabled = false;
