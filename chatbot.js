@@ -202,7 +202,7 @@
       list: () => readAlarms().map(item=>({...item})),
       create({name,time,date=null,repeat=false}) {
         const clean=String(name||"").trim().slice(0,80);
-        if(!clean || !/^([01]\\d|2[0-3]):[0-5]\\d$/.test(String(time||""))) throw new Error("A name and valid time are required.");
+        if(!clean || !/^([01]\d|2[0-3]):[0-5]\d$/.test(String(time||""))) throw new Error("A name and valid time are required.");
         const selected=repeat?null:String(date||new Date().toLocaleDateString("en-CA"));
         if(!repeat) { const at=new Date(selected+"T"+time+":00"); if(Number.isNaN(at.getTime())||at<=new Date()) throw new Error("Please choose a future date and time."); }
         const alarm={id:Date.now().toString()+Math.random().toString(36).slice(2,6),name:clean,time,date:selected,repeat:!!repeat,enabled:true,createdAt:new Date().toISOString()};
