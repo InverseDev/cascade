@@ -841,7 +841,7 @@
     }
     const alarmCreate = /\b(create|add|schedule|set|make)\b.*\b(alarm|reminder)\b/.test(q)
       || /\b(alarm|reminder)\b.*\b(create|add|set|schedule|for|at)\b/.test(q)
-      || /\b(remind me|remind me to)\b/.test(q)
+      || /\b(remind me|remind me to|reminder to|reminder for|notify me to|notify me when|alert me to|alert me when|wake me up)\b/.test(q)
       || /मुझे याद दिला|याद दिलाना|अलार्म लगाओ|অ্যালার্ম দাও|মনে করিয়ে দিও/.test(q);
     if (alarmCreate) {
       const alarm = {name:"",time:parseAlarmTime(text)||"",date:parseAlarmDate(text)||"",repeat:/\b(daily|every day|everyday|प्रतिदिन|প্রতিদিন)\b/.test(q)};
