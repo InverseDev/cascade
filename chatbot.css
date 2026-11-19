@@ -256,3 +256,16 @@ body.dark-mode #cascade-chat .cascade-language-menu{border-color:rgba(116,188,22
 }
 @media(max-height:520px) and (max-width:600px){#cascade-chat .cascade-chat-panel,#cascade-chat .cascade-chat-panel.open{height:calc(100dvh - 20px)!important}}
 @media(prefers-reduced-motion:reduce){#cascade-chat .cascade-chat-close,#cascade-chat .cascade-chat-form button,#cascade-chat .cascade-chat-suggestions button{transition:none!important}}
+
+
+/* Cascade AI report attachment control */
+#cascade-chat .cascade-chat-attach{
+  flex:0 0 40px;width:40px;height:42px;border:1px solid var(--chat-border,rgba(110,170,200,.25));
+  border-radius:13px;background:rgba(112,178,205,.10);color:var(--chat-text,#4b829d);
+  font-size:24px;line-height:1;display:grid;place-items:center;cursor:pointer;
+  transition:background .18s ease,transform .18s ease;
+}
+#cascade-chat .cascade-chat-attach:hover{background:rgba(69,164,194,.18);transform:translateY(-1px)}
+#cascade-chat .cascade-chat-attach:disabled{opacity:.55;cursor:wait}
+body.dark-mode #cascade-chat .cascade-chat-attach{border-color:rgba(112,185,220,.24);color:#c7edff;background:rgba(36,93,119,.45)}
+@media(max-width:600px){#cascade-chat .cascade-chat-attach{flex-basis:38px;width:38px;height:40px}}
