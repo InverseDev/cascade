@@ -1,5 +1,12 @@
 // Cascade AI Worker — Cloudflare Git-connected deployment entry point.
-const ALLOWED_ORIGIN = "https://inversedev.github.io";
+const ALLOWED_ORIGINS = new Set([
+  "https://inversedev.github.io",
+  // Capacitor Android WebView serves the bundled app from https://localhost.
+  "https://localhost",
+  "http://localhost",
+  // Keep iOS Capacitor builds compatible if the app is shipped there later.
+  "capacitor://localhost"
+]);
 const SYSTEM_PROMPT = `You are Cascade Assistant, a conversational assistant embedded in the Cascade smart water monitoring website.
 The assistant supports English, Hindi (हिन्दी), and Bengali (বাংলা). You MUST understand Hindi and Bengali when typed in Latin/Roman letters as well as native scripts. Romanized Hindi is often called Hinglish and Romanized Bengali is often called Banglish. Do not mistake these for English or ask the visitor to change keyboard/script. Understand informal spelling variations, missing diacritics, phonetic spellings, abbreviations, typos, and mixed English + Hindi/Bengali in the same sentence. Infer the intended meaning from context rather than requiring exact transliteration.
 Examples of Romanized Hindi: "paani kitna hai", "tank bhar gaya kya", "motor chalu karo", "low water alert 10 percent pe set kar do", "mujhe history dikhao", "kal alarm laga do".
@@ -24,7 +31,7 @@ export default {
       "Vary": "Origin"
     };
     if (request.method === "OPTIONS") return new Response(null, { headers: cors });
-    if (origin !== ALLOWED_ORIGIN) return new Response("Forbidden", { status: 403, headers: cors });
+    if (!allowedOrigin) return new Response("Forbidden", { status: 403, headers: cors });
     if (request.method !== "POST") return new Response("Method not allowed", { status: 405, headers: cors });
     if (!env.GEMINI_API_KEY) return Response.json({ error: "Missing GEMINI_API_KEY secret." }, { status: 503, headers: cors });
     try {
