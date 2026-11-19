@@ -173,6 +173,50 @@
     if (event.key === "Escape") closeLanguageMenu();
   });
   refreshLanguageMenu();
+  // Alarm API fallback for pages that do not load alarms.js (Dashboard and History).
+  // Uses the same local storage schema and native notification plugin.
+  if (!window.CascadeAlarms) {
+    const alarmKey = "cascade_scheduled_alarms";
+    const readAlarms = () => { try { const value = JSON.parse(localStorage.getItem(alarmKey) || "[]"); return Array.isArray(value) ? value : []; } catch (_) { return []; } };
+    const writeAlarms = value => localStorage.setItem(alarmKey, JSON.stringify(value));
+    const nativeNotifications = () => window.Capacitor?.isNativePlatform?.()
+      ? (window.Capacitor.registerPlugin?.("LocalNotifications") || window.Capacitor.Plugins?.LocalNotifications)
+      : null;
+    const notificationId = id => { let hash=0; for (const ch of String(id)) hash=(hash*31+ch.charCodeAt(0))|0; return 200000+(Math.abs(hash)%1000000000); };
+    const cancelNative = async id => { const plugin=nativeNotifications(); if(plugin) try { await plugin.cancel({notifications:[{id:notificationId(id)}]}); } catch (_) {} };
+    const syncNative = async alarm => {
+      const plugin=nativeNotifications(); if(!plugin || !alarm.enabled) return;
+      try {
+        const permission=await plugin.checkPermissions();
+        if(permission.display!=="granted") return;
+        if(plugin.createChannel) await plugin.createChannel({id:"cascade-alerts",name:"Cascade alerts",description:"Water level and pump alerts",importance:4});
+        await cancelNative(alarm.id);
+        const [hour,minute]=alarm.time.split(":").map(Number);
+        let schedule;
+        if(alarm.repeat) schedule={on:{hour,minute},allowWhileIdle:true};
+        else { const at=new Date(String(alarm.date)+"T"+alarm.time+":00"); if(at<=new Date()) return; schedule={at,allowWhileIdle:true}; }
+        await plugin.schedule({notifications:[{id:notificationId(alarm.id),title:alarm.name||"Cascade reminder",body:"Your scheduled Cascade reminder.",schedule,channelId:"cascade-alerts"}]});
+      } catch(error) { console.warn("Cascade AI alarm notification sync failed:",error); }
+    };
+    window.CascadeAlarms = {
+      list: () => readAlarms().map(item=>({...item})),
+      create({name,time,date=null,repeat=false}) {
+        const clean=String(name||"").trim().slice(0,80);
+        if(!clean || !/^([01]\\d|2[0-3]):[0-5]\\d$/.test(String(time||""))) throw new Error("A name and valid time are required.");
+        const selected=repeat?null:String(date||new Date().toLocaleDateString("en-CA"));
+        if(!repeat) { const at=new Date(selected+"T"+time+":00"); if(Number.isNaN(at.getTime())||at<=new Date()) throw new Error("Please choose a future date and time."); }
+        const alarm={id:Date.now().toString()+Math.random().toString(36).slice(2,6),name:clean,time,date:selected,repeat:!!repeat,enabled:true,createdAt:new Date().toISOString()};
+        const all=readAlarms(); all.push(alarm); writeAlarms(all); syncNative(alarm); return {...alarm};
+      },
+      remove(id) { const all=readAlarms(), found=all.find(item=>String(item.id)===String(id)); if(!found)return false; writeAlarms(all.filter(item=>String(item.id)!==String(id))); cancelNative(id); return true; },
+      update(id,changes={}) {
+        const all=readAlarms(), index=all.findIndex(item=>String(item.id)===String(id)); if(index<0)throw new Error("I couldn't find that alarm.");
+        const next={...all[index],...changes};
+        if(!next.repeat) { const at=new Date(String(next.date)+"T"+next.time+":00"); if(Number.isNaN(at.getTime())||at<=new Date())throw new Error("The updated alarm must be in the future."); }
+        all[index]=next; writeAlarms(all); cancelNative(id); syncNative(next); return {...next};
+      }
+    };
+  }
   let busy = false;
 
   const uiText = {
@@ -622,10 +666,7 @@
       if (missing) { setPending({ type:"alarm-field", field: missing.startsWith("name") ? "name" : missing.startsWith("time") ? "time" : "date", alarm:a }); return "Got it. What is the alarm " + missing + "?"; }
       setPending(null);
       try {
-        const created = window.CascadeAlarms
-          ? window.CascadeAlarms.create({ name:a.name, time:a.time, date:a.date, repeat:!!a.repeat })
-          : null;
-        if (!created) throw new Error("Alarm Centre is still loading. Please try again.");
+        const created = window.CascadeAlarms.create({ name:a.name, time:a.time, date:a.date, repeat:!!a.repeat });
         return "Created “" + created.name + "” for " + created.time + (created.repeat ? " every day." : " on " + created.date + ".") + " Your device notification schedule has been updated where permission is available.";
       } catch (error) { return error.message || "I couldn't create that alarm."; }
     }
