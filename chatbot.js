@@ -606,7 +606,7 @@
       select:"device_id,distance_cm,water_level_percent,motor_status,sensor_status,created_at",
       device_id:"eq." + String(config.DEVICE_ID || "cascade-esp32-01"),
       created_at:"gte." + from,
-      order:"created_at.asc",
+      order:"created_at.desc",
       limit:"5000"
     });
     const headers = { apikey:key, Accept:"application/json" };
@@ -617,7 +617,8 @@
       const rows = await response.json();
       const valid = (Array.isArray(rows) ? rows : []).filter(row => Number.isFinite(Number(row.water_level_percent)) && row.water_level_percent !== null)
         .map(row => ({ at:row.created_at, level:Number(row.water_level_percent), motor:String(row.motor_status || "unknown").toLowerCase(), distance:row.distance_cm === null ? null : Number(row.distance_cm) }))
-        .filter(row => row.level >= 0 && row.level <= 100 && Number.isFinite(Date.parse(row.at)));
+        .filter(row => row.level >= 0 && row.level <= 100 && Number.isFinite(Date.parse(row.at)))
+        .sort((a,b)=>Date.parse(a.at)-Date.parse(b.at));
       const local = (() => { try { return JSON.parse(localStorage.getItem("fluidops_full_history") || "[]"); } catch (_) { return []; } })()
         .filter(item => Date.parse(item.timestamp) >= Date.now() - days * 86400000)
         .slice(0, 80);
@@ -654,7 +655,11 @@
       }
       const capacity = Number(config.TANK_CAPACITY_LITRES);
       const summary = {
-        periodDays:days, sensorRows:valid.length,
+        periodDays:days, sensorRows:valid.length, queryRowLimit:5000,
+        requestedWindowStart:from, requestedWindowEnd:new Date().toISOString(),
+        coverageStart:valid[0].at, coverageEnd:valid[valid.length-1].at,
+        coverageDays:Number(((Date.parse(valid[valid.length-1].at)-Date.parse(valid[0].at))/86400000).toFixed(2)),
+        coverageComplete:Date.parse(valid[0].at) <= Date.parse(from) + 86400000,
         firstReading:{ at:valid[0].at, levelPercent:valid[0].level },
         latestReading:{ at:valid[valid.length-1].at, levelPercent:valid[valid.length-1].level },
         netLevelChangePercentagePoints:Number((valid[valid.length-1].level-valid[0].level).toFixed(2)),
