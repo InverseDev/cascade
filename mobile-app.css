@@ -587,3 +587,68 @@ html.cascade-native-app body.dark-mode #cascade-chat .cascade-language-menu {
   background:#17364e !important;
 }
 html.cascade-native-app body.dark-mode #cascade-chat .cascade-language-option { color:#e4f5fc !important; }
+
+
+/* Final Android fixes: force a fully dark assistant canvas and tidy threshold cards. */
+html.cascade-native-app body.dark-mode #cascade-chat,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-panel,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-messages,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-welcome,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-form,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-foot {
+  background-color:#0d1d2e !important;
+}
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-panel {
+  background:linear-gradient(150deg,#10263a,#0d1d2e) !important;
+}
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-messages {
+  background:linear-gradient(150deg,#0d1d2e,#142b40) !important;
+}
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-welcome,
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-welcome * {
+  color:#dceefa !important;
+}
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-form {
+  border-top:1px solid #29445b !important;
+}
+html.cascade-native-app body.dark-mode #cascade-chat .cascade-chat-form input {
+  background:#1a354b !important;
+}
+html.cascade-native-app .setting-card > .subtle-btn,
+html.cascade-native-app .alert-card > .subtle-btn {
+  display:none !important;
+}
+
+/* Keep the System Alerts heading and its label strictly horizontal on Android. */
+html.cascade-native-app .alarm-panel-heading {
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  writing-mode:horizontal-tb !important;
+  text-orientation:mixed !important;
+}
+html.cascade-native-app .alarm-panel-heading > div:last-child {
+  display:block !important;
+  flex:1 1 auto !important;
+  width:auto !important;
+  min-width:0 !important;
+  writing-mode:horizontal-tb !important;
+  text-orientation:mixed !important;
+}
+html.cascade-native-app .alarm-panel-heading h2 {
+  display:block !important;
+  width:auto !important;
+  max-width:100% !important;
+  white-space:normal !important;
+  writing-mode:horizontal-tb !important;
+  text-orientation:mixed !important;
+  overflow-wrap:normal !important;
+}
+html.cascade-native-app .alarm-panel-icon {
+  display:grid !important;
+  flex:0 0 38px !important;
+  width:38px !important;
+  height:38px !important;
+}
