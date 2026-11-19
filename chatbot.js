@@ -308,6 +308,7 @@
     el.textContent = text;
     messages.appendChild(el);
     messages.scrollTop = messages.scrollHeight;
+    if (!el.classList.contains("typing")) persistConversation();
     return el;
   }
   function addTyping() {
@@ -395,13 +396,37 @@
     }, { once: true });
     no.addEventListener("click", () => { addMessage("No changes made.", "bot"); actions.remove(); }, { once: true });
   }
-  // Conversation content and pending follow-up context exist only in memory.
-  // A page refresh starts a fresh assistant conversation.
-  const CHAT_LOG_KEY = "cascade-assistant-chat-v1";
-  const CHAT_PENDING_KEY = "cascade-assistant-pending-v1";
-  try { localStorage.removeItem(CHAT_LOG_KEY); localStorage.removeItem(CHAT_PENDING_KEY); } catch (_) {}
+  // Keep a short assistant session across same-origin page navigation.
+  const CHAT_LOG_KEY = "cascade-assistant-chat-v2";
+  const CHAT_PENDING_KEY = "cascade-assistant-pending-v2";
   let pendingIntent = null;
-  function setPending(intent) { pendingIntent = intent; }
+  try { pendingIntent = JSON.parse(sessionStorage.getItem(CHAT_PENDING_KEY) || "null"); } catch (_) {}
+  function persistConversation() {
+    try {
+      const saved = [...messages.querySelectorAll(".cascade-chat-message:not(.typing)")].slice(-24)
+        .filter(node => !node.querySelector(".cascade-chat-confirm"))
+        .map(node => ({ who:node.classList.contains("user") ? "user" : "bot", text:node.textContent }));
+      sessionStorage.setItem(CHAT_LOG_KEY, JSON.stringify(saved));
+    } catch (_) {}
+  }
+  function setPending(intent) {
+    pendingIntent = intent;
+    try { if (intent) sessionStorage.setItem(CHAT_PENDING_KEY, JSON.stringify(intent)); else sessionStorage.removeItem(CHAT_PENDING_KEY); } catch (_) {}
+  }
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(CHAT_LOG_KEY) || "[]");
+    if (Array.isArray(saved) && saved.length) {
+      messages.querySelector(".cascade-chat-welcome")?.remove();
+      messages.querySelector(".cascade-chat-suggestions")?.remove();
+      saved.forEach(item => {
+        const node = document.createElement("div");
+        node.className = "cascade-chat-message " + (item.who === "user" ? "user" : "bot");
+        node.textContent = String(item.text || "");
+        messages.appendChild(node);
+      });
+      messages.scrollTop = messages.scrollHeight;
+    }
+  } catch (_) {}
 
   function pageName() {
     const path = location.pathname.toLowerCase();
@@ -887,6 +912,7 @@
       console.error("Cascade assistant:", error);
     } finally {
       typing.classList.remove("typing");
+      persistConversation();
       busy = false;
 
       messages.scrollTop = messages.scrollHeight;
