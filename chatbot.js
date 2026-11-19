@@ -397,36 +397,16 @@
     no.addEventListener("click", () => { addMessage("No changes made.", "bot"); actions.remove(); }, { once: true });
   }
   // Keep a short assistant session across same-origin page navigation.
-  const CHAT_LOG_KEY = "cascade-assistant-chat-v2";
-  const CHAT_PENDING_KEY = "cascade-assistant-pending-v2";
-  let pendingIntent = null;
-  try { pendingIntent = JSON.parse(sessionStorage.getItem(CHAT_PENDING_KEY) || "null"); } catch (_) {}
-  function persistConversation() {
-    try {
-      const saved = [...messages.querySelectorAll(".cascade-chat-message:not(.typing)")].slice(-24)
-        .filter(node => !node.querySelector(".cascade-chat-confirm"))
-        .map(node => ({ who:node.classList.contains("user") ? "user" : "bot", text:node.textContent }));
-      sessionStorage.setItem(CHAT_LOG_KEY, JSON.stringify(saved));
-    } catch (_) {}
-  }
-  function setPending(intent) {
-    pendingIntent = intent;
-    try { if (intent) sessionStorage.setItem(CHAT_PENDING_KEY, JSON.stringify(intent)); else sessionStorage.removeItem(CHAT_PENDING_KEY); } catch (_) {}
-  }
+  // Chat messages are intentionally not persisted. A fresh page load starts a clean chat.
   try {
-    const saved = JSON.parse(sessionStorage.getItem(CHAT_LOG_KEY) || "[]");
-    if (Array.isArray(saved) && saved.length) {
-      messages.querySelector(".cascade-chat-welcome")?.remove();
-      messages.querySelector(".cascade-chat-suggestions")?.remove();
-      saved.forEach(item => {
-        const node = document.createElement("div");
-        node.className = "cascade-chat-message " + (item.who === "user" ? "user" : "bot");
-        node.textContent = String(item.text || "");
-        messages.appendChild(node);
-      });
-      messages.scrollTop = messages.scrollHeight;
-    }
+    sessionStorage.removeItem("cascade-assistant-chat-v1");
+    sessionStorage.removeItem("cascade-assistant-chat-v2");
+    sessionStorage.removeItem("cascade-assistant-pending-v1");
+    sessionStorage.removeItem("cascade-assistant-pending-v2");
   } catch (_) {}
+  let pendingIntent = null;
+  function persistConversation() { /* intentionally disabled: chat history is not saved */ }
+  function setPending(intent) { pendingIntent = intent; }
 
   function pageName() {
     const path = location.pathname.toLowerCase();
@@ -535,22 +515,25 @@
     const input = String(value || "").trim().toLowerCase().replace(/\./g, ":").replace(/\s+/g, " ");
     let m = input.match(/\b(\d{1,2})(?::(\d{1,2}))?\s*(a\.?m\.?|p\.?m\.?)\b/i);
     if (m) {
-      let hour = Number(m[1]);
-      const minute = Number(m[2] || 0);
+      let hour = Number(m[1]), minute = Number(m[2] || 0);
       const meridiem = m[3].replace(/\./g, "").toLowerCase();
       if (hour < 1 || hour > 12 || minute > 59) return null;
       if (meridiem === "pm" && hour !== 12) hour += 12;
       if (meridiem === "am" && hour === 12) hour = 0;
-      return String(hour).padStart(2, "0") + ":" + String(minute).padStart(2, "0");
+      return String(hour).padStart(2,"0") + ":" + String(minute).padStart(2,"0");
     }
     m = input.match(/\b(\d{1,2}):(\d{2})\b/);
     if (m) {
-      const hour = Number(m[1]), minute = Number(m[2]);
-      if (hour > 23 || minute > 59) return null;
-      return String(hour).padStart(2, "0") + ":" + String(minute).padStart(2, "0");
+      const hour=Number(m[1]), minute=Number(m[2]);
+      if(hour>23||minute>59)return null;
+      return String(hour).padStart(2,"0")+":"+String(minute).padStart(2,"0");
     }
-    m = input.match(/\b(\d{1,2})\s*(a\.?m\.?|p\.?m\.?)\b/i);
-    if (m) return parseAlarmTime(m[1] + " " + m[2]);
+    m = input.match(/\b(?:at|around|by)\s+(\d{1,2})(?:\s*(?:o'?clock|baje|ta))?\b|\b(\d{1,2})\s*(?:o'?clock|baje|ta)\b/i);
+    if (m) {
+      const hour=Number(m[1] || m[2]);
+      if(hour<0||hour>23)return null;
+      return String(hour).padStart(2,"0")+":00";
+    }
     return null;
   }
 
@@ -712,20 +695,28 @@
       if (/\b(cancel|never mind|nevermind)\b/.test(q)) { setPending(null); return "Cancelled. No setting was changed."; }
     }
     if (pendingIntent?.type === "alarm-field") {
-      const field = pendingIntent.field;
-      if (field === "name") pendingIntent.alarm.name = text.trim();
-      if (field === "time") { const parsedTime = parseAlarmTime(text); if (parsedTime) pendingIntent.alarm.time = parsedTime; }
-      if (field === "date") { const parsedDate = parseAlarmDate(text); if (parsedDate) pendingIntent.alarm.date = parsedDate; }
-      if (field === "repeat" && /^(yes|daily|repeat)$/i.test(q)) pendingIntent.alarm.repeat = true;
-      if (field === "repeat" && /^(no|once|one time)$/i.test(q)) pendingIntent.alarm.repeat = false;
       const a = pendingIntent.alarm;
-      const missing = !a.name ? "name" : !a.time ? "time (e.g. 9:15pm, 9 AM or 21:15)" : (!a.date && !a.repeat) ? "date (e.g. 19/11/2026, 19-11-2026, 2026-11-19 or tomorrow)" : null;
-      if (missing) { setPending({ type:"alarm-field", field: missing.startsWith("name") ? "name" : missing.startsWith("time") ? "time" : "date", alarm:a }); return "Got it. What is the alarm " + missing + "?"; }
+      const suppliedTime = parseAlarmTime(text);
+      const suppliedDate = parseAlarmDate(text);
+      if (suppliedTime) a.time = suppliedTime;
+      if (suppliedDate) a.date = suppliedDate;
+      if (/\b(daily|every day|everyday|प्रतिदिन|প্রতিদিন)\b/i.test(q)) a.repeat = true;
+      else if (/\b(once|one time|not daily|no repeat)\b/i.test(q)) a.repeat = false;
+      if (/\b(cancel|never mind|nevermind)\b/i.test(q)) { setPending(null); return "Cancelled. No alarm was created."; }
+      if (!a.name && !suppliedTime && !suppliedDate && !/^(yes|no|daily|repeat|once)$/i.test(q)) a.name = text.trim().replace(/^(please\s+)?(remind me to|reminder to|alarm for)\s+/i,"").slice(0,80);
+      if (!a.time) { setPending({type:"alarm-field",field:"time",alarm:a}); return "Sure — what time should I remind you? You can reply “7”, “7:30 PM” or “tomorrow at 8”."; }
+      if (!a.date && !a.repeat) {
+        const [hour,minute]=a.time.split(":").map(Number);
+        const now=new Date(), target=new Date(); target.setHours(hour,minute,0,0);
+        if(target<=now)target.setDate(target.getDate()+1);
+        a.date=target.getFullYear()+"-"+String(target.getMonth()+1).padStart(2,"0")+"-"+String(target.getDate()).padStart(2,"0");
+      }
+      if (!a.name) a.name="Reminder";
       setPending(null);
-      try {
-        const created = window.CascadeAlarms.create({ name:a.name, time:a.time, date:a.date, repeat:!!a.repeat });
-        return "Created “" + created.name + "” for " + created.time + (created.repeat ? " every day." : " on " + created.date + ".") + " Your device notification schedule has been updated where permission is available.";
-      } catch (error) { return error.message || "I couldn't create that alarm."; }
+      return confirmAction("Create “"+a.name+"” for "+a.time+(a.repeat?" every day":" on "+a.date)+"?",()=>{
+        const created=window.CascadeAlarms.create({name:a.name,time:a.time,date:a.date,repeat:!!a.repeat});
+        return "Created “"+created.name+"” for "+created.time+(created.repeat?" every day.":" on "+created.date)+" Your reminder is scheduled where notification permission is available.";
+      });
     }
 
     if (/^(hi|hello|hey|namaste|नमस्ते|नमस्कार|নমস্কার|হ্যালো)[.!?,\s]*$/i.test(q)) return assistantLanguage === "hi" ? "नमस्ते! मैं डैशबोर्ड सेटिंग, अलर्ट, हिस्ट्री और पंप नियंत्रण में मदद कर सकता हूँ।" : assistantLanguage === "bn" ? "নমস্কার! ড্যাশবোর্ড সেটিংস, অ্যালার্ট, ইতিহাস এবং পাম্প নিয়ন্ত্রণে সাহায্য করতে পারি।" : "Hello! I can manage dashboard preferences, navigate pages, create alarms, filter or export history, change themes and help with pump controls.";
@@ -842,31 +833,32 @@
         catch (error) { return error.message; }
       });
     }
-    const alarmCreate = /\b(create|add|schedule|set up|set)\b.*\balarm\b/.test(q) || /\b(alarm|reminder)\b.*\b(set|create|schedule)\b/.test(q) || /\bremind me\b/.test(q);
+    const alarmCreate = /\b(create|add|schedule|set|make)\b.*\b(alarm|reminder)\b/.test(q)
+      || /\b(alarm|reminder)\b.*\b(create|add|set|schedule|for|at)\b/.test(q)
+      || /\b(remind me|remind me to)\b/.test(q)
+      || /मुझे याद दिला|याद दिलाना|अलार्म लगाओ|অ্যালার্ম দাও|মনে করিয়ে দিও/.test(q);
     if (alarmCreate) {
-      const alarm = { name:"", time:"", date:"", repeat:/daily|every day|repeat/.test(q) };
-      const name = text.match(/\balarm\s+(?:called|named)\s+["“]?(.+?)["”]?(?=\s+(?:at|on)\b|$)/i)
-        || text.match(/\balarm\s+for\s+(.+?)(?=\s+(?:at|on)\b|$)/i)
-        || text.match(/\bremind me to\s+(.+?)(?=\s+(?:at|on|tomorrow|today)\b|$)/i);
-      if (name) {
-        const proposedName = name[1].trim().replace(/[“”"]/g, "");
-        alarm.name = parseAlarmTime(proposedName) ? "Cascade reminder" : proposedName;
+      const alarm = {name:"",time:parseAlarmTime(text)||"",date:parseAlarmDate(text)||"",repeat:/\b(daily|every day|everyday|प्रतिदिन|প্রতিদিন)\b/.test(q)};
+      const nameMatch = text.match(/\b(?:remind me to|remind me about|reminder to|alarm called|alarm named|alarm for|remind me)\s+(.+?)(?=\s+(?:at|on|tomorrow|today|daily|every day)\b|$)/i);
+      if(nameMatch) {
+        const candidate=nameMatch[1].trim().replace(/^[“"]|[”"]$/g,"");
+        if(!parseAlarmTime(candidate) && !parseAlarmDate(candidate)) alarm.name=candidate.slice(0,80);
       }
-      alarm.time = parseAlarmTime(text) || "";
-      alarm.date = parseAlarmDate(text) || "";
-      if (!alarm.name && alarm.time) alarm.name = "Cascade reminder";
-      if (/daily|every day/.test(q)) alarm.repeat = true;
-      if (alarm.time && !alarm.date && !alarm.repeat) {
-        const [hour,minute] = alarm.time.split(":").map(Number);
-        const now = new Date();
-        const target = new Date(); target.setHours(hour,minute,0,0);
-        if (target <= now) target.setDate(target.getDate()+1);
-        alarm.date = target.getFullYear()+"-"+String(target.getMonth()+1).padStart(2,"0")+"-"+String(target.getDate()).padStart(2,"0");
+      if(!alarm.time) {
+        setPending({type:"alarm-field",field:"time",alarm});
+        return "Sure — what time should I remind you? You can say “7”, “8:30 PM” or “tomorrow at 9”.";
       }
-      const missing = !alarm.name ? "name" : !alarm.time ? "time (e.g. 9:15pm, 9 AM or 21:15)" : (!alarm.date && !alarm.repeat) ? "date (e.g. 19/11/2026, 19-11-2026, 2026-11-19 or tomorrow)" : null;
-      if (missing) { setPending({type:"alarm-field",field:missing.startsWith("name")?"name":missing.startsWith("time")?"time":"date",alarm}); return "I can create that. What is the alarm " + missing + "?"; }
-      setPending({type:"alarm-field",field:"repeat",alarm});
-      return "Should “" + alarm.name + "” repeat every day? Reply yes or no.";
+      if(!alarm.date && !alarm.repeat) {
+        const [hour,minute]=alarm.time.split(":").map(Number);
+        const now=new Date(),target=new Date();target.setHours(hour,minute,0,0);
+        if(target<=now)target.setDate(target.getDate()+1);
+        alarm.date=target.getFullYear()+"-"+String(target.getMonth()+1).padStart(2,"0")+"-"+String(target.getDate()).padStart(2,"0");
+      }
+      if(!alarm.name)alarm.name="Reminder";
+      return confirmAction("Create “"+alarm.name+"” for "+alarm.time+(alarm.repeat?" every day":" on "+alarm.date)+"?",()=>{
+        const created=window.CascadeAlarms.create({name:alarm.name,time:alarm.time,date:alarm.date,repeat:!!alarm.repeat});
+        return "Created “"+created.name+"” for "+created.time+(created.repeat?" every day.":" on "+created.date)+" Your reminder is scheduled where notification permission is available.";
+      });
     }
     if (/\b(delete|remove|cancel)\b.*\balarm\b/.test(q)) {
       const alarms = JSON.parse(localStorage.getItem("cascade_scheduled_alarms") || "[]");
