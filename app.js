@@ -4,7 +4,7 @@ let waterLevel = null;
 let distanceCm = null;
 let motorStatus = "unknown";
 let sensorOnline = false;
-let latestReadingAt = null;
+let latestReadingAt = null;\nlet latestOfflineReason = "waiting for first reading";
 let cutoffLevel = 90;
 let lowWaterLevel = 20;
 let previousLowState = false;
@@ -153,7 +153,7 @@ function updateDashboard() {
     if (!latestReadingAt) sensorMeta.textContent = "No sensor reading received yet.";
     else {
       const time = new Date(latestReadingAt).toLocaleString();
-      sensorMeta.textContent = `${distanceText} · Last update: ${time}${sensorOnline ? "" : " · stale/offline"}`;
+      sensorMeta.textContent = `${distanceText} · Last update: ${time}${sensorOnline ? " · live" : ` · offline: ${latestOfflineReason}`}`;
     }
   }
 }
@@ -431,6 +431,22 @@ async function fetchLatestReading() {
       ? distance : null;
     latestReadingAt = Number.isFinite(timestamp) ? timestamp : null;
     sensorOnline = fresh && declaredOnline && waterLevel !== null;
+
+    // Keep the exact reason for an offline state visible while diagnosing
+    // device connectivity; this avoids silently masking a valid Supabase read.
+    const ageSeconds = Number.isFinite(age) ? Math.round(age / 1000) : "unknown";
+    latestOfflineReason = !Number.isFinite(timestamp) ? "invalid created_at timestamp"
+      : age < -60000 ? "database timestamp is more than 60s in the future"
+      : age > staleAfter ? `latest row is ${ageSeconds}s old (limit ${Math.round(staleAfter / 1000)}s)`
+      : !declaredOnline ? `sensor_status is "${reportedSensorStatus}"`
+      : waterLevel === null ? `invalid water_level_percent: ${String(row.water_level_percent)}`
+      : "none";
+    console.info("[CASCADE] Supabase reading diagnostic", {
+      deviceId: row.device_id, created_at: row.created_at, ageSeconds,
+      staleAfterSeconds: Math.round(staleAfter / 1000),
+      sensor_status: row.sensor_status, water_level_percent: row.water_level_percent,
+      fresh, declaredOnline, sensorOnline, offlineReason
+    });
 
     const reportedMotorStatus = String(row.motor_status || "unknown").toLowerCase();
     motorStatus = sensorOnline && ["on", "off"].includes(reportedMotorStatus)
