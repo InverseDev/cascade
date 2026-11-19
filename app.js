@@ -445,7 +445,7 @@ async function fetchLatestReading() {
       deviceId: row.device_id, created_at: row.created_at, ageSeconds,
       staleAfterSeconds: Math.round(staleAfter / 1000),
       sensor_status: row.sensor_status, water_level_percent: row.water_level_percent,
-      fresh, declaredOnline, sensorOnline, offlineReason
+      fresh, declaredOnline, sensorOnline, offlineReason: latestOfflineReason
     });
 
     const reportedMotorStatus = String(row.motor_status || "unknown").toLowerCase();
