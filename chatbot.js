@@ -34,10 +34,10 @@
           <h3>How can I help?</h3>
         </div>
         <div class="cascade-chat-suggestions">
-          <button type="button" data-question="How does Cascade work?">How does the system work?</button>
-          <button type="button" data-question="Explain the dashboard features.">Explore dashboard features</button>
-          <button type="button" data-question="How do I change the low-water alert?">Change low-water alert</button>
-          <button type="button" data-question="How do I change the maximum cutoff level?">Adjust maximum level</button>
+          <button type="button" data-question="Summarise my water usage over the last 9 days.">9-day water usage</button>
+          <button type="button" data-question="Turn the motor off.">Turn motor off</button>
+          <button type="button" data-question="Create a daily tank inspection alarm at 8:00 PM.">Create an alarm</button>
+          <button type="button" data-question="Analyse my recent water usage and identify unusual patterns.">Analyse my water data</button>
         </div>
       </div>
       <form class="cascade-chat-form">
@@ -62,6 +62,72 @@
   const form = root.querySelector("form");
   const input = form.elements.message;
   const messages = root.querySelector(".cascade-chat-messages");
+  let attachedReportText = "";
+  let attachedReportName = "";
+  const reportPicker = document.createElement("input");
+  reportPicker.type = "file";
+  reportPicker.accept = ".pdf,.csv,.txt,.json";
+  reportPicker.hidden = true;
+  reportPicker.setAttribute("aria-label", "Attach a report");
+  const attachButton = document.createElement("button");
+  attachButton.type = "button";
+  attachButton.className = "cascade-chat-attach";
+  attachButton.textContent = "＋";
+  attachButton.title = "Attach PDF, CSV, TXT or JSON report";
+  attachButton.setAttribute("aria-label", "Attach a report");
+  form.insertBefore(attachButton, form.lastElementChild);
+  form.appendChild(reportPicker);
+  attachButton.addEventListener("click", () => reportPicker.click());
+  function loadPdfJs() {
+    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+      script.onload = () => {
+        if (!window.pdfjsLib) return reject(new Error("PDF reader did not initialise."));
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        resolve(window.pdfjsLib);
+      };
+      script.onerror = () => reject(new Error("Could not load the PDF reader. Try a CSV or TXT report."));
+      document.head.appendChild(script);
+    });
+  }
+  async function extractReportText(file) {
+    const ext = (file.name.split(".").pop() || "").toLowerCase();
+    if (file.size > 8 * 1024 * 1024) throw new Error("Please attach a report smaller than 8 MB.");
+    if (["txt","csv","json"].includes(ext)) return (await file.text()).slice(0, 24000);
+    if (ext === "pdf") {
+      const pdfjs = await loadPdfJs();
+      const pdf = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
+      const pages = [];
+      for (let pageNo = 1; pageNo <= Math.min(pdf.numPages, 30); pageNo++) {
+        const page = await pdf.getPage(pageNo);
+        const content = await page.getTextContent();
+        pages.push(content.items.map(item => item.str).join(" "));
+      }
+      return pages.join("\n").slice(0, 24000);
+    }
+    throw new Error("Supported report formats: PDF, CSV, TXT and JSON.");
+  }
+  reportPicker.addEventListener("change", async () => {
+    const file = reportPicker.files?.[0];
+    if (!file) return;
+    attachButton.disabled = true;
+    attachButton.textContent = "…";
+    try {
+      attachedReportText = await extractReportText(file);
+      attachedReportName = file.name;
+      addMessage("Report attached: " + file.name + ". Ask me to analyse it, summarise it, find trends or explain specific figures.", "bot");
+      input.value = "Analyse the attached report and explain its key findings, trends, anomalies and recommendations.";
+      input.focus();
+    } catch (error) {
+      addMessage(error.message || "I couldn't read that report.", "bot");
+    } finally {
+      attachButton.disabled = false;
+      attachButton.textContent = "＋";
+      reportPicker.value = "";
+    }
+  });
   const initialGreeting = messages.querySelector(".cascade-chat-message.bot");
   if (initialGreeting) initialGreeting.dataset.initialGreeting = "true";
   const languageTrigger = root.querySelector("#cascade-chat-language");
@@ -317,11 +383,18 @@
     const no = document.createElement("button");
     no.type = "button"; no.textContent = "Cancel";
     actions.append(yes, no); prompt.appendChild(actions);
-    yes.addEventListener("click", () => {
-      actions.remove();
-      const result = action();
-      addMessage(typeof result === "string" ? result : success, "bot");
-
+    yes.addEventListener("click", async () => {
+      yes.disabled = true;
+      no.disabled = true;
+      yes.textContent = "Working…";
+      try {
+        const result = await action();
+        addMessage(typeof result === "string" ? result : success, "bot");
+      } catch (error) {
+        addMessage(error?.message || "The action could not be completed.", "bot");
+      } finally {
+        actions.remove();
+      }
     }, { once: true });
     no.addEventListener("click", () => {
       actions.remove(); setPending(null); addMessage("Cancelled. No changes made.", "bot")
@@ -358,6 +431,12 @@
       .replace(/अधिकतम स्तर|मैक्सिमम लेवल|कट.?ऑफ स्तर|পানির সর্বোচ্চ স্তর|সর্বোচ্চ লেভেল|কাট.?অফ লেভেল/gi, "maximum cutoff")
       .replace(/सेट करो|सेट करें|बदल दो|बदलें|रखो|कर दो|করো|সেট করো|সেট করুন|বদলে দাও|বদলাও/gi, "set")
       .replace(/कितने प्रतिशत|कितना प्रतिशत|प्रतिशत|শতাংশ|কত পার্সেন্ট/gi, "percent")
+      .replace(/मोटर चालू करो|मोटर चालू कर दो|पंप चालू करो|पंप चालू कर दो|मोटर शुरू करो|पंप शुरू करो/gi, "motor on")
+      .replace(/मोटर बंद करो|मोटर बंद कर दो|पंप बंद करो|पंप बंद कर दो|मोटर रोक दो|पंप रोक दो/gi, "motor off")
+      .replace(/মোটর চালু করো|মোটর চালু করুন|পাম্প চালু করো|পাম্প চালু করুন/gi, "motor on")
+      .replace(/মোটর বন্ধ করো|মোটর বন্ধ করুন|পাম্প বন্ধ করো|পাম্প বন্ধ করুন/gi, "motor off")
+      .replace(/अलार्म लगाओ|अलार्म लगा दो|अलार्म बनाओ|रिमाइंडर लगाओ|রিমাইন্ডার দাও|অ্যালার্ম দাও|অ্যালার্ম সেট করো/gi, "create alarm")
+      .replace(/अलार्म दिखाओ|मेरे अलार्म दिखाओ|অ্যালার্ম দেখাও|রিমাইন্ডার দেখাও/gi, "list alarms")
       .replace(/रद्द करो|रद्द करें|না|বাতিল করো|বাতিল করুন/gi, "cancel")
       .replace(/खोलो|खोलें|दिखाओ|দেখাও|খুলুন/gi, "open")
       .replace(/कम पानी का अलर्ट|low pani alert|paani kam hone ka alert|kam paani ka alert/gi, "low water alert")
@@ -432,6 +511,78 @@
     return y + "-" + String(month).padStart(2,"0") + "-" + String(day).padStart(2,"0");
   }
 
+  function requestedHistoryDays(text) {
+    const q = String(text).toLowerCase();
+    const numeric = q.match(/(?:last|past|over|during|in the)s+(\d{1,2})s+days?/);
+    if (numeric) return Math.max(1, Math.min(30, Number(numeric[1])));
+    const words = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12};
+    const word = q.match(/(?:last|past|over|during|in the)s+(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)s+days?/);
+    return word ? words[word[1]] : 9;
+  }
+  async function fetchHistoricalContext(text) {
+    const q = String(text).toLowerCase();
+    const wantsHistory = /history|historical|last\s+\d+\s+days|past\s+\d+\s+days|water usage|water consumed|consumption|trend|refill|motor run|how much water|কত জল|পানি খরচ|इतना पानी|खपत/.test(q);
+    if (!wantsHistory) return "";
+    const days = requestedHistoryDays(text);
+    const config = window.CASCADE_CONFIG || {};
+    const base = String(config.SUPABASE_URL || "").replace(/\/$/, "");
+    const key = String(config.SUPABASE_ANON_KEY || "");
+    if (!base || !key) return "Historical sensor data could not be queried because Supabase browser configuration is missing.";
+    const from = new Date(Date.now() - days * 86400000).toISOString();
+    const params = new URLSearchParams({
+      select:"device_id,distance_cm,water_level_percent,motor_status,sensor_status,created_at",
+      device_id:"eq." + String(config.DEVICE_ID || "cascade-esp32-01"),
+      created_at:"gte." + from,
+      order:"created_at.asc",
+      limit:"5000"
+    });
+    const headers = { apikey:key, Accept:"application/json" };
+    if (!key.startsWith("sb_publishable_")) headers.Authorization = "Bearer " + key;
+    try {
+      const response = await fetch(base + "/rest/v1/" + encodeURIComponent(config.SENSOR_TABLE || "sensor_readings") + "?" + params, { headers, cache:"no-store" });
+      if (!response.ok) return "Historical sensor query failed with HTTP " + response.status + ". Do not invent historical values.";
+      const rows = await response.json();
+      const valid = (Array.isArray(rows) ? rows : []).filter(row => Number.isFinite(Number(row.water_level_percent)) && row.water_level_percent !== null)
+        .map(row => ({ at:row.created_at, level:Number(row.water_level_percent), motor:String(row.motor_status || "unknown").toLowerCase(), distance:row.distance_cm === null ? null : Number(row.distance_cm) }))
+        .filter(row => row.level >= 0 && row.level <= 100 && Number.isFinite(Date.parse(row.at)));
+      const local = (() => { try { return JSON.parse(localStorage.getItem("fluidops_full_history") || "[]"); } catch (_) { return []; } })()
+        .filter(item => Date.parse(item.timestamp) >= Date.now() - days * 86400000)
+        .slice(0, 80);
+      if (!valid.length) return JSON.stringify({ periodDays:days, sensorRows:0, message:"No valid sensor readings were recorded in this period. The device may have been offline or its sensor was faulty. Local activity events are included separately.", localActivity:local });
+      let cumulativeDrop = 0, refillRises = 0, motorOnSamples = 0;
+      for (let i=0;i<valid.length;i++) {
+        if (valid[i].motor === "on") motorOnSamples++;
+        if (i) {
+          const delta = valid[i].level - valid[i-1].level;
+          if (delta < 0) cumulativeDrop += -delta;
+          if (delta > 5) refillRises++;
+        }
+      }
+      const capacity = Number(config.TANK_CAPACITY_LITRES);
+      const summary = {
+        periodDays:days, sensorRows:valid.length,
+        firstReading:{ at:valid[0].at, levelPercent:valid[0].level },
+        latestReading:{ at:valid[valid.length-1].at, levelPercent:valid[valid.length-1].level },
+        netLevelChangePercentagePoints:Number((valid[valid.length-1].level-valid[0].level).toFixed(2)),
+        cumulativeObservedLevelDropsPercentagePoints:Number(cumulativeDrop.toFixed(2)),
+        estimatedConsumptionLitres:Number.isFinite(capacity) && capacity > 0 ? Number((cumulativeDrop/100*capacity).toFixed(2)) : null,
+        tankCapacityLitres:Number.isFinite(capacity) && capacity > 0 ? capacity : null,
+        refillRiseEvents:refillRises, motorOnSamples,
+        sampleWindowStart:valid[0].at, sampleWindowEnd:valid[valid.length-1].at,
+        dailyReadings:valid.filter((row,index)=>index===0 || index===valid.length-1 || index % Math.max(1,Math.floor(valid.length/35))===0).slice(0,40),
+        localActivity:local,
+        interpretation:"Cumulative observed level drops are an estimate, not a precise water-consumption measurement. Refills, gaps between readings and sensor noise can affect it. Litres are provided only when TANK_CAPACITY_LITRES is configured."
+      };
+      return JSON.stringify(summary);
+    } catch (error) {
+      return "Could not retrieve historical readings: " + (error.message || "network error") + ". Do not invent historical values.";
+    }
+  }
+  function listAlarmSummary() {
+    const alarms = window.CascadeAlarms?.list?.() || [];
+    if (!alarms.length) return "You have no saved alarms.";
+    return "Your saved alarms: " + alarms.map(a => a.name + " at " + a.time + (a.repeat ? " (daily)" : " on " + a.date)).join("; ") + ".";
+  }
   function runAction(text) {
     const q = normalizeActionText(text).toLowerCase().trim();
 
@@ -470,11 +621,13 @@
       const missing = !a.name ? "name" : !a.time ? "time (e.g. 9:15pm, 9 AM or 21:15)" : (!a.date && !a.repeat) ? "date (e.g. 19/11/2026, 19-11-2026, 2026-11-19 or tomorrow)" : null;
       if (missing) { setPending({ type:"alarm-field", field: missing.startsWith("name") ? "name" : missing.startsWith("time") ? "time" : "date", alarm:a }); return "Got it. What is the alarm " + missing + "?"; }
       setPending(null);
-      const key = "cascade_scheduled_alarms";
-      const alarms = JSON.parse(localStorage.getItem(key) || "[]");
-      alarms.push({ id: Date.now().toString(), name:a.name, time:a.time, date:a.repeat ? null : a.date, repeat:!!a.repeat, enabled:true, createdAt:new Date().toISOString() });
-      localStorage.setItem(key, JSON.stringify(alarms));
-      return "Created the alarm “" + a.name + "” for " + a.time + (a.repeat ? " every day." : " on " + a.date + ".");
+      try {
+        const created = window.CascadeAlarms
+          ? window.CascadeAlarms.create({ name:a.name, time:a.time, date:a.date, repeat:!!a.repeat })
+          : null;
+        if (!created) throw new Error("Alarm Centre is still loading. Please try again.");
+        return "Created “" + created.name + "” for " + created.time + (created.repeat ? " every day." : " on " + created.date + ".") + " Your device notification schedule has been updated where permission is available.";
+      } catch (error) { return error.message || "I couldn't create that alarm."; }
     }
 
     if (/^(hi|hello|hey|namaste|नमस्ते|नमस्कार|নমস্কার|হ্যালো)[.!?,\s]*$/i.test(q)) return assistantLanguage === "hi" ? "नमस्ते! मैं डैशबोर्ड सेटिंग, अलर्ट, हिस्ट्री और पंप नियंत्रण में मदद कर सकता हूँ।" : assistantLanguage === "bn" ? "নমস্কার! ড্যাশবোর্ড সেটিংস, অ্যালার্ট, ইতিহাস এবং পাম্প নিয়ন্ত্রণে সাহায্য করতে পারি।" : "Hello! I can manage dashboard preferences, navigate pages, create alarms, filter or export history, change themes and help with pump controls.";
@@ -566,11 +719,26 @@
       checkbox.dispatchEvent(new Event("change", { bubbles:true }));
       return (enabled ? "Enabled " : "Disabled ") + target.replace("Enabled","").replace(/([A-Z])/g," $1").toLowerCase() + " alerts.";
     }
-    const alarmCreate = /\b(create|add|schedule|set up)\b.*\balarm\b/.test(q);
+    if (/\b(list|show|view|what are|my)\b.*\b(alarms?|reminders?)\b/.test(q) || /\b(list alarms|show alarms)\b/.test(q)) return listAlarmSummary();
+    const editAlarm = q.match(/\b(?:change|edit|update|move|reschedule)\b.*\balarm\b/i);
+    if (editAlarm) {
+      const alarms = window.CascadeAlarms?.list?.() || [];
+      const target = alarms.find(a => q.includes(String(a.name).toLowerCase()));
+      if (!target) return alarms.length ? "Which alarm should I change? Your alarms are: " + alarms.map(a=>a.name).join(", ") + "." : "There are no alarms to change.";
+      const newTime = parseAlarmTime(text);
+      const newDate = parseAlarmDate(text);
+      if (!newTime && !newDate) return "What new time or date should I use for “" + target.name + "”?";
+      return confirmAction("Update “" + target.name + "”" + (newTime ? " to " + newTime : "") + (newDate ? " on " + newDate : "") + "?", () => {
+        try { window.CascadeAlarms.update(target.id, { ...(newTime ? {time:newTime} : {}), ...(newDate ? {date:newDate,repeat:false} : {}) }); return "Updated “" + target.name + "”. The alarm schedule has been refreshed."; }
+        catch (error) { return error.message; }
+      });
+    }
+    const alarmCreate = /\b(create|add|schedule|set up)\b.*\balarm\b/.test(q) || /\bremind me\b/.test(q);
     if (alarmCreate) {
       const alarm = { name:"", time:"", date:"", repeat:/daily|every day|repeat/.test(q) };
       const name = text.match(/\balarm\s+(?:called|named)\s+["“]?(.+?)["”]?(?=\s+(?:at|on)\b|$)/i)
-        || text.match(/\balarm\s+for\s+(.+?)(?=\s+(?:at|on)\b|$)/i);
+        || text.match(/\balarm\s+for\s+(.+?)(?=\s+(?:at|on)\b|$)/i)
+        || text.match(/\bremind me to\s+(.+?)(?=\s+(?:at|on|tomorrow|today)\b|$)/i);
       if (name) alarm.name = name[1].trim().replace(/[“”"]/g, "");
       alarm.time = parseAlarmTime(text) || "";
       alarm.date = parseAlarmDate(text) || "";
@@ -586,8 +754,8 @@
       const target = alarms.find(a => q.includes(String(a.name).toLowerCase()));
       if (!target) return "I found " + alarms.length + " alarm(s). Tell me the exact alarm name you want to delete.";
       return confirmAction("Delete the alarm “"+target.name+"”?", () => {
-        localStorage.setItem("cascade_scheduled_alarms", JSON.stringify(alarms.filter(a=>a.id!==target.id)));
-        return "Deleted alarm “"+target.name+"”.";
+        if (!window.CascadeAlarms?.remove?.(target.id)) return "I couldn't delete that alarm.";
+        return "Deleted alarm “"+target.name+"” and cancelled its scheduled notification.";
       });
     }
     if (/\b(export|download)\b.*\b(history|reports|csv)\b/.test(q)) {
@@ -613,17 +781,23 @@
       if(field&&m){field.value=m[1];field.dispatchEvent(new Event("input",{bubbles:true}));return "Filtered history for “"+m[1]+"”.";}
       navigateTo("history"); return "Opening History & Reports. Tell me what to search for.";
     }
-    if (/\b(turn|switch|start)\s+(the\s+)?pump\s+on\b|\bmotor on\b/.test(q)) {
+    if (/\b(turn|switch|start|run|activate)\s+(the\s+)?(pump|motor)\s+on\b|\b(motor|pump)\s+(on|start|start karo|chalu)\b/.test(q)) {
       const button=document.getElementById("motorOnButton");
       if(!button) { navigateTo("dashboard"); return "Pump controls are on the Dashboard. Opening it; ask me again there."; }
       if(button.disabled) return "I can't send a pump-ON command right now. Check owner sign-in, device connection, fresh sensor reading and cutoff safety conditions on the Dashboard.";
-      return confirmAction("Send a command to turn the pump ON? This affects physical hardware. Confirm only if the area and system are safe.", () => { window.motorOn(); return "Pump ON command submitted. Check the reported device status for confirmation."; });
+      return confirmAction("Send a command to turn the pump ON? This affects physical hardware. Confirm only if the area and system are safe. Fresh sensor data and the cutoff interlock remain mandatory.", async () => {
+        const ok = await window.motorOn();
+        return ok ? "The pump-ON command was queued. This is not proof that the relay switched; wait for ESP32 feedback." : "The pump-ON command failed or was blocked. Check owner sign-in, sensor freshness, cutoff and device connectivity.";
+      });
     }
-    if (/\b(turn|switch|stop)\s+(the\s+)?pump\s+off\b|\bmotor off\b/.test(q)) {
+    if (/\b(turn|switch|stop|deactivate)\s+(the\s+)?(pump|motor)\s+off\b|\b(motor|pump)\s+(off|stop|band)\b/.test(q)) {
       const button=document.getElementById("motorOffButton");
       if(!button) { navigateTo("dashboard"); return "Pump controls are on the Dashboard. Opening it; ask me again there."; }
       if(button.disabled) return "I can't send a pump-OFF command: sign in with the owner account first.";
-      return confirmAction("Send a command to turn the pump OFF?", () => { window.motorOff(); return "Pump OFF command submitted. Check the reported device status for confirmation."; });
+      return confirmAction("Send a command to turn the pump OFF?", async () => {
+        const ok = await window.motorOff();
+        return ok ? "The pump-OFF command was queued. Wait for ESP32 feedback to confirm the physical state." : "The pump-OFF command failed. Check owner sign-in and the device connection.";
+      });
     }
     // Let unmatched natural-language questions reach Gemini instead of the limited local FAQ.
     return null;
@@ -647,13 +821,25 @@
         const history = conversation.slice(-20)
           .map(node => (node.classList.contains("user") ? "Visitor: " : "Assistant: ") + node.textContent)
           .join("\n");
+        const [historicalContext] = await Promise.all([fetchHistoricalContext(text)]);
         const response = await fetch(API_URL, {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text, history, page: pageName(), language: assistantLanguage, languageName: languageNames[assistantLanguage], liveStatus: typeof window.getCascadeAssistantContext === "function" ? window.getCascadeAssistantContext() : null })
+          body: JSON.stringify({
+            message: text, history, page: pageName(), language: assistantLanguage,
+            languageName: languageNames[assistantLanguage],
+            liveStatus: typeof window.getCascadeAssistantContext === "function" ? window.getCascadeAssistantContext() : null,
+            dataContext: historicalContext,
+            reportName: attachedReportName,
+            reportText: attachedReportText
+          })
         });
         if (!response.ok) throw new Error("Assistant service returned " + response.status);
         const data = await response.json();
         typing.textContent = data.reply || (assistantLanguage === "hi" ? "माफ़ कीजिए, जवाब नहीं बन पाया। फिर कोशिश करें।" : assistantLanguage === "bn" ? "দুঃখিত, উত্তর তৈরি করা যায়নি। আবার চেষ্টা করুন।" : "I couldn't generate a reply. Please try again.");
+        if (attachedReportText && /analyse|analyze|report|summari[sz]e|attached/i.test(text)) {
+          attachedReportText = "";
+          attachedReportName = "";
+        }
       }
     } catch (error) {
       typing.textContent = assistantLanguage === "hi" ? "AI सेवा से संपर्क नहीं हो पाया। कृपया बाद में कोशिश करें।" : assistantLanguage === "bn" ? "AI পরিষেবার সঙ্গে যোগাযোগ করা যায়নি। পরে আবার চেষ্টা করুন।" : "I couldn't reach the AI service. Please try again later.";
