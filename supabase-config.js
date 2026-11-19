@@ -9,7 +9,7 @@ window.CASCADE_CONFIG = Object.freeze({
   DEVICE_ID: "cascade-esp32-01",
   SENSOR_TABLE: "sensor_readings",
   POLL_INTERVAL_MS: 5000,
-  STALE_AFTER_MS: 30000
+  STALE_AFTER_MS: 90000
 });
 
 
