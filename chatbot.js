@@ -633,14 +633,21 @@
         firstLevelPercent:Number(b.first.toFixed(2)), lastLevelPercent:Number(b.last.toFixed(2)),
         sampleCount:b.samples
       }));
+      const intervalBuckets = new Map();
+      valid.forEach(row => {
+        const slot = Math.floor(Date.parse(row.at) / 900000);
+        const bucket = intervalBuckets.get(slot) || {sum:0,count:0};
+        bucket.sum += row.level; bucket.count++;
+        intervalBuckets.set(slot,bucket);
+      });
+      const smoothed = [...intervalBuckets.entries()].sort((a,b)=>a[0]-b[0])
+        .map(([slot,b])=>({at:new Date(slot*900000).toISOString(),level:b.sum/b.count}));
       let cumulativeDrop = 0, refillRises = 0, motorOnSamples = 0;
-      for (let i=0;i<valid.length;i++) {
-        if (valid[i].motor === "on") motorOnSamples++;
-        if (i) {
-          const delta = valid[i].level - valid[i-1].level;
-          if (delta < 0) cumulativeDrop += -delta;
-          if (delta > 5) refillRises++;
-        }
+      for (let i=0;i<valid.length;i++) if (valid[i].motor === "on") motorOnSamples++;
+      for (let i=1;i<smoothed.length;i++) {
+        const delta = smoothed[i].level - smoothed[i-1].level;
+        if (delta < -0.5) cumulativeDrop += -delta;
+        if (delta > 5) refillRises++;
       }
       const capacity = Number(config.TANK_CAPACITY_LITRES);
       const summary = {
@@ -803,7 +810,7 @@
     }
     if (/\b(list|show|view|what are|my)\b.*\b(alarms?|reminders?)\b/.test(q) || /\b(list alarms|show alarms)\b/.test(q)) return listAlarmSummary();
     const alarmToggle = q.match(/\b(enable|turn on|disable|turn off)\b.*\balarm\b/i);
-    if (alarmToggle) {
+    if (alarmToggle && !/(low.?water|motor|cut.?off|alert)/.test(q)) {
       const alarms = window.CascadeAlarms?.list?.() || [];
       const target = alarms.find(a => q.includes(String(a.name).toLowerCase()));
       if (!target) return alarms.length ? "Which alarm should I " + (/disable|turn off/.test(q) ? "disable" : "enable") + "? Your alarms are: " + alarms.map(a=>a.name).join(", ") + "." : "There are no saved alarms.";
