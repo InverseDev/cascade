@@ -26,7 +26,7 @@
   <!-- <link rel="stylesheet" href="style-responsive-fixed.css"> -->
   <link rel="stylesheet" href="typography.css?v=20261118-font-system-1">
   <link rel="stylesheet" href="feature-stack.css?v=20261118-scroll-deck-2">
-  <link rel="stylesheet" href="mobile-app.css?v=20261119-final-ai-dark-alarm-horizontal-11">
+  <link rel="stylesheet" href="mobile-app.css?v=20261119-native-ui-hard-fix-12">
 </head>
 <body>
   <div class="page-glow glow-one"></div><div class="page-glow glow-two"></div>
@@ -236,7 +236,7 @@
             </div>
           </article>
           <article class="dash-card setting-card reveal">
-            <div class="card-top"><div><span class="card-kicker">MAXIMUM THRESHOLD</span>
+            <div class="card-top"><div><span class="card-kicker">MAXIMUM THRESHOLD</span></div></div>
             <p class="muted-copy">Set the maximum fill level. When the tank reaches this percentage, the pump should turn OFF automatically to prevent overfilling.</p>
             <div class="range-value"><strong id="cutoffValue">90%</strong><span class="cutoff">Pump stop point</span></div>
             <input id="cutoff" class="range-input" type="range" min="50"
@@ -246,7 +246,7 @@
             <button class="subtle-btn" onclick="saveSettings()">Save thresholds ↗</button>
           </article>
           <article class="dash-card alert-card reveal">
-            <div class="card-top"><div><span class="card-kicker">MINIMUM THRESHOLD</span>
+            <div class="card-top"><div><span class="card-kicker">MINIMUM THRESHOLD</span></div></div>
             <p class="muted-copy">Set the minimum water level. When the tank falls to this percentage, the pump should turn ON automatically to refill it.</p>
             <div class="range-value"><strong id="lowValue">20%</strong><span class="cutoff">Pump start point</span></div>
             <input id="lowLevel" class="range-input amber-range" type="range"
