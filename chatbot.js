@@ -452,6 +452,7 @@
     const no = document.createElement("button");
     no.type = "button"; no.textContent = "Cancel";
     actions.append(yes, no); prompt.appendChild(actions);
+    persistConversation();
     yes.addEventListener("click", async () => {
       yes.disabled = true;
       no.disabled = true;
