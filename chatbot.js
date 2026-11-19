@@ -557,10 +557,10 @@
 
   function requestedHistoryDays(text) {
     const q = String(text).toLowerCase();
-    const numeric = q.match(/(?:last|past|over|during|in the)s+(\d{1,2})s+days?/);
+    const numeric = q.match(/(?:last|past|over|during|in the)[ ]+(\d{1,2})[ ]+days?/);
     if (numeric) return Math.max(1, Math.min(30, Number(numeric[1])));
     const words = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12};
-    const word = q.match(/(?:last|past|over|during|in the)s+(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)s+days?/);
+    const word = q.match(/(?:last|past|over|during|in the)[ ]+(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)[ ]+days?/);
     return word ? words[word[1]] : 9;
   }
   async function fetchHistoricalContext(text) {
@@ -774,7 +774,7 @@
         catch (error) { return error.message; }
       });
     }
-    const alarmCreate = /\b(create|add|schedule|set up)\b.*\balarm\b/.test(q) || /\bremind me\b/.test(q);
+    const alarmCreate = /\b(create|add|schedule|set up|set)\b.*\balarm\b/.test(q) || /\b(alarm|reminder)\b.*\b(set|create|schedule)\b/.test(q) || /\bremind me\b/.test(q);
     if (alarmCreate) {
       const alarm = { name:"", time:"", date:"", repeat:/daily|every day|repeat/.test(q) };
       const name = text.match(/\balarm\s+(?:called|named)\s+["“]?(.+?)["”]?(?=\s+(?:at|on)\b|$)/i)
@@ -822,7 +822,7 @@
       if(field&&m){field.value=m[1];field.dispatchEvent(new Event("input",{bubbles:true}));return "Filtered history for “"+m[1]+"”.";}
       navigateTo("history"); return "Opening History & Reports. Tell me what to search for.";
     }
-    if (/\b(turn|switch|start|run|activate)\s+(the\s+)?(pump|motor)\s+on\b|\b(motor|pump)\s+(on|start|start karo|chalu)\b/.test(q)) {
+    if (/\b(turn|switch|start|run|activate)\s+(the\s+)?(pump|motor)\s+on\b|\b(turn|switch)\s+on\s+(the\s+)?(pump|motor)\b|\b(motor|pump)\s+(on|start|start karo|chalu)\b/.test(q)) {
       const button=document.getElementById("motorOnButton");
       if(!button) { navigateTo("dashboard"); return "Pump controls are on the Dashboard. Opening it; ask me again there."; }
       if(button.disabled) return "I can't send a pump-ON command right now. Check owner sign-in, device connection, fresh sensor reading and cutoff safety conditions on the Dashboard.";
@@ -831,7 +831,7 @@
         return ok ? "The pump-ON command was queued. This is not proof that the relay switched; wait for ESP32 feedback." : "The pump-ON command failed or was blocked. Check owner sign-in, sensor freshness, cutoff and device connectivity.";
       });
     }
-    if (/\b(turn|switch|stop|deactivate)\s+(the\s+)?(pump|motor)\s+off\b|\b(motor|pump)\s+(off|stop|band)\b/.test(q)) {
+    if (/\b(turn|switch|stop|deactivate)\s+(the\s+)?(pump|motor)\s+off\b|\b(turn|switch)\s+off\s+(the\s+)?(pump|motor)\b|\b(motor|pump)\s+(off|stop|band)\b/.test(q)) {
       const button=document.getElementById("motorOffButton");
       if(!button) { navigateTo("dashboard"); return "Pump controls are on the Dashboard. Opening it; ask me again there."; }
       if(button.disabled) return "I can't send a pump-OFF command: sign in with the owner account first.";
