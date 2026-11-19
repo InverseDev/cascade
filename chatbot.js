@@ -853,6 +853,7 @@
       }
       alarm.time = parseAlarmTime(text) || "";
       alarm.date = parseAlarmDate(text) || "";
+      if (!alarm.name && alarm.time) alarm.name = "Cascade reminder";
       if (/daily|every day/.test(q)) alarm.repeat = true;
       if (alarm.time && !alarm.date && !alarm.repeat) {
         const [hour,minute] = alarm.time.split(":").map(Number);
