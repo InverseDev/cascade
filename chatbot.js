@@ -569,8 +569,9 @@
     const alarmCreate = /\b(create|add|schedule|set up)\b.*\balarm\b/.test(q);
     if (alarmCreate) {
       const alarm = { name:"", time:"", date:"", repeat:/daily|every day|repeat/.test(q) };
-      const name = text.match(/alarm(?: called| named)?\s+["“]?([^,]+?)["”]?(?:\s+at\s+|$)/i);
-      if (name && !/^for|^at$/i.test(name[1])) alarm.name = name[1].trim();
+      const name = text.match(/\balarm\s+(?:called|named)\s+["“]?(.+?)["”]?(?=\s+(?:at|on)\b|$)/i)
+        || text.match(/\balarm\s+for\s+(.+?)(?=\s+(?:at|on)\b|$)/i);
+      if (name) alarm.name = name[1].trim().replace(/[“”"]/g, "");
       alarm.time = parseAlarmTime(text) || "";
       alarm.date = parseAlarmDate(text) || "";
       if (/daily|every day/.test(q)) alarm.repeat = true;
