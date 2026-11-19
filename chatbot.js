@@ -534,6 +534,12 @@
       if(hour<0||hour>23)return null;
       return String(hour).padStart(2,"0")+":00";
     }
+    // A short reply like "7" or "tomorrow 7" is accepted as 07:00.
+    m = input.match(/(?:^|\s)(\d{1,2})\s*$/);
+    if (m) {
+      const hour=Number(m[1]);
+      if(hour>=0&&hour<=23)return String(hour).padStart(2,"0")+":00";
+    }
     return null;
   }
 
