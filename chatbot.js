@@ -36,7 +36,6 @@
         <div class="cascade-chat-suggestions">
           <button type="button" data-question="Summarise my water usage over the last 9 days.">9-day water usage</button>
           <button type="button" data-question="Turn the motor off.">Turn motor off</button>
-          <button type="button" data-question="Create a daily tank inspection alarm at 8:00 PM.">Create an alarm</button>
           <button type="button" data-question="Analyse my recent water usage and identify unusual patterns.">Analyse my water data</button>
         </div>
       </div>
@@ -54,7 +53,7 @@
   const mascotImage = launcher.querySelector(".cascade-mascot-launcher");
   const nativeApp = Boolean(window.Capacitor?.isNativePlatform?.());
   const mascotPage = location.pathname.toLowerCase();
-  mascotImage.src = mascotPage.includes("history") ? "assets/mascots/cascade-analytics.svg" : mascotPage.includes("alarms") ? "assets/mascots/cascade-summary.svg" : "assets/mascots/cascade-hero.svg";
+  mascotImage.src = mascotPage.includes("history") ? "assets/mascots/cascade-analytics.svg" : "assets/mascots/cascade-hero.svg";
   const headerMascot = root.querySelector(".cascade-chat-avatar");
   if (headerMascot) headerMascot.src = mascotImage.src;
   const panel = root.querySelector(".cascade-chat-panel");
@@ -173,50 +172,6 @@
     if (event.key === "Escape") closeLanguageMenu();
   });
   refreshLanguageMenu();
-  // Alarm API fallback for pages that do not load alarms.js (Dashboard and History).
-  // Uses the same local storage schema and native notification plugin.
-  if (!window.CascadeAlarms) {
-    const alarmKey = "cascade_scheduled_alarms";
-    const readAlarms = () => { try { const value = JSON.parse(localStorage.getItem(alarmKey) || "[]"); return Array.isArray(value) ? value : []; } catch (_) { return []; } };
-    const writeAlarms = value => localStorage.setItem(alarmKey, JSON.stringify(value));
-    const nativeNotifications = () => window.Capacitor?.isNativePlatform?.()
-      ? (window.Capacitor.registerPlugin?.("LocalNotifications") || window.Capacitor.Plugins?.LocalNotifications)
-      : null;
-    const notificationId = id => { let hash=0; for (const ch of String(id)) hash=(hash*31+ch.charCodeAt(0))|0; return 200000+(Math.abs(hash)%1000000000); };
-    const cancelNative = async id => { const plugin=nativeNotifications(); if(plugin) try { await plugin.cancel({notifications:[{id:notificationId(id)}]}); } catch (_) {} };
-    const syncNative = async alarm => {
-      const plugin=nativeNotifications(); if(!plugin || !alarm.enabled) return;
-      try {
-        const permission=await plugin.checkPermissions();
-        if(permission.display!=="granted") return;
-        if(plugin.createChannel) await plugin.createChannel({id:"cascade-alerts",name:"Cascade alerts",description:"Water level and pump alerts",importance:4});
-        await cancelNative(alarm.id);
-        const [hour,minute]=alarm.time.split(":").map(Number);
-        let schedule;
-        if(alarm.repeat) schedule={on:{hour,minute},allowWhileIdle:true};
-        else { const at=new Date(String(alarm.date)+"T"+alarm.time+":00"); if(at<=new Date()) return; schedule={at,allowWhileIdle:true}; }
-        await plugin.schedule({notifications:[{id:notificationId(alarm.id),title:alarm.name||"Cascade reminder",body:"Your scheduled Cascade reminder.",schedule,channelId:"cascade-alerts"}]});
-      } catch(error) { console.warn("Cascade AI alarm notification sync failed:",error); }
-    };
-    window.CascadeAlarms = {
-      list: () => readAlarms().map(item=>({...item})),
-      create({name,time,date=null,repeat=false}) {
-        const clean=String(name||"").trim().slice(0,80);
-        if(!clean || !/^([01]\d|2[0-3]):[0-5]\d$/.test(String(time||""))) throw new Error("A name and valid time are required.");
-        const selected=repeat?null:String(date||new Date().toLocaleDateString("en-CA"));
-        if(!repeat) { const at=new Date(selected+"T"+time+":00"); if(Number.isNaN(at.getTime())||at<=new Date()) throw new Error("Please choose a future date and time."); }
-        const alarm={id:Date.now().toString()+Math.random().toString(36).slice(2,6),name:clean,time,date:selected,repeat:!!repeat,enabled:true,createdAt:new Date().toISOString()};
-        const all=readAlarms(); all.push(alarm); writeAlarms(all); syncNative(alarm); return {...alarm};
-      },
-      remove(id) { const all=readAlarms(), found=all.find(item=>String(item.id)===String(id)); if(!found)return false; writeAlarms(all.filter(item=>String(item.id)!==String(id))); cancelNative(id); return true; },
-      update(id,changes={}) {
-        const all=readAlarms(), index=all.findIndex(item=>String(item.id)===String(id)); if(index<0)throw new Error("I couldn't find that alarm.");
-        const next={...all[index],...changes};
-        if(!next.repeat) { const at=new Date(String(next.date)+"T"+next.time+":00"); if(Number.isNaN(at.getTime())||at<=new Date())throw new Error("The updated alarm must be in the future."); }
-        all[index]=next; writeAlarms(all); cancelNative(id); syncNative(next); return {...next};
-      }
-    };
-  }
   let busy = false;
 
   const uiText = {
@@ -320,18 +275,18 @@
     if (assistantLanguage === "hi") {
       if (/^(hi|hello|hey|नमस्ते|नमस्कार)/i.test(text)) return "नमस्ते! मैं Cascade की सुविधाओं और डैशबोर्ड का उपयोग समझाने में मदद कर सकता हूँ।";
       if (/how.*work|working|process|flow|कैसे काम|कैसे चलता/.test(q)) return "Cascade में अल्ट्रासोनिक सेंसर पानी का स्तर मापता है। ESP32 रीडिंग को प्रोसेस करके डैशबोर्ड पर भेजता है और कॉन्फ़िगर होने पर रिले के ज़रिए पंप नियंत्रित कर सकता है।";
-      if (/feature|dashboard|tank|pump|alarm|history|report|सुविधा|डैशबोर्ड|टैंक|पंप|अलर्ट|इतिहास/.test(q)) return "डैशबोर्ड टैंक का स्तर, सेंसर रीडिंग, पंप की स्थिति और अलर्ट सेटिंग दिखाता है। Alarm Centre में रिमाइंडर और History & Reports में गतिविधियों का रिकॉर्ड मिलता है।";
+      if (/feature|dashboard|tank|pump|history|report|सुविधा|डैशबोर्ड|टैंक|पंप|अलर्ट|इतिहास/.test(q)) return "डैशबोर्ड टैंक का स्तर, सेंसर रीडिंग, पंप की स्थिति और अलर्ट सेटिंग दिखाता है। History & Reports में गतिविधियों का रिकॉर्ड मिलता है।";
       return "मैं Cascade, सेंसर, डैशबोर्ड, पंप नियंत्रण और अलर्ट के बारे में मदद कर सकता हूँ।";
     }
     if (assistantLanguage === "bn") {
       if (/^(hi|hello|hey|নমস্কার|হ্যালো)/i.test(text)) return "নমস্কার! Cascade-এর ফিচার এবং ড্যাশবোর্ড ব্যবহার করতে আমি সাহায্য করতে পারি।";
       if (/how.*work|working|process|flow|কীভাবে কাজ|কিভাবে চলে/.test(q)) return "Cascade-এ আল্ট্রাসোনিক সেন্সর পানির স্তর মাপে। ESP32 রিডিং প্রসেস করে ড্যাশবোর্ডে পাঠায় এবং কনফিগার করা থাকলে রিলের মাধ্যমে পাম্প নিয়ন্ত্রণ করতে পারে।";
-      if (/feature|dashboard|tank|pump|alarm|history|report|ফিচার|ড্যাশবোর্ড|ট্যাঙ্ক|পাম্প|অ্যালার্ট|ইতিহাস/.test(q)) return "ড্যাশবোর্ডে ট্যাঙ্কের স্তর, সেন্সর রিডিং, পাম্পের অবস্থা এবং অ্যালার্ট সেটিং দেখা যায়। Alarm Centre-এ রিমাইন্ডার এবং History & Reports-এ কার্যকলাপের রেকর্ড থাকে।";
+      if (/feature|dashboard|tank|pump|history|report|ফিচার|ড্যাশবোর্ড|ট্যাঙ্ক|পাম্প|অ্যালার্ট|ইতিহাস/.test(q)) return "ড্যাশবোর্ডে ট্যাঙ্কের স্তর, সেন্সর রিডিং, পাম্পের অবস্থা এবং অ্যালার্ট সেটিং দেখা যায়। History & Reports-এ কার্যকলাপের রেকর্ড থাকে।
       return "আমি Cascade, সেন্সর, ড্যাশবোর্ড, পাম্প নিয়ন্ত্রণ এবং অ্যালার্ট সম্পর্কে সাহায্য করতে পারি।";
     }
     if (/^(hi|hello|hey)\b/.test(q)) return "Hello! I can explain Cascade's features and help you use the dashboard.";
     if (/how.*work|working|process|flow/.test(q)) return "Cascade uses an ultrasonic sensor to measure the water level. The ESP32 processes the reading, reports it to the dashboard and can control a pump through a relay when device-side automation is configured.";
-    if (/feature|dashboard|tank overview|pump management|alarm|history|report/.test(q)) return "The dashboard shows the tank level, sensor distance, pump status, automation cutoff and low-water alert setting. Alarm Centre is for alerts, while History & Reports shows recorded system activity.";
+    if (/feature|dashboard|tank overview|pump management|history|report/.test(q)) return "The dashboard shows the tank level, sensor distance, pump status, automation cutoff and low-water alert setting. History & Reports shows recorded system activity.";
     if (/low.?water|alert|threshold/.test(q)) return "You can change the low-water alert from the Early Warning card. You can also ask me to set a new percentage; I'll show you the change and ask you to confirm it before saving.";
     if (/cut.?off|automation/.test(q)) return "The cutoff threshold is the selected tank level at which the motor should stop. Note that the current website labels this as a dashboard preference; device-side automation is not active yet.";
     if (/motor|pump/.test(q)) return "Pump status is reported by the ESP32. Pump controls require the owner account and a connected device. Don't rely on the website alone as a safety interlock.";
@@ -410,13 +365,12 @@
 
   function pageName() {
     const path = location.pathname.toLowerCase();
-    return path.includes("alarms") ? "alerts" : path.includes("history") ? "history" : "dashboard";
+    return path.includes("history") ? "history" : "dashboard";
   }
   function navigateTo(target) {
     const urls = {
       home: "index.html#home", dashboard: "index.html#dashboard",
       features: "index.html#features", how: "index.html#how",
-      alerts: "alarms.html", alarms: "alarms.html",
       history: "history.html", reports: "history.html"
     };
     if (!urls[target]) return false;
@@ -471,7 +425,7 @@
     const dark = mode === "dark" ? true : mode === "light" ? false : localStorage.getItem("fluidops-theme") !== "dark";
     localStorage.setItem("fluidops-theme", dark ? "dark" : "light");
     document.body.classList.toggle("dark-mode", dark);
-    const toggle = document.getElementById("themeToggle") || document.getElementById("alarmThemeToggle") || document.getElementById("historyThemeToggle");
+    const toggle = document.getElementById("themeToggle") || document.getElementById("historyThemeToggle");
     if (toggle) toggle.textContent = dark ? "☀️" : "🌙";
     return "Switched to " + (dark ? "dark" : "light") + " mode.";
   }
@@ -489,8 +443,6 @@
       .replace(/মোটর চালু করো|মোটর চালু করুন|পাম্প চালু করো|পাম্প চালু করুন/gi, "motor on")
       .replace(/মোটর বন্ধ করো|মোটর বন্ধ করুন|পাম্প বন্ধ করো|পাম্প বন্ধ করুন|মোটর বন্ধ করো|পাম্প বন্ধ করো/gi, "motor off")
       .replace(/motor\s+(?:ko\s+)?band\s+(?:kar dena|kar do|karna|karo)|pump\s+(?:ko\s+)?band\s+(?:kar do|karo)/gi, "motor off")
-      .replace(/अलार्म लगाओ|अलार्म लगा दो|अलार्म बनाओ|रिमाइंडर लगाओ|রিমাইন্ডার দাও|অ্যালার্ম দাও|অ্যালার্ম সেট করো|alarm lagao|alarm laga do|reminder lagao|reminder laga do/gi, "create alarm")
-      .replace(/अलार्म दिखाओ|मेरे अलार्म दिखाओ|অ্যালার্ম দেখাও|রিমাইন্ডার দেখাও/gi, "list alarms")
       .replace(/रद्द करो|रद्द करें|না|বাতিল করো|বাতিল করুন/gi, "cancel")
       .replace(/खोलो|खोलें|दिखाओ|দেখাও|খুলুন/gi, "open")
       .replace(/कम पानी का अलर्ट|low pani alert|paani kam hone ka alert|kam paani ka alert/gi, "low water alert")
@@ -508,69 +460,6 @@
       .replace(/set kore dao|set koro|kore dao|bodle dao|barie dao|komie dao|rakho|koro/gi, "set")
       .replace(/[০-৯]/g, ch => "০১২৩৪৫৬৭৮৯".indexOf(ch))
       .replace(/[०-९]/g, ch => "०१२३४५६७८९".indexOf(ch));
-  }
-
-  // Accept common 12-hour/24-hour time formats and Indian day/month/year dates.
-  function parseAlarmTime(value) {
-    const input = String(value || "").trim().toLowerCase().replace(/\./g, ":").replace(/\s+/g, " ");
-    let m = input.match(/\b(\d{1,2})(?::|\s+)(\d{1,2})\s*(a\.?m\.?|p\.?m\.?)\b/i);
-    if (m) {
-      let hour = Number(m[1]), minute = Number(m[2]);
-      const meridiem = m[3].replace(/\./g, "").toLowerCase();
-      if (hour < 1 || hour > 12 || minute > 59) return null;
-      if (meridiem === "pm" && hour !== 12) hour += 12;
-      if (meridiem === "am" && hour === 12) hour = 0;
-      return String(hour).padStart(2,"0") + ":" + String(minute).padStart(2,"0");
-    }
-    m = input.match(/\b(\d{1,2})(?::|\s+)(\d{2})\b/);
-    if (m) {
-      const hour=Number(m[1]), minute=Number(m[2]);
-      if(hour>23||minute>59)return null;
-      return String(hour).padStart(2,"0")+":"+String(minute).padStart(2,"0");
-    }
-    m = input.match(/\b(?:at|around|by)\s+(\d{1,2})(?:\s*(?:o'?clock|baje|ta))?\b|\b(\d{1,2})\s*(?:o'?clock|baje|ta)\b/i);
-    if (m) {
-      const hour=Number(m[1] || m[2]);
-      if(hour<0||hour>23)return null;
-      return String(hour).padStart(2,"0")+":00";
-    }
-    m = input.match(/(?:^|\s)(\d{1,2})\s*$/);
-    if (m) {
-      const hour=Number(m[1]);
-      if(hour>=0&&hour<=23)return String(hour).padStart(2,"0")+":00";
-    }
-    return null;
-  }
-
-  function parseAlarmDate(value) {
-    const input = String(value || "").trim().toLowerCase();
-    const now = new Date();
-    if (/\btoday\b|\baaj\b|आज|আজ/.test(input)) {
-      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-    }
-    if (/\btomorrow\b|\bkal\b|कल|আগামীকাল|কাল/.test(input)) {
-      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
-      return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-    }
-    let y, month, day, m;
-    if ((m = input.match(/\b(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})\b/))) {
-      y=Number(m[1]); month=Number(m[2]); day=Number(m[3]);
-    } else if ((m = input.match(/\b(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})\b/))) {
-      day=Number(m[1]); month=Number(m[2]); y=Number(m[3]);
-    } else {
-      const months = {jan:0,january:0,feb:1,february:1,mar:2,march:2,apr:3,april:3,may:4,jun:5,june:5,jul:6,july:6,aug:7,august:7,sep:8,sept:8,september:8,oct:9,october:9,nov:10,november:10,dec:11,december:11};
-      m = input.match(/\b(\d{1,2})\s+([a-z]+)\s+(\d{4})\b/i);
-      if (m && Object.prototype.hasOwnProperty.call(months,m[2])) { day=Number(m[1]); month=months[m[2]]+1; y=Number(m[3]); }
-      else {
-        m = input.match(/\b([a-z]+)\s+(\d{1,2}),?\s+(\d{4})\b/i);
-        if (!m || !Object.prototype.hasOwnProperty.call(months,m[1])) return null;
-        month=months[m[1]]+1; day=Number(m[2]); y=Number(m[3]);
-      }
-    }
-    const d = new Date(y, month-1, day);
-    if (y < now.getFullYear() || d.getFullYear()!==y || d.getMonth()!==month-1 || d.getDate()!==day) return null;
-    return y + "-" + String(month).padStart(2,"0") + "-" + String(day).padStart(2,"0");
   }
 
   function requestedHistoryDays(text) {
@@ -667,11 +556,6 @@
       return "Could not retrieve historical readings: " + (error.message || "network error") + ". Do not invent historical values.";
     }
   }
-  function listAlarmSummary() {
-    const alarms = window.CascadeAlarms?.list?.() || [];
-    if (!alarms.length) return "You have no saved alarms.";
-    return "Your saved alarms: " + alarms.map(a => a.name + " at " + a.time + (a.repeat ? " (daily)" : " on " + a.date)).join("; ") + ".";
-  }
   function runAction(text) {
     const q = normalizeActionText(text).toLowerCase().trim();
 
@@ -699,32 +583,9 @@
       }
       if (/\b(cancel|never mind|nevermind)\b/.test(q)) { setPending(null); return "Cancelled. No setting was changed."; }
     }
-    if (pendingIntent?.type === "alarm-field") {
-      const a = pendingIntent.alarm;
-      const suppliedTime = parseAlarmTime(text) || parseAlarmTime(q);
-      const suppliedDate = parseAlarmDate(text);
-      if (suppliedTime) a.time = suppliedTime;
-      if (suppliedDate) a.date = suppliedDate;
-      if (/\b(daily|every day|everyday|प्रतिदिन|প্রতিদিন)\b/i.test(q)) a.repeat = true;
-      else if (/\b(once|one time|not daily|no repeat)\b/i.test(q)) a.repeat = false;
-      if (/\b(cancel|never mind|nevermind)\b/i.test(q)) { setPending(null); return "Cancelled. No alarm was created."; }
-      if (!a.name && !suppliedTime && !suppliedDate && !/^(yes|no|daily|repeat|once)$/i.test(q)) a.name = text.trim().replace(/^(please\s+)?(remind me to|reminder to|alarm for)\s+/i,"").slice(0,80);
-      if (!a.time) { setPending({type:"alarm-field",field:"time",alarm:a}); return "Sure — what time should I remind you? You can reply “7”, “7:30 PM” or “tomorrow at 8”."; }
-      if (!a.date && !a.repeat) {
-        const [hour,minute]=a.time.split(":").map(Number);
-        const now=new Date(), target=new Date(); target.setHours(hour,minute,0,0);
-        if(target<=now)target.setDate(target.getDate()+1);
-        a.date=target.getFullYear()+"-"+String(target.getMonth()+1).padStart(2,"0")+"-"+String(target.getDate()).padStart(2,"0");
-      }
-      if (!a.name) a.name="Reminder";
-      setPending(null);
-      return confirmAction("Create “"+a.name+"” for "+a.time+(a.repeat?" every day":" on "+a.date)+"?",()=>{
-        const created=window.CascadeAlarms.create({name:a.name,time:a.time,date:a.date,repeat:!!a.repeat});
-        return "Created “"+created.name+"” for "+created.time+(created.repeat?" every day.":" on "+created.date)+" Your reminder is scheduled where notification permission is available.";
-      });
-    }
 
-    if (/^(hi|hello|hey|namaste|नमस्ते|नमस्कार|নমস্কার|হ্যালো)[.!?,\s]*$/i.test(q)) return assistantLanguage === "hi" ? "नमस्ते! मैं डैशबोर्ड सेटिंग, अलर्ट, हिस्ट्री और पंप नियंत्रण में मदद कर सकता हूँ।" : assistantLanguage === "bn" ? "নমস্কার! ড্যাশবোর্ড সেটিংস, অ্যালার্ট, ইতিহাস এবং পাম্প নিয়ন্ত্রণে সাহায্য করতে পারি।" : "Hello! I can manage dashboard preferences, navigate pages, create alarms, filter or export history, change themes and help with pump controls.";
+
+    if (/^(hi|hello|hey|namaste|नमस्ते|नमस्कार|নমস্কার|হ্যালো)[.!?,\s]*$/i.test(q)) return assistantLanguage === "hi" ? "नमस्ते! मैं डैशबोर्ड सेटिंग, अलर्ट, हिस्ट्री और पंप नियंत्रण में मदद कर सकता हूँ।" : assistantLanguage === "bn" ? "নমস্কার! ড্যাশবোর্ড সেটিংস, অ্যালার্ট, ইতিহাস এবং পাম্প নিয়ন্ত্রণে সাহায্য করতে পারি।" : "Hello! I can manage dashboard preferences, navigate pages, filter or export history, change themes and help with pump controls.";
     // Threshold requests are handled locally, so they are fast and don't depend on Gemini wording.
     const lowTerm = /low.?water|\blow\b|low level|low alert|early warning|minimum level|water (?:falls|drops|goes) (?:below|under)|water.{0,15}low|tank.{0,15}low|below (?:the )?\d|paani (?:kam|neeche)|paani.{0,20}kam|pani (?:kam|neeche)|pani.{0,20}kam|jol (?:kom|niche)|panir (?:kom|niche)|कम पानी|पानी कम|नीचे जाए|कम हो|জল কম|পানি কম|নিচে নাম/.test(q);
     const highTerm = /cut.?off|maximum|max level|\bhigh\b|high.?water|upper level|full.?tank|tank.{0,20}(?:full|bhar|bhare|fills|filled)|motor.{0,24}(?:off|stop|band)|(?:off|stop|band).{0,24}motor|tank bhar|paani bhar|pani bhar|jol bhore|panir tank bhore|टंकी भर|पानी भर|मोटर बंद|ভরে গেলে|মোটর বন্ধ/.test(q);
@@ -760,9 +621,9 @@
       setPending({ type:"threshold", kind });
       return "What percentage should I set the " + (kind === "low" ? "low-water alert" : "maximum cutoff") + " to?";
     }
-    const nav = q.match(/\b(open|go to|show|take me to|visit)\s+(the\s+)?(dashboard|home|alerts?|alarm center|alarm centre|history|reports|features|how it works)\b/);
+    const nav = q.match(/\b(open|go to|show|take me to|visit)\s+(the\s+)?(dashboard|home|history|reports|features|how it works)\b/);
     if (nav) {
-      const dest = /alert|alarm/.test(nav[3]) ? "alerts" : /history|report/.test(nav[3]) ? "history" : /feature/.test(nav[3]) ? "features" : /how/.test(nav[3]) ? "how" : /home/.test(nav[3]) ? "home" : "dashboard";
+      const dest = /history|report/.test(nav[3]) ? "history" : /feature/.test(nav[3]) ? "features" : /how/.test(nav[3]) ? "how" : /home/.test(nav[3]) ? "home" : "dashboard";
       navigateTo(dest); return "Opening " + dest + ".";
     }
     if (/\b(dark mode|dark theme|turn on dark)\b/.test(q)) return toggleTheme("dark");
@@ -777,18 +638,6 @@
       if (typeof window.fetchLatestReading === "function") { window.fetchLatestReading(); return "Refreshing the latest sensor reading from Supabase."; }
       navigateTo("dashboard"); return "Opening the Dashboard, where live sensor readings are displayed.";
     }
-    if (/\\b(test|preview|play)\\b.*\\b(alarm|ringtone|sound)\\b/.test(q)) {
-      const button = document.getElementById("testAlarmSound");
-      if (!button) { navigateTo("alerts"); return "Opening Alarm Centre. I can preview the selected ringtone there."; }
-      button.click(); return "Playing a preview of the currently selected alarm sound.";
-    }
-    const soundChoice = q.match(/\\b(classic|gentle|digital)\\b.*\\b(sound|ringtone|alarm)\\b|\\b(sound|ringtone|alarm)\\b.*\\b(classic|gentle|digital)\\b/);
-    if (soundChoice) {
-      const select = document.getElementById("alarmSoundPreset");
-      if (!select) { navigateTo("alerts"); return "Opening Alarm Centre. Ask me again to change the ringtone."; }
-      const preset = ["classic","gentle","digital"].find(value => q.includes(value));
-      if (preset) { select.value = preset; select.dispatchEvent(new Event("change",{bubbles:true})); return "Selected the " + preset + " alarm sound."; }
-    }
     if (/\\b(clear|reset)\\b.*\\b(search|filters?)\\b/.test(q)) {
       const search = document.getElementById("historySearch");
       const from = document.getElementById("historyFrom"), to = document.getElementById("historyTo");
@@ -801,83 +650,6 @@
       return "Cleared the history search and date filters.";
     }
 
-    const alertPref = q.match(/\b(enable|turn on|disable|turn off)\b.*\b(low water|low-water|motor|cutoff|cut-off)\b.*\b(alert|alerts|notification|notifications)\b|\b(enable|turn on|disable|turn off)\b.*\b(alert|alerts|notifications)\b.*\b(low water|low-water|motor|cutoff|cut-off)\b/);
-    if (alertPref) {
-      const enabled = /enable|turn on/.test(q);
-      const targetText = (alertPref[2] || alertPref[4] || "").replace(/-/g," ");
-      const target = /low water/.test(targetText) ? "lowWaterAlertEnabled" : /motor/.test(targetText) ? "motorAlertEnabled" : /cutoff/.test(targetText) ? "cutoffAlertEnabled" : null;
-      if (!target) return "Which alert do you mean: low-water, motor, or automatic-cutoff alerts?";
-      const checkbox = document.getElementById(target);
-      if (!checkbox) { navigateTo("alerts"); return "Opening Alarm Centre. Ask me again there to change that alert."; }
-      checkbox.checked = enabled;
-      checkbox.dispatchEvent(new Event("change", { bubbles:true }));
-      return (enabled ? "Enabled " : "Disabled ") + target.replace("Enabled","").replace(/([A-Z])/g," $1").toLowerCase() + " alerts.";
-    }
-    if (/\b(list|show|view|what are|my)\b.*\b(alarms?|reminders?)\b/.test(q) || /\b(list alarms|show alarms)\b/.test(q)) return listAlarmSummary();
-    const alarmToggle = q.match(/\b(enable|turn on|disable|turn off)\b.*\balarm\b/i);
-    if (alarmToggle && !/(low.?water|motor|cut.?off|alert)/.test(q)) {
-      const alarms = window.CascadeAlarms?.list?.() || [];
-      const target = alarms.find(a => q.includes(String(a.name).toLowerCase()));
-      if (!target) return alarms.length ? "Which alarm should I " + (/disable|turn off/.test(q) ? "disable" : "enable") + "? Your alarms are: " + alarms.map(a=>a.name).join(", ") + "." : "There are no saved alarms.";
-      const enabled = !/disable|turn off/.test(q);
-      return confirmAction((enabled ? "Enable" : "Disable") + " the alarm “" + target.name + "”?", () => {
-        try { window.CascadeAlarms.update(target.id,{enabled}); return (enabled ? "Enabled " : "Disabled ") + "“" + target.name + "”."; }
-        catch(error) { return error.message; }
-      });
-    }
-    const editAlarm = q.match(/\b(?:change|edit|update|move|reschedule)\b.*\balarm\b/i);
-    if (editAlarm) {
-      const alarms = window.CascadeAlarms?.list?.() || [];
-      const target = alarms.find(a => q.includes(String(a.name).toLowerCase()));
-      if (!target) return alarms.length ? "Which alarm should I change? Your alarms are: " + alarms.map(a=>a.name).join(", ") + "." : "There are no alarms to change.";
-      const newTime = parseAlarmTime(text);
-      const newDate = parseAlarmDate(text);
-      if (!newTime && !newDate) return "What new time or date should I use for “" + target.name + "”?";
-      return confirmAction("Update “" + target.name + "”" + (newTime ? " to " + newTime : "") + (newDate ? " on " + newDate : "") + "?", () => {
-        try { window.CascadeAlarms.update(target.id, { ...(newTime ? {time:newTime} : {}), ...(newDate ? {date:newDate,repeat:false} : {}) }); return "Updated “" + target.name + "”. The alarm schedule has been refreshed."; }
-        catch (error) { return error.message; }
-      });
-    }
-    const alarmCreate = /\b(create|add|schedule|set|make)\b.*\b(alarm|reminder)\b/.test(q)
-      || /\b(alarm|reminder)\b.*\b(create|add|set|schedule|for|at)\b/.test(q)
-      || /\b(remind me|remind me to|reminder to|reminder for|notify me to|notify me when|alert me to|alert me when|wake me up)\b/.test(q)
-      || /मुझे याद दिला|याद दिलाना|अलार्म लगाओ|অ্যালার্ম দাও|মনে করিয়ে দিও/.test(q);
-    if (alarmCreate) {
-      const alarm = {name:"",time:parseAlarmTime(text)||"",date:parseAlarmDate(text)||"",repeat:/\b(daily|every day|everyday|प्रतिदिन|প্রতিদিন)\b/.test(q)};
-      const namedMatch = text.match(/\b(?:named|called)\s+(.+?)(?=\s+(?:at|on|tomorrow|today|daily|every day)\b|\s+for\s+\d{1,2}(?:\s+\d{2})?\s*(?:a\.?m\.?|p\.?m\.?)?\b|$)/i);
-      const actionNameMatch = text.match(/\b(?:create|add|schedule|set|make)\s+(?:an?\s+)?(?:daily|everyday|every\s+day)\s+(.+?)\s+alarm\b/i)
-        || text.match(/\b(?:create|add|schedule|set|make)\s+(?:an?\s+)?(.+?)\s+alarm\b/i);
-      const nameMatch = namedMatch || actionNameMatch || text.match(/\b(?:remind me to|remind me about|reminder to|alarm for|remind me)\s+(.+?)(?=\s+(?:at|on|tomorrow|today|daily|every day)\b|\s+\d{1,2}(?::|\s+)\d{2}\s*(?:a\.?m\.?|p\.?m\.?)?\b|$)/i);
-      if(nameMatch) {
-        const candidate=nameMatch[1].trim().replace(/^[“"]|[”"]$/g,"").replace(/\s+for\s*$/i,"");
-        if(candidate && !parseAlarmTime(candidate) && !parseAlarmDate(candidate)) alarm.name=candidate.slice(0,80);
-      }
-      if(!alarm.time) {
-        setPending({type:"alarm-field",field:"time",alarm});
-        return "Sure — what time should I remind you? You can say “7”, “8:30 PM” or “tomorrow at 9”.";
-      }
-      if(!alarm.date && !alarm.repeat) {
-        const [hour,minute]=alarm.time.split(":").map(Number);
-        const now=new Date(),target=new Date();target.setHours(hour,minute,0,0);
-        if(target<=now)target.setDate(target.getDate()+1);
-        alarm.date=target.getFullYear()+"-"+String(target.getMonth()+1).padStart(2,"0")+"-"+String(target.getDate()).padStart(2,"0");
-      }
-      if(!alarm.name)alarm.name="Reminder";
-      return confirmAction("Create “"+alarm.name+"” for "+alarm.time+(alarm.repeat?" every day":" on "+alarm.date)+"?",()=>{
-        const created=window.CascadeAlarms.create({name:alarm.name,time:alarm.time,date:alarm.date,repeat:!!alarm.repeat});
-        return "Created “"+created.name+"” for "+created.time+(created.repeat?" every day.":" on "+created.date)+" Your reminder is scheduled where notification permission is available.";
-      });
-    }
-    if (/\b(delete|remove|cancel)\b.*\balarm\b/.test(q)) {
-      const alarms = JSON.parse(localStorage.getItem("cascade_scheduled_alarms") || "[]");
-      if (!alarms.length) return "There are no scheduled alarms to delete.";
-      const target = alarms.find(a => q.includes(String(a.name).toLowerCase()));
-      if (!target) return "I found " + alarms.length + " alarm(s). Tell me the exact alarm name you want to delete.";
-      return confirmAction("Delete the alarm “"+target.name+"”?", () => {
-        if (!window.CascadeAlarms?.remove?.(target.id)) return "I couldn't delete that alarm.";
-        return "Deleted alarm “"+target.name+"” and cancelled its scheduled notification.";
-      });
-    }
     if (/\b(export|download)\b.*\b(history|reports|csv)\b/.test(q)) {
       const button=document.getElementById("historyExport"); if(button){button.click();return "Exporting the history CSV.";}
       navigateTo("history"); return "Opening History & Reports. Ask me to export again once the page loads.";
