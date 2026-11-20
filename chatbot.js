@@ -1,6 +1,7 @@
 (() => {
   "use strict";
   const API_URL = window.CASCADE_CHAT_API_URL || "";
+  if (!window.Capacitor?.isNativePlatform?.()) { try { localStorage.removeItem("cascade_scheduled_alarms"); } catch (_) {} }
   const root = document.createElement("div");
   root.id = "cascade-chat";
   root.innerHTML = `
@@ -197,10 +198,10 @@
         ? "हार्डवेयर कार्रवाइयों के लिए पुष्टि आवश्यक है।"
         : "হার্ডওয়্যার কাজের জন্য নিশ্চিতকরণ প্রয়োজন।";
     const suggestionLabels = assistantLanguage === "hi"
-      ? ["पिछले 9 दिनों का पानी","मोटर बंद करें","अलार्म बनाएँ","पानी के डेटा का विश्लेषण"]
+      ? ["पिछले 9 दिनों का पानी","मोटर बंद करें","पानी के डेटा का विश्लेषण"]
       : assistantLanguage === "bn"
-        ? ["গত ৯ দিনের পানির ব্যবহার","মোটর বন্ধ করুন","অ্যালার্ম তৈরি করুন","পানির ডেটা বিশ্লেষণ"]
-        : ["9-day water usage","Turn motor off","Create an alarm","Analyse my water data"];
+        ? ["গত ৯ দিনের পানির ব্যবহার","মোটর বন্ধ করুন","পানির ডেটা বিশ্লেষণ"]
+        : ["9-day water usage","Turn motor off","Analyse my water data"];
     root.querySelectorAll(".cascade-chat-suggestions button").forEach((button,index) => { button.textContent = suggestionLabels[index] || button.textContent; });
   }
   applyLanguage();
