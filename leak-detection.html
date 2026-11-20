@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>Cascade | Leak Detection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20261120-leak-soon-1">
+  <link rel="stylesheet" href="cascade-responsive.css?v=20261120-leak-soon-1">
+  <link rel="stylesheet" href="mobile-app.css?v=20261120-leak-soon-1">
+  <style>
+    body.leak-detection-page { min-height:100vh; background:#f4f7fb; color:#152238; font-family:'Open Sans',sans-serif; }
+    .leak-page-header { width:min(1120px,calc(100% - 40px)); margin:0 auto; min-height:88px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .leak-page-brand img { display:block; width:min(190px,42vw); height:auto; }
+    .leak-page-home { display:inline-flex; align-items:center; justify-content:center; min-height:42px; padding:0 18px; border:1px solid #dce5ef; border-radius:12px; background:#fff; color:#334155; text-decoration:none; font-weight:700; font-size:14px; }
+    .leak-coming-soon { width:min(1120px,calc(100% - 40px)); min-height:calc(100vh - 110px); margin:0 auto; display:grid; place-items:center; padding:30px 0 70px; }
+    .leak-coming-card { width:min(620px,100%); padding:clamp(32px,7vw,64px) 24px; text-align:center; border:1px solid #e1e8f0; border-radius:28px; background:#fff; box-shadow:0 18px 55px rgba(30,55,90,.07); }
+    .leak-coming-icon { width:68px; height:68px; margin:0 auto 22px; display:grid; place-items:center; border-radius:22px; background:#e9f4ff; color:#2875ce; }
+    .leak-coming-icon svg { width:34px; height:34px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+    .leak-coming-kicker { margin:0 0 12px; color:#2875ce; font-size:12px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+    .leak-coming-card h1 { margin:0; color:#152238; font:800 clamp(30px,6vw,44px)/1.12 'Ubuntu',sans-serif; letter-spacing:-1.2px; }
+    .leak-coming-card p { max-width:390px; margin:16px auto 0; color:#718096; font-size:15px; line-height:1.7; }
+    body.dark-mode.leak-detection-page { background:#101a2a; color:#e6edf7; }
+    body.dark-mode .leak-coming-card, body.dark-mode .leak-page-home { background:#172438; border-color:#2a3b52; color:#e6edf7; }
+    body.dark-mode .leak-coming-card h1 { color:#f2f6fc; }
+    body.dark-mode .leak-coming-card p { color:#a6b4c8; }
+    @media(max-width:600px) { .leak-page-header { min-height:70px; width:calc(100% - 28px); } .leak-coming-soon { width:calc(100% - 28px); min-height:calc(100dvh - 82px); } .leak-coming-card { border-radius:22px; } }
+    html.cascade-native-app .leak-page-header { display:none; }
+    html.cascade-native-app .leak-coming-soon { width:100%; min-height:calc(100dvh - 82px); padding:20px 14px; }
+    html.cascade-native-app .leak-coming-card { padding:38px 22px; border-radius:22px; }
+  </style>
+</head>
+<body class="leak-detection-page">
+  <header class="leak-page-header">
+    <a class="leak-page-brand" href="index.html#home" aria-label="Cascade home"><img src="assets/brand/cascade-horizontal.png" alt="Cascade"></a>
+    <a class="leak-page-home" href="index.html#dashboard">Dashboard</a>
+  </header>
+  <main class="leak-coming-soon">
+    <section class="leak-coming-card" aria-labelledby="leak-coming-title">
+      <div class="leak-coming-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 3c-2.8 4-6 7.1-6 11a6 6 0 0 0 12 0c0-3.9-3.2-7-6-11Z"/><path d="M9 15a3 3 0 0 0 3 3"/></svg>
+      </div>
+      <p class="leak-coming-kicker">CASCADE FEATURE</p>
+      <h1 id="leak-coming-title">Leak Detection</h1>
+      <p>Coming Soon</p>
+    </section>
+  </main>
+  <script src="mobile-app.js?v=20261120-leak-soon-1"></script>
+</body>
+</html>
