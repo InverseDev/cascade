@@ -751,7 +751,7 @@ body.history-page:not(.dark-mode) #historyThemeToggle:hover {
 
 /* Use the shared Cascade typography pair on this page as well. */
 html, body, body * { font-family: "Montserrat", sans-serif !important; }
-h1, h2, h3, h4, h5, h6, .alarm-page-heading, .history-page-heading { font-family: "Poppins", "Montserrat", sans-serif !important; }
+h1, h2, h3, h4, h5, h6, .history-page-heading { font-family: "Poppins", "Montserrat", sans-serif !important; }
 
 /* Keep all page headings and subheadings in the shared Poppins display font. */
 h1, h2, h3, h4, h5, h6,
