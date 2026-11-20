@@ -3,6 +3,21 @@
   const Capacitor = window.Capacitor;
   if (!Capacitor || typeof Capacitor.isNativePlatform !== "function" || !Capacitor.isNativePlatform()) return;
   const LocalNotifications = Capacitor.registerPlugin?.("LocalNotifications") || Capacitor.Plugins?.LocalNotifications || null;
+  // Clear old locally scheduled notification records and cancel their native entries.
+  (async () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("cascade_scheduled_alarms") || "[]");
+      if (Array.isArray(saved) && saved.length && LocalNotifications?.cancel) {
+        const notifications = saved.map(item => {
+          let hash = 0;
+          for (const ch of String(item.id || "")) hash = (hash * 31 + ch.charCodeAt(0)) | 0;
+          return { id: 200000 + (Math.abs(hash) % 1000000000) };
+        });
+        await LocalNotifications.cancel({ notifications });
+      }
+    } catch (_) {}
+    try { localStorage.removeItem("cascade_scheduled_alarms"); } catch (_) {}
+  })();
   if (window.__cascadeNativeShell) return;
   window.__cascadeNativeShell = true;
 
