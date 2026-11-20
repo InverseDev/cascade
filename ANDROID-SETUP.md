@@ -76,7 +76,7 @@ The Capacitor build now enables a dedicated Android app shell when it runs insid
 
 The Android shell adds:
 - A compact Cascade-branded app bar with the live device connection state sourced from the existing dashboard.
-- Persistent bottom navigation for Dashboard, History, Alarms, and Assistant.
+- Persistent bottom navigation for Dashboard, History, and Assistant.
 - Android safe-area spacing, touch-sized controls, and app-focused layouts.
 - The existing HTML, CSS, JavaScript, Supabase, and Cloudflare Worker flows remain shared; this does not create a second backend.
 
@@ -95,4 +95,4 @@ An already-installed APK does **not** silently update just because GitHub receiv
 - The Capacitor app bundles the website locally; it does not simply open the GitHub Pages URL.
 - Supabase and the public Cloudflare Worker endpoint can be shared by both versions.
 - Never place Supabase service-role keys, Gemini API keys, or device secrets in the frontend.
-- Native notification scheduling and background monitoring are separate enhancements. The current setup packages the existing website; it does not automatically turn browser reminders into reliable Android background alarms.
+- Native background monitoring is a separate enhancement. The current setup packages the existing website and does not guarantee background delivery when Android restricts app activity.
