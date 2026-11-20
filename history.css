@@ -740,7 +740,7 @@ body.history-page:not(.dark-mode) #historyThemeToggle:hover {
 .cascade-footer{
     align-items: left;
 }
-.alarm-brand-logo {
+.history-brand-logo {
     display: block;
     width: auto;
     height: 60px;
