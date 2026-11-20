@@ -282,7 +282,7 @@
     if (assistantLanguage === "bn") {
       if (/^(hi|hello|hey|নমস্কার|হ্যালো)/i.test(text)) return "নমস্কার! Cascade-এর ফিচার এবং ড্যাশবোর্ড ব্যবহার করতে আমি সাহায্য করতে পারি।";
       if (/how.*work|working|process|flow|কীভাবে কাজ|কিভাবে চলে/.test(q)) return "Cascade-এ আল্ট্রাসোনিক সেন্সর পানির স্তর মাপে। ESP32 রিডিং প্রসেস করে ড্যাশবোর্ডে পাঠায় এবং কনফিগার করা থাকলে রিলের মাধ্যমে পাম্প নিয়ন্ত্রণ করতে পারে।";
-      if (/feature|dashboard|tank|pump|history|report|ফিচার|ড্যাশবোর্ড|ট্যাঙ্ক|পাম্প|অ্যালার্ট|ইতিহাস/.test(q)) return "ড্যাশবোর্ডে ট্যাঙ্কের স্তর, সেন্সর রিডিং, পাম্পের অবস্থা এবং অ্যালার্ট সেটিং দেখা যায়। History & Reports-এ কার্যকলাপের রেকর্ড থাকে।
+      if (/feature|dashboard|tank|pump|history|report|ফিচার|ড্যাশবোর্ড|ট্যাঙ্ক|পাম্প|অ্যালার্ট|ইতিহাস/.test(q)) return "ড্যাশবোর্ডে ট্যাঙ্কের স্তর, সেন্সর রিডিং, পাম্পের অবস্থা এবং অ্যালার্ট সেটিং দেখা যায়। History & Reports-এ কার্যকলাপের রেকর্ড থাকে।";
       return "আমি Cascade, সেন্সর, ড্যাশবোর্ড, পাম্প নিয়ন্ত্রণ এবং অ্যালার্ট সম্পর্কে সাহায্য করতে পারি।";
     }
     if (/^(hi|hello|hey)\b/.test(q)) return "Hello! I can explain Cascade's features and help you use the dashboard.";
