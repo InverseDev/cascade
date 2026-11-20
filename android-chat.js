@@ -6,7 +6,6 @@
     const QUICK_QUESTIONS = [
         "Tank status",
         "Motor state",
-        "Scheduled alarms",
         "How cutoff works"
     ];
 
@@ -33,20 +32,6 @@
             return "Motor controls require owner authentication on the main Dashboard and automatically block ON commands when tank level reaches the cutoff limit.";
         }
 
-        // 3. Alarms (reads localStorage directly across all pages)
-        if (/alarm|remind|schedule|ringtone/.test(q)) {
-            try {
-                const alarms = JSON.parse(localStorage.getItem("cascade_scheduled_alarms") || "[]");
-                if (!alarms.length) {
-                    return "You have 0 alarms scheduled right now. You can create daily or one-time reminders in the Alarm Center.";
-                }
-                const next = alarms[0];
-                return `You have ${alarms.length} scheduled alarm(s). Next: "${next.name}" at ${next.time} (${next.repeat ? "Daily" : next.date}).`;
-            } catch (_) {
-                return "Manage your tank check reminders and custom ringtones in the Alarm Center.";
-            }
-        }
-
         // 4. History & Logs
         if (/history|log|report|activity/.test(q)) {
             try {
@@ -63,7 +48,7 @@
             return "Cascade monitors overhead tank water levels via ultrasonic sensing and automatically stops the pump at your cutoff threshold to prevent overflow and dry-run damage.";
         }
 
-        return "I can help with live tank water level, motor status, scheduled alarms, recent logs, or overflow cutoff rules. Tap a quick prompt below or ask away!";
+        return "I can help with live tank water level, motor status, recent logs, or overflow cutoff rules. Tap a quick prompt below or ask away!";
     }
 
     function initChat() {
@@ -89,7 +74,7 @@
             </div>
             <div class="cascade-chat-messages" id="cascadeChatMessages">
                 <div class="cascade-msg bot">
-                    Hi! Ask me about your water tank level, motor status, or scheduled alarms.
+                    Hi! Ask me about your water tank level or motor status.
                 </div>
             </div>
             <div class="cascade-chat-chips" id="cascadeChatChips"></div>
