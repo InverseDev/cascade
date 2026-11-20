@@ -26,11 +26,13 @@
   if (localStorage.getItem("fluidops-theme") === "dark") document.body.classList.add("dark-mode");
   const path = window.location.pathname.toLowerCase();
   const isHistory = path.endsWith("history.html");
-  let active = isHistory ? "history" : "dashboard";
+  const isLeakDetection = path.endsWith("leak-detection.html");
+  let active = isHistory ? "history" : isLeakDetection ? "leak" : "dashboard";
 
   const icons = {
     dashboard: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="10" width="8" height="11" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/></svg>',
     history: '<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>',
+    leak: '<svg viewBox="0 0 24 24"><path d="M12 3c-2.8 4-6 7.1-6 11a6 6 0 0 0 12 0c0-3.9-3.2-7-6-11Z"/><path d="M9 15a3 3 0 0 0 3 3"/></svg>',
     assistant: '<svg viewBox="0 0 24 24"><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Z"/><path d="m19 14 1.2 2.8L23 18l-2.8 1.2L19 22l-1.2-2.8L15 18l2.8-1.2L19 14Z"/></svg>'
   };
 
@@ -47,7 +49,7 @@
   const nav = document.createElement("nav");
   nav.className = "cascade-app-bottom-nav";
   nav.setAttribute("aria-label", "Main navigation");
-  const items = [["dashboard","Home","index.html#dashboard"],["history","History","history.html"],["assistant","AI","#assistant"]];
+  const items = [["dashboard","Home","index.html#dashboard"],["history","History","history.html"],["leak","Leak Detection","leak-detection.html"],["assistant","AI","#assistant"]];
   const navButtons = {};
   items.forEach(([key,label,href]) => {
     const item = document.createElement("a");
