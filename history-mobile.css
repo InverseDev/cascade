@@ -11,7 +11,7 @@
   /* ───── HEADER: logo + theme on row 1, Home + Back on row 2 ───── */
   html body.history-page .history-navbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 8px;padding:10px 16px}
   html body.history-page .history-brand{order:1;flex:1 1 auto;min-width:0;display:flex;align-items:center}
-  html body.history-page .alarm-brand-logo{height:34px;width:auto;max-width:min(170px,46vw)}
+  html body.history-page .history-brand-logo{height:34px;width:auto;max-width:min(170px,46vw)}
   html body.history-page .history-nav-actions{display:contents}                 /* its 3 children join the header row */
   html body.history-page #historyThemeToggle{order:2;display:inline-flex;align-items:center;justify-content:center;
     width:40px;height:40px;padding:0;font-size:18px;border-radius:13px}
@@ -95,7 +95,7 @@
 }
 
 @media (max-width:360px){
-  html body.history-page .alarm-brand-logo{height:30px}
+  html body.history-page .history-brand-logo{height:30px}
   html body.history-page .summary-card strong{font-size:26px}
 }
 
